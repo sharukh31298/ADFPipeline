@@ -1,0 +1,140 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "usagemetricsadf"
+		},
+		"getgroups_api_ds_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'getgroups_api_ds'"
+		},
+		"getgroups_sql_ls_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'getgroups_sql_ls'"
+		},
+		"getreports_api_ls_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'getreports_api_ls'"
+		},
+		"getreports_sql_ds_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'getreports_sql_ds'"
+		},
+		"getusers_api_ls_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'getusers_api_ls'"
+		},
+		"viewreport_api_ls_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'viewreport_api_ls'"
+		},
+		"getgroups_api_ds_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?%24top=2000"
+		},
+		"getgroups_api_ds_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"getreports_api_ls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/groups/',linkedService().groupid,'/reports')}"
+		},
+		"getreports_api_ls_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"getusers_api_ls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/reports/',linkedService().reportid,'/users')}"
+		},
+		"getusers_api_ls_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"viewreport_api_ls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime=''',substring(addDays(utcNow(), -2), 0, 10),'T00%3A00%3A00.000Z''&endDateTime=''',substring(addDays(utcNow(), -2), 0, 10),'T23%3A59%3A59.000Z''&%24filter=Activity%20eq%20''viewreport''')}"
+		},
+		"viewreport_api_ls_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "usagemetricsadf_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"getgroups_api_ds_clientSecret": {
+						"value": "[parameters('getgroups_api_ds_clientSecret')]"
+					},
+					"getgroups_sql_ls_connectionString": {
+						"value": "[parameters('getgroups_sql_ls_connectionString')]"
+					},
+					"getreports_api_ls_clientSecret": {
+						"value": "[parameters('getreports_api_ls_clientSecret')]"
+					},
+					"getreports_sql_ds_connectionString": {
+						"value": "[parameters('getreports_sql_ds_connectionString')]"
+					},
+					"getusers_api_ls_clientSecret": {
+						"value": "[parameters('getusers_api_ls_clientSecret')]"
+					},
+					"viewreport_api_ls_clientSecret": {
+						"value": "[parameters('viewreport_api_ls_clientSecret')]"
+					},
+					"getgroups_api_ds_properties_typeProperties_url": {
+						"value": "[parameters('getgroups_api_ds_properties_typeProperties_url')]"
+					},
+					"getgroups_api_ds_properties_typeProperties_clientId": {
+						"value": "[parameters('getgroups_api_ds_properties_typeProperties_clientId')]"
+					},
+					"getreports_api_ls_properties_typeProperties_url": {
+						"value": "[parameters('getreports_api_ls_properties_typeProperties_url')]"
+					},
+					"getreports_api_ls_properties_typeProperties_clientId": {
+						"value": "[parameters('getreports_api_ls_properties_typeProperties_clientId')]"
+					},
+					"getusers_api_ls_properties_typeProperties_url": {
+						"value": "[parameters('getusers_api_ls_properties_typeProperties_url')]"
+					},
+					"getusers_api_ls_properties_typeProperties_clientId": {
+						"value": "[parameters('getusers_api_ls_properties_typeProperties_clientId')]"
+					},
+					"viewreport_api_ls_properties_typeProperties_url": {
+						"value": "[parameters('viewreport_api_ls_properties_typeProperties_url')]"
+					},
+					"viewreport_api_ls_properties_typeProperties_clientId": {
+						"value": "[parameters('viewreport_api_ls_properties_typeProperties_clientId')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
