@@ -21,7 +21,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "getreports_sql_ds",
+						"referenceName": "getreports_current_sql_ds",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -61,6 +61,15 @@
 							"typeProperties": {
 								"source": {
 									"type": "RestSource",
+									"additionalColumns": [
+										{
+											"name": "report_id",
+											"value": {
+												"value": "@item().id",
+												"type": "Expression"
+											}
+										}
+									],
 									"httpRequestTimeout": "00:01:40",
 									"requestInterval": "00.00:00:00.010",
 									"requestMethod": "GET",
@@ -73,7 +82,53 @@
 									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false
 								},
-								"enableStaging": false
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['reportUserAccessRight']"
+											}
+										},
+										{
+											"source": {
+												"path": "['emailAddress']"
+											}
+										},
+										{
+											"source": {
+												"path": "['displayName']"
+											}
+										},
+										{
+											"source": {
+												"path": "['identifier']"
+											}
+										},
+										{
+											"source": {
+												"path": "['graphId']"
+											}
+										},
+										{
+											"source": {
+												"path": "['principalType']"
+											}
+										},
+										{
+											"source": {
+												"path": "['userType']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['report_id']"
+											}
+										}
+									],
+									"collectionReference": "$['value']"
+								}
 							},
 							"inputs": [
 								{
@@ -89,7 +144,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "getreports_sql_ds",
+									"referenceName": "getreports_current_sql_ds",
 									"type": "DatasetReference"
 								}
 							]

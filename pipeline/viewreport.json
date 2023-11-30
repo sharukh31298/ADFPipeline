@@ -29,7 +29,33 @@
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['activityEventEntities'][0]"
+								}
+							},
+							{
+								"source": {
+									"path": "$['continuationUri']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['continuationToken']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastResultSet']"
+								}
+							}
+						],
+						"collectionReference": ""
+					}
 				},
 				"inputs": [
 					{
@@ -39,7 +65,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "getreports_sql_ds",
+						"referenceName": "getreports_current_sql_ds",
 						"type": "DatasetReference"
 					}
 				]

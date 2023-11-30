@@ -61,6 +61,12 @@
 							"typeProperties": {
 								"source": {
 									"type": "RestSource",
+									"additionalColumns": [
+										{
+											"name": "group_id",
+											"value": "@item().id"
+										}
+									],
 									"httpRequestTimeout": "00:01:40",
 									"requestInterval": "00.00:00:00.010",
 									"requestMethod": "GET",
@@ -73,7 +79,112 @@
 									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false
 								},
-								"enableStaging": false
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['id']"
+											},
+											"sink": {
+												"name": "id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['reportType']"
+											},
+											"sink": {
+												"name": "report_type",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['name']"
+											},
+											"sink": {
+												"name": "name",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['webUrl']"
+											},
+											"sink": {
+												"name": "web_url",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['embedUrl']"
+											},
+											"sink": {
+												"name": "embed_url",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['datasetId']"
+											},
+											"sink": {
+												"name": "dataset_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['createdDateTime']"
+											},
+											"sink": {
+												"name": "created_date_time",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['modifiedDateTime']"
+											},
+											"sink": {
+												"name": "modified_date_time",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['modifiedBy']"
+											},
+											"sink": {
+												"name": "modified_by",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['createdBy']"
+											},
+											"sink": {
+												"name": "created_by",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['group_id']"
+											},
+											"sink": {
+												"name": "group_id",
+												"type": "String"
+											}
+										}
+									],
+									"collectionReference": "$['value']"
+								}
 							},
 							"inputs": [
 								{
@@ -89,7 +200,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "getreports_sql_ds",
+									"referenceName": "getreports_current_sql_ds",
 									"type": "DatasetReference"
 								}
 							]
