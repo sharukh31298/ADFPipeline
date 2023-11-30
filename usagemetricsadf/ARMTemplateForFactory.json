@@ -31,6 +31,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'viewreport_api_ls'"
 		},
+		"viewreport_history_api_ls_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'viewreport_history_api_ls'"
+		},
 		"getgroups_api_ds_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?%24top=2000"
@@ -60,6 +64,14 @@
 			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime=''',substring(addDays(utcNow(), -2), 0, 10),'T00%3A00%3A00.000Z''&endDateTime=''',substring(addDays(utcNow(), -2), 0, 10),'T23%3A59%3A59.000Z''&%24filter=Activity%20eq%20''viewreport''')}"
 		},
 		"viewreport_api_ls_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"viewreport_history_api_ls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime=''',substring(addDays(utcNow(), -1), 0, 10),'T00%3A00%3A00.000Z''&endDateTime=''',substring(addDays(utcNow(), -1), 0, 10),'T23%3A59%3A59.000Z''&%24filter=Activity%20eq%20''viewreport''')}"
+		},
+		"viewreport_history_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		}
@@ -101,7 +113,94 @@
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false
 							},
-							"enableStaging": false
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['id']"
+										},
+										"sink": {
+											"name": "id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isReadOnly']"
+										},
+										"sink": {
+											"name": "is_read_only",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isOnDedicatedCapacity']"
+										},
+										"sink": {
+											"name": "is_on_dedicated_capacity",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['capacityMigrationStatus']"
+										},
+										"sink": {
+											"name": "capacity_migration_status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['description']"
+										},
+										"sink": {
+											"name": "description",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['type']"
+										},
+										"sink": {
+											"name": "type",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['state']"
+										},
+										"sink": {
+											"name": "state",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['hasWorkspaceLevelSettings ']"
+										},
+										"sink": {
+											"name": "has_workspace_level_settings",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['name']"
+										},
+										"sink": {
+											"name": "name",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "$['value']"
+							}
 						},
 						"inputs": [
 							{
@@ -196,6 +295,15 @@
 									"typeProperties": {
 										"source": {
 											"type": "RestSource",
+											"additionalColumns": [
+												{
+													"name": "group_id",
+													"value": {
+														"value": "@item().id",
+														"type": "Expression"
+													}
+												}
+											],
 											"httpRequestTimeout": "00:01:40",
 											"requestInterval": "00.00:00:00.010",
 											"requestMethod": "GET",
@@ -208,7 +316,112 @@
 											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false
 										},
-										"enableStaging": false
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"path": "[['id']"
+													},
+													"sink": {
+														"name": "id",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['reportType']"
+													},
+													"sink": {
+														"name": "report_type",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['name']"
+													},
+													"sink": {
+														"name": "name",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['webUrl']"
+													},
+													"sink": {
+														"name": "web_url",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['embedUrl']"
+													},
+													"sink": {
+														"name": "embed_url",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['datasetId']"
+													},
+													"sink": {
+														"name": "dataset_id",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['createdDateTime']"
+													},
+													"sink": {
+														"name": "created_date_time",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['modifiedDateTime']"
+													},
+													"sink": {
+														"name": "modified_date_time",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['modifiedBy']"
+													},
+													"sink": {
+														"name": "modified_by",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['createdBy']"
+													},
+													"sink": {
+														"name": "created_by",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['group_id']"
+													},
+													"sink": {
+														"name": "group_id",
+														"type": "String"
+													}
+												}
+											],
+											"collectionReference": "$['value']"
+										}
 									},
 									"inputs": [
 										{
@@ -312,6 +525,15 @@
 									"typeProperties": {
 										"source": {
 											"type": "RestSource",
+											"additionalColumns": [
+												{
+													"name": "report_id",
+													"value": {
+														"value": "@item().id",
+														"type": "Expression"
+													}
+												}
+											],
 											"httpRequestTimeout": "00:01:40",
 											"requestInterval": "00.00:00:00.010",
 											"requestMethod": "GET",
@@ -324,7 +546,85 @@
 											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false
 										},
-										"enableStaging": false
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"path": "[['reportUserAccessRight']"
+													},
+													"sink": {
+														"name": "report_user_access_right",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['emailAddress']"
+													},
+													"sink": {
+														"name": "email_address",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['displayName']"
+													},
+													"sink": {
+														"name": "display_name",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['identifier']"
+													},
+													"sink": {
+														"name": "identifier",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['graphId']"
+													},
+													"sink": {
+														"name": "graph_id",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['principalType']"
+													},
+													"sink": {
+														"name": "principal_type",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['userType']"
+													},
+													"sink": {
+														"name": "user_type",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "$['report_id']"
+													},
+													"sink": {
+														"name": "report_id",
+														"type": "varchar"
+													}
+												}
+											],
+											"collectionReference": "$['value']"
+										}
 									},
 									"inputs": [
 										{
@@ -340,7 +640,7 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "getreports_sql_ds",
+											"referenceName": "getusers_sql_ds",
 											"type": "DatasetReference",
 											"parameters": {}
 										}
@@ -358,7 +658,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/getreports_sql_ds')]",
-				"[concat(variables('factoryId'), '/datasets/getusers_api_ds')]"
+				"[concat(variables('factoryId'), '/datasets/getusers_api_ds')]",
+				"[concat(variables('factoryId'), '/datasets/getusers_sql_ds')]"
 			]
 		},
 		{
@@ -394,7 +695,301 @@
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false
 							},
-							"enableStaging": false
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['Id']"
+										},
+										"sink": {
+											"name": "Id",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['RecordType']"
+										},
+										"sink": {
+											"name": "RecordType",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"path": "[['CreationTime']"
+										},
+										"sink": {
+											"name": "CreationTime",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "[['Operation']"
+										},
+										"sink": {
+											"name": "Operation",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['OrganizationId']"
+										},
+										"sink": {
+											"name": "OrganizationId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['UserType']"
+										},
+										"sink": {
+											"name": "UserType",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"path": "[['UserKey']"
+										},
+										"sink": {
+											"name": "UserKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['Workload']"
+										},
+										"sink": {
+											"name": "Workload",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['UserId']"
+										},
+										"sink": {
+											"name": "UserId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ClientIP']"
+										},
+										"sink": {
+											"name": "ClientIP",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['Activity']"
+										},
+										"sink": {
+											"name": "Activity",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ItemName']"
+										},
+										"sink": {
+											"name": "ItemName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['WorkSpaceName']"
+										},
+										"sink": {
+											"name": "WorkSpaceName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['DatasetName']"
+										},
+										"sink": {
+											"name": "DatasetName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ReportName']"
+										},
+										"sink": {
+											"name": "ReportName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['CapacityId']"
+										},
+										"sink": {
+											"name": "CapacityId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['CapacityName']"
+										},
+										"sink": {
+											"name": "CapacityName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['WorkspaceId']"
+										},
+										"sink": {
+											"name": "WorkspaceId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ObjectId']"
+										},
+										"sink": {
+											"name": "ObjectId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['DatasetId']"
+										},
+										"sink": {
+											"name": "DatasetId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ReportId']"
+										},
+										"sink": {
+											"name": "ReportId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['EmbedTokenId']"
+										},
+										"sink": {
+											"name": "EmbedTokenId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ArtifactId']"
+										},
+										"sink": {
+											"name": "ArtifactId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ArtifactName']"
+										},
+										"sink": {
+											"name": "ArtifactName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['IsSuccess']"
+										},
+										"sink": {
+											"name": "IsSuccess",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ReportType']"
+										},
+										"sink": {
+											"name": "ReportType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['RequestId']"
+										},
+										"sink": {
+											"name": "RequestId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ActivityId']"
+										},
+										"sink": {
+											"name": "ActivityId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['DistributionMethod']"
+										},
+										"sink": {
+											"name": "DistributionMethod",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ConsumptionMethod']"
+										},
+										"sink": {
+											"name": "ConsumptionMethod",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ArtifactKind']"
+										},
+										"sink": {
+											"name": "ArtifactKind",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['RefreshEnforcementPolicy']"
+										},
+										"sink": {
+											"name": "RefreshEnforcementPolicy",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "$['activityEventEntities']"
+							}
 						},
 						"inputs": [
 							{
@@ -405,7 +1000,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "getreports_sql_ds",
+								"referenceName": "viewreports_sql_ds",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -420,7 +1015,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/viewreport_api_ds')]",
-				"[concat(variables('factoryId'), '/datasets/getreports_sql_ds')]"
+				"[concat(variables('factoryId'), '/datasets/viewreports_sql_ds')]"
 			]
 		},
 		{
@@ -505,7 +1100,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "reports"
+					"table": "viewreports"
 				}
 			},
 			"dependsOn": [
@@ -542,6 +1137,66 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/getusers_sql_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "report_user_access_right",
+						"type": "varchar"
+					},
+					{
+						"name": "email_address",
+						"type": "varchar"
+					},
+					{
+						"name": "display_name",
+						"type": "varchar"
+					},
+					{
+						"name": "identifier",
+						"type": "varchar"
+					},
+					{
+						"name": "graph_id",
+						"type": "varchar"
+					},
+					{
+						"name": "principal_type",
+						"type": "varchar"
+					},
+					{
+						"name": "user_type",
+						"type": "varchar"
+					},
+					{
+						"name": "report_id",
+						"type": "varchar"
+					},
+					{
+						"name": "updated_time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "users"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/viewreport_api_ds')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -552,11 +1207,167 @@
 				},
 				"annotations": [],
 				"type": "RestResource",
-				"typeProperties": {},
+				"typeProperties": {
+					"relativeUrl": "6b157947-34a1-48c0-8cad-d99e224d004b"
+				},
 				"schema": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/viewreport_api_ls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/viewreports_sql_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "Id",
+						"type": "varchar"
+					},
+					{
+						"name": "RecordType",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CreationTime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "Operation",
+						"type": "varchar"
+					},
+					{
+						"name": "OrganizationId",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "UserKey",
+						"type": "varchar"
+					},
+					{
+						"name": "Workload",
+						"type": "varchar"
+					},
+					{
+						"name": "UserId",
+						"type": "varchar"
+					},
+					{
+						"name": "ClientIP",
+						"type": "varchar"
+					},
+					{
+						"name": "Activity",
+						"type": "varchar"
+					},
+					{
+						"name": "ItemName",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceName",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetName",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportName",
+						"type": "varchar"
+					},
+					{
+						"name": "CapacityId",
+						"type": "varchar"
+					},
+					{
+						"name": "CapacityName",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkspaceId",
+						"type": "varchar"
+					},
+					{
+						"name": "ObjectId",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetId",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportId",
+						"type": "varchar"
+					},
+					{
+						"name": "EmbedTokenId",
+						"type": "varchar"
+					},
+					{
+						"name": "ArtifactId",
+						"type": "varchar"
+					},
+					{
+						"name": "ArtifactName",
+						"type": "varchar"
+					},
+					{
+						"name": "IsSuccess",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportType",
+						"type": "varchar"
+					},
+					{
+						"name": "RequestId",
+						"type": "varchar"
+					},
+					{
+						"name": "ActivityId",
+						"type": "varchar"
+					},
+					{
+						"name": "DistributionMethod",
+						"type": "varchar"
+					},
+					{
+						"name": "ConsumptionMethod",
+						"type": "varchar"
+					},
+					{
+						"name": "ArtifactKind",
+						"type": "varchar"
+					},
+					{
+						"name": "RefreshEnforcementPolicy",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "viewreports"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
 			]
 		},
 		{
@@ -679,7 +1490,32 @@
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default",
-					"dataFactoryName": "UsageMetricsDF"
+					"dataFactoryName": "UsageMetricsDF",
+					"clientsecret": ".TR8Q~Jhhvx3rUBMXX4Ksyr1XZNMO8OellLDNazb"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/viewreport_history_api_ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('viewreport_history_api_ls_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": "true",
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('viewreport_history_api_ls_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('viewreport_history_api_ls_clientSecret')]"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default",
+					"dataFactoryName": "UsageMetricsDF",
+					"clientsecret": ".TR8Q~Jhhvx3rUBMXX4Ksyr1XZNMO8OellLDNazb"
 				}
 			},
 			"dependsOn": []
