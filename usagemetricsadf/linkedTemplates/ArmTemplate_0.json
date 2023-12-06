@@ -27,9 +27,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'getusers_api_ls'"
 		},
-		"viewreport_api_ls_clientSecret": {
+		"view_report_api_ls_clientSecret": {
 			"type": "secureString",
-			"metadata": "Secure string for 'clientSecret' of 'viewreport_api_ls'"
+			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
 		"viewreport_history_api_ls_clientSecret": {
 			"type": "secureString",
@@ -59,11 +59,11 @@
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		},
-		"viewreport_api_ls_properties_typeProperties_url": {
+		"view_report_api_ls_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime=''',substring(addDays(utcNow(), -1), 0, 10),'T00%3A00%3A00.000Z''&endDateTime=''',substring(addDays(utcNow(), -1), 0, 10),'T23%3A59%3A59.000Z''&%24filter=Activity%20eq%20''viewreport''')}"
 		},
-		"viewreport_api_ls_properties_typeProperties_clientId": {
+		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		},
@@ -183,20 +183,20 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/viewreport_api_ls')]",
+			"name": "[concat(parameters('factoryName'), '/view_report_api_ls')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"annotations": [],
 				"type": "RestService",
 				"typeProperties": {
-					"url": "[parameters('viewreport_api_ls_properties_typeProperties_url')]",
+					"url": "[parameters('view_report_api_ls_properties_typeProperties_url')]",
 					"enableServerCertificateValidation": "true",
 					"authenticationType": "OAuth2ClientCredential",
-					"clientId": "[parameters('viewreport_api_ls_properties_typeProperties_clientId')]",
+					"clientId": "[parameters('view_report_api_ls_properties_typeProperties_clientId')]",
 					"clientSecret": {
 						"type": "SecureString",
-						"value": "[parameters('viewreport_api_ls_clientSecret')]"
+						"value": "[parameters('view_report_api_ls_clientSecret')]"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default",
@@ -414,8 +414,14 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "viewreport_api_ls",
+					"referenceName": "view_report_api_ls",
 					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"urldate": {
+						"type": "string",
+						"defaultValue": "@dataset().urldate"
+					}
 				},
 				"annotations": [],
 				"type": "RestResource",
@@ -425,7 +431,7 @@
 				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/viewreport_api_ls')]"
+				"[concat(variables('factoryId'), '/linkedServices/view_report_api_ls')]"
 			]
 		},
 		{
@@ -1497,7 +1503,9 @@
 							{
 								"referenceName": "viewreport_api_ds",
 								"type": "DatasetReference",
-								"parameters": {}
+								"parameters": {
+									"urldate": "@dataset().urldate"
+								}
 							}
 						],
 						"outputs": [
@@ -1511,6 +1519,12 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"urldate": {
+						"type": "string",
+						"defaultValue": "@substring(addDays(utcNow(), -1), 0, 10)"
+					}
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T09:03:18Z"
@@ -1541,9 +1555,8 @@
 					"recurrence": {
 						"frequency": "Day",
 						"interval": 1,
-						"startTime": "2023-11-30T13:00:00",
-						"timeZone": "India Standard Time",
-						"schedule": {}
+						"startTime": "2023-11-30T11:54:00",
+						"timeZone": "India Standard Time"
 					}
 				}
 			},
