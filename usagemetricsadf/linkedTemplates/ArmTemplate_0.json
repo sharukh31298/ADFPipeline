@@ -61,7 +61,7 @@
 		},
 		"view_report_api_ls_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime=''',substring(addDays(utcNow(), -1), 0, 10),'T00%3A00%3A00.000Z''&endDateTime=''',substring(addDays(utcNow(), -1), 0, 10),'T23%3A59%3A59.000Z''&%24filter=Activity%20eq%20''viewreport''')}"
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime=''',linkedService().urldate,'T00%3A00%3A00.000Z''&endDateTime=''',linkedService().urldate,'T23%3A59%3A59.000Z''&%24filter=Activity%20eq%20''viewreport''')}"
 		},
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
@@ -187,6 +187,12 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"urldate": {
+						"type": "string",
+						"defaultValue": "@substring(addDays(utcNow(), -1), 0, 10)"
+					}
+				},
 				"annotations": [],
 				"type": "RestService",
 				"typeProperties": {
@@ -200,8 +206,7 @@
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default",
-					"dataFactoryName": "usagemetricsadf",
-					"clientsecret": ".TR8Q~Jhhvx3rUBMXX4Ksyr1XZNMO8OellLDNazb"
+					"dataFactoryName": "usagemetricsadf"
 				}
 			},
 			"dependsOn": []
@@ -415,12 +420,9 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "view_report_api_ls",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"urldate": {
-						"type": "string",
-						"defaultValue": "@dataset().urldate"
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"urldate": "@substring(addDays(utcNow(), -1), 0, 10)"
 					}
 				},
 				"annotations": [],
@@ -1503,9 +1505,7 @@
 							{
 								"referenceName": "viewreport_api_ds",
 								"type": "DatasetReference",
-								"parameters": {
-									"urldate": "@dataset().urldate"
-								}
+								"parameters": {}
 							}
 						],
 						"outputs": [
@@ -1519,12 +1519,6 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"urldate": {
-						"type": "string",
-						"defaultValue": "@substring(addDays(utcNow(), -1), 0, 10)"
-					}
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T09:03:18Z"
@@ -1553,9 +1547,9 @@
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2023-11-30T11:54:00",
+						"frequency": "Minute",
+						"interval": 5,
+						"startTime": "2023-11-30T12:15:00",
 						"timeZone": "India Standard Time"
 					}
 				}
