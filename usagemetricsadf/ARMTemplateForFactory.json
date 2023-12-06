@@ -110,8 +110,15 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"id"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
 							"translator": {
@@ -1547,8 +1554,8 @@
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
-						"frequency": "Minute",
-						"interval": 5,
+						"frequency": "Day",
+						"interval": 1,
 						"startTime": "2023-11-30T12:15:00",
 						"timeZone": "India Standard Time"
 					}
