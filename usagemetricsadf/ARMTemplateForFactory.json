@@ -320,8 +320,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"id"
+												]
+											},
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
 										},
 										"enableStaging": false,
 										"translator": {
@@ -550,8 +557,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"graph_id"
+												]
+											},
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
 										},
 										"enableStaging": false,
 										"translator": {
@@ -667,6 +681,216 @@
 				"[concat(variables('factoryId'), '/datasets/getreports_sql_ds')]",
 				"[concat(variables('factoryId'), '/datasets/getusers_api_ds')]",
 				"[concat(variables('factoryId'), '/datasets/getusers_sql_ds')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/getusers_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "getreports_sql_ds",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Copy data1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"additionalColumns": [
+												{
+													"name": "report_id",
+													"value": {
+														"value": "@item().id",
+														"type": "Expression"
+													}
+												}
+											],
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"graph_id"
+												]
+											},
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"path": "[['reportUserAccessRight']"
+													},
+													"sink": {
+														"name": "report_user_access_right",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['emailAddress']"
+													},
+													"sink": {
+														"name": "email_address",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['displayName']"
+													},
+													"sink": {
+														"name": "display_name",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['identifier']"
+													},
+													"sink": {
+														"name": "identifier",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['graphId']"
+													},
+													"sink": {
+														"name": "graph_id",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['principalType']"
+													},
+													"sink": {
+														"name": "principal_type",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "[['userType']"
+													},
+													"sink": {
+														"name": "user_type",
+														"type": "varchar"
+													}
+												},
+												{
+													"source": {
+														"path": "$['report_id']"
+													},
+													"sink": {
+														"name": "report_id",
+														"type": "varchar"
+													}
+												}
+											],
+											"collectionReference": "$['value']"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "getusers_api_ds",
+											"type": "DatasetReference",
+											"parameters": {
+												"report_id": {
+													"value": "@item().id",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "getusersql_ds_1",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-11-29T06:27:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/getreports_sql_ds')]",
+				"[concat(variables('factoryId'), '/datasets/getusers_api_ds')]",
+				"[concat(variables('factoryId'), '/datasets/getusersql_ds_1')]"
 			]
 		},
 		{
@@ -1197,6 +1421,66 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "users"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/getusersql_ds_1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "report_user_access_right",
+						"type": "varchar"
+					},
+					{
+						"name": "email_address",
+						"type": "varchar"
+					},
+					{
+						"name": "display_name",
+						"type": "varchar"
+					},
+					{
+						"name": "identifier",
+						"type": "varchar"
+					},
+					{
+						"name": "graph_id",
+						"type": "varchar"
+					},
+					{
+						"name": "principal_type",
+						"type": "varchar"
+					},
+					{
+						"name": "user_type",
+						"type": "varchar"
+					},
+					{
+						"name": "report_id",
+						"type": "varchar"
+					},
+					{
+						"name": "updated_time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "users1"
 				}
 			},
 			"dependsOn": [
