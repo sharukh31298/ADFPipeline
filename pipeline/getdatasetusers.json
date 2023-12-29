@@ -1,0 +1,208 @@
+{
+	"name": "getdatasetusers",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "getdataset_sql_ds",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup1').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Copy data1",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"additionalColumns": [
+										{
+											"name": "dataset_id",
+											"value": {
+												"value": "@item().id",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "workspace_id",
+											"value": {
+												"value": "@item().workspaceId",
+												"type": "Expression"
+											}
+										}
+									],
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['datasetUserAccessRight']"
+											},
+											"sink": {
+												"name": "datasetUserAccessRight",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['emailAddress']"
+											},
+											"sink": {
+												"name": "emailAddress",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['displayName']"
+											},
+											"sink": {
+												"name": "displayName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['identifier']"
+											},
+											"sink": {
+												"name": "identifier",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['graphId']"
+											},
+											"sink": {
+												"name": "graphId",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['principalType']"
+											},
+											"sink": {
+												"name": "principalType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['userType']"
+											},
+											"sink": {
+												"name": "userType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['dataset_id']"
+											},
+											"sink": {
+												"name": "dataset_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['workspace_id']"
+											},
+											"sink": {
+												"name": "workspace_id",
+												"type": "String"
+											}
+										}
+									],
+									"collectionReference": "$['value']"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "getdatasetusers_api_ds",
+									"type": "DatasetReference",
+									"parameters": {
+										"dataset_id": {
+											"value": "@item().id",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "getdatasetusers_sql_ds",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2023-11-29T06:27:10Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
