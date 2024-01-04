@@ -3,7 +3,16 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "getdataset_api_ls",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Created_Date": "@activity('Lookup1').output.MaxModifiedDate"
+			}
+		},
+		"parameters": {
+			"Created_Date": {
+				"type": "string",
+				"defaultValue": "@activity('Lookup1').output.MaxModifiedDate"
+			}
 		},
 		"annotations": [],
 		"type": "RestResource",
