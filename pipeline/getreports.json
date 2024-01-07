@@ -204,8 +204,8 @@
 				}
 			},
 			{
-				"name": "Script1",
-				"type": "Script",
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
 						"activity": "ForEach1",
@@ -222,18 +222,12 @@
 					"secureInput": false
 				},
 				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_DLPC_reports]"
+				},
 				"linkedServiceName": {
 					"referenceName": "getgroups_sql_ls",
 					"type": "LinkedServiceReference"
-				},
-				"typeProperties": {
-					"scripts": [
-						{
-							"type": "Query",
-							"text": "UPDATE [dbo].[DeltaLoadProcessingControl] SET \nMaxModifiedDate = GETDATE()\nWHERE ProcessName = 'Reports'\n"
-						}
-					],
-					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
