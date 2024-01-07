@@ -61,15 +61,6 @@
 							"typeProperties": {
 								"source": {
 									"type": "RestSource",
-									"additionalColumns": [
-										{
-											"name": "group_id",
-											"value": {
-												"value": "@item().id",
-												"type": "Expression"
-											}
-										}
-									],
 									"httpRequestTimeout": "00:01:40",
 									"requestInterval": "00.00:00:00.010",
 									"requestMethod": "GET",
@@ -79,13 +70,7 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"writeBehavior": "upsert",
-									"upsertSettings": {
-										"useTempDB": true,
-										"keys": [
-											"id"
-										]
-									},
+									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false,
 									"disableMetricsCollection": false
 								},
@@ -204,8 +189,7 @@
 										"id": {
 											"value": "@item().id",
 											"type": "Expression"
-										},
-										"date": "@activity('Lookup2').output.MaxModifiedDate"
+										}
 									}
 								}
 							],
