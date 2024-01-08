@@ -5,7 +5,6 @@
 			"referenceName": "getreports_current_api_ls",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"groupid": "@dataset().id",
 				"date": {
 					"value": "@dataset().date",
 					"type": "Expression"
@@ -13,12 +12,9 @@
 			}
 		},
 		"parameters": {
-			"id": {
-				"type": "string"
-			},
 			"date": {
 				"type": "string",
-				"defaultValue": "@item().output.firstRow.MaxModifiedDate"
+				"defaultValue": "@activity('Lookup1').output.firstRow.MaxModifiedDate"
 			}
 		},
 		"annotations": [],
