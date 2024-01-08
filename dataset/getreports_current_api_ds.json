@@ -6,7 +6,10 @@
 			"type": "LinkedServiceReference",
 			"parameters": {
 				"groupid": "@dataset().id",
-				"date": "@activity('Lookup2').output.MaxModifiedDate"
+				"date": {
+					"value": "@dataset().date",
+					"type": "Expression"
+				}
 			}
 		},
 		"parameters": {
@@ -15,7 +18,7 @@
 			},
 			"date": {
 				"type": "string",
-				"defaultValue": "@activity('Lookup2').output.MaxModifiedDate"
+				"defaultValue": "@item().output.firstRow.MaxModifiedDate"
 			}
 		},
 		"annotations": [],
