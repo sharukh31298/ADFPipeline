@@ -24,9 +24,6 @@
 			"transformations": [
 				{
 					"name": "flatten1"
-				},
-				{
-					"name": "AlterRow1"
 				}
 			],
 			"scriptLines": [
@@ -48,7 +45,7 @@
 				"          Refresh_id = body.value.lastRefresh.id,",
 				"          refreshType = body.value.lastRefresh.refreshType,",
 				"          startTime = body.value.lastRefresh.startTime,",
-				"          lastrefresh_endTime = body.value.lastRefresh.endTime,",
+				"          endTime = body.value.lastRefresh.endTime,",
 				"          extendedStatus = body.value.lastRefresh.extendedStatus,",
 				"          requestId = body.value.lastRefresh.requestId,",
 				"          serviceExceptionJson = body.value.lastRefresh.serviceExceptionJson,",
@@ -56,17 +53,27 @@
 				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flatten1",
-				"flatten1 alterRow() ~> AlterRow1",
-				"AlterRow1 sink(allowSchemaDrift: true,",
+				"flatten1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     deletable:false,",
-				"     insertable:false,",
+				"     insertable:true,",
 				"     updateable:false,",
-				"     upsertable:true,",
+				"     upsertable:false,",
 				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          dataset_id,",
+				"          name,",
+				"          kind,",
+				"          Refresh_id,",
+				"          refreshType,",
+				"          startTime,",
+				"          lastrefresh_endTime = endTime,",
+				"          extendedStatus,",
+				"          requestId,",
+				"          serviceExceptionJson,",
+				"          status",
+				"     )) ~> sink1"
 			]
 		}
 	}
