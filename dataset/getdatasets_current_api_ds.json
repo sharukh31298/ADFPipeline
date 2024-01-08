@@ -5,7 +5,16 @@
 			"referenceName": "getdatasets_current_api_ls",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"Created_Date": "@activity('Lookup1').output.MaxModifiedDate"
+				"Created_Date": {
+					"value": "@dataset().Created_Date",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Created_Date": {
+				"type": "string",
+				"defaultValue": "@activity('Lookup1').output.firstRow.MaxModifiedDate"
 			}
 		},
 		"annotations": [],

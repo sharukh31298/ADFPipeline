@@ -201,7 +201,13 @@
 				"inputs": [
 					{
 						"referenceName": "getdatasets_current_api_ds",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"Created_Date": {
+								"value": "@activity('Lookup1').output.firstRow.MaxModifiedDate",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -234,7 +240,7 @@
 						"referenceName": "getcontroltable_sql_ds",
 						"type": "DatasetReference"
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
 				}
 			},
 			{
@@ -244,7 +250,7 @@
 					{
 						"activity": "Copy data1",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
