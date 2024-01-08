@@ -26,11 +26,86 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"id"
+							]
+						},
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
-					"enableStaging": false
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "id",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['reportType']"
+								},
+								"sink": {
+									"name": "reportType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "name",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['webUrl']"
+								},
+								"sink": {
+									"name": "webUrl",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['embedUrl']"
+								},
+								"sink": {
+									"name": "embedUrl",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['datasetId']"
+								},
+								"sink": {
+									"name": "datasetId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['workspaceId']"
+								},
+								"sink": {
+									"name": "workspaceId",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['value']"
+					}
 				},
 				"inputs": [
 					{
@@ -40,7 +115,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "getdataset_sql_ds",
+						"referenceName": "getreports_sql_ds",
 						"type": "DatasetReference"
 					}
 				]
