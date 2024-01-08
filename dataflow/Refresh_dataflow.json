@@ -14,6 +14,10 @@
 			],
 			"sinks": [
 				{
+					"dataset": {
+						"referenceName": "getdataset_refreshes_sql_ds",
+						"type": "DatasetReference"
+					},
 					"name": "sink1"
 				}
 			],
@@ -22,25 +26,47 @@
 					"name": "flatten1"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "AlterRow1"
 				}
 			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          body as ({@odata.context} as string, {@odata.count} as short, value as (averageDuration as double, configuredBy as string[], endTime as string, id as string, kind as string, lastRefresh as (endTime as string, extendedStatus as string, id as integer, refreshAttempts as string[], refreshType as string, requestId as string, serviceExceptionJson as string, startTime as string, status as string), medianDuration as double, name as string, refreshCount as short, refreshFailures as boolean, refreshSchedule as (days as string[], enabled as boolean, localTimeZoneId as string, notifyOption as string, times as string[]), refreshesPerDay as short, startTime as string)[]),",
+				"          headers as [string,string]",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     httpMethod: 'GET',",
 				"     timeout: 30,",
-				"     requestInterval: 0,",
 				"     paginationRules: ['supportRFC5988' -> 'true'],",
-				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'documentPerLine']) ~> source1",
-				"source1 foldDown(unroll(),",
+				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments']) ~> source1",
+				"source1 foldDown(unroll(body.value),",
+				"     mapColumn(",
+				"          dataset_id = body.value.id,",
+				"          name = body.value.name,",
+				"          kind = body.value.kind,",
+				"          Refresh_id = body.value.lastRefresh.id,",
+				"          refreshType = body.value.lastRefresh.refreshType,",
+				"          startTime = body.value.lastRefresh.startTime,",
+				"          lastrefresh_endTime = body.value.lastRefresh.endTime,",
+				"          extendedStatus = body.value.lastRefresh.extendedStatus,",
+				"          requestId = body.value.lastRefresh.requestId,",
+				"          serviceExceptionJson = body.value.lastRefresh.serviceExceptionJson,",
+				"          status = body.value.lastRefresh.status",
+				"     ),",
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flatten1",
-				"flatten1 derive() ~> derivedColumn1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
+				"flatten1 alterRow() ~> AlterRow1",
+				"AlterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     deletable:false,",
+				"     insertable:false,",
+				"     updateable:false,",
+				"     upsertable:true,",
+				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
