@@ -61,20 +61,9 @@
 				"     updateable:false,",
 				"     upsertable:false,",
 				"     format: 'table',",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          dataset_id,",
-				"          name,",
-				"          kind,",
-				"          Refresh_id,",
-				"          refreshType,",
-				"          startTime,",
-				"          lastrefresh_endTime = endTime,",
-				"          extendedStatus,",
-				"          requestId,",
-				"          serviceExceptionJson,",
-				"          status",
-				"     )) ~> sink1"
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
 			]
 		}
 	}
