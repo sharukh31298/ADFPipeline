@@ -67,7 +67,112 @@
 										"supportRFC5988": "true"
 									}
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"Refresh_id"
+										]
+									},
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['requestId']"
+											},
+											"sink": {
+												"name": "requestId",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['id']"
+											},
+											"sink": {
+												"name": "Refresh_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['refreshType']"
+											},
+											"sink": {
+												"name": "refreshType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['startTime']"
+											},
+											"sink": {
+												"name": "startTime",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['endTime']"
+											},
+											"sink": {
+												"name": "endTime",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['status']"
+											},
+											"sink": {
+												"name": "status",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['@odata.context']"
+											}
+										},
+										{
+											"source": {
+												"path": "['refreshAttempts'][0]['attemptId']"
+											}
+										},
+										{
+											"source": {
+												"path": "['refreshAttempts'][0]['startTime']"
+											},
+											"sink": {
+												"name": "startTime",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['refreshAttempts'][0]['endTime']"
+											},
+											"sink": {
+												"name": "endTime",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['refreshAttempts'][0]['type']"
+											}
+										}
+									],
+									"collectionReference": "$['value']"
+								}
 							},
 							"inputs": [
 								{
@@ -83,6 +188,12 @@
 											"type": "Expression"
 										}
 									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "getdataset_refreshes_sql_ds",
+									"type": "DatasetReference"
 								}
 							]
 						}
