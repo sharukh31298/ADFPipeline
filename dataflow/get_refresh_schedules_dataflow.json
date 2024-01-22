@@ -34,8 +34,8 @@
 			],
 			"scriptLines": [
 				"parameters{",
-				"     groupid as string ($groupid),",
-				"     datasetid as string ($datasetid)",
+				"     groupid as string,",
+				"     datasetid as string",
 				"}",
 				"source(output(",
 				"          body as ({@odata.context} as string, days as string[], enabled as boolean, localTimeZoneId as string, notifyOption as string, times as string[]),",
@@ -45,6 +45,7 @@
 				"     validateSchema: false,",
 				"     httpMethod: 'GET',",
 				"     timeout: 30,",
+				"     requestInterval: 0,",
 				"     paginationRules: ['supportRFC5988' -> 'true'],",
 				"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments']) ~> source1",
 				"source1 foldDown(unroll(body.days),",
