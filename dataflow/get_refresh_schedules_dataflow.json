@@ -12,15 +12,7 @@
 					"name": "source1"
 				}
 			],
-			"sinks": [
-				{
-					"dataset": {
-						"referenceName": "getrefreshscedules_sql_ds",
-						"type": "DatasetReference"
-					},
-					"name": "sink1"
-				}
-			],
+			"sinks": [],
 			"transformations": [
 				{
 					"name": "flatten1"
@@ -69,29 +61,7 @@
 				"     skipDuplicateMapInputs: false,",
 				"     skipDuplicateMapOutputs: false) ~> flatten2",
 				"flatten2 derive(groupid = $groupid,",
-				"          datasetid = $datasetid) ~> derivedColumn1",
-				"derivedColumn1 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          index_no as integer,",
-				"          dataset_id as string,",
-				"          name as string,",
-				"          kind as string,",
-				"          days as string,",
-				"          times as string,",
-				"          enabled as string,",
-				"          localTimeZoneId as string,",
-				"          notifyOption as string,",
-				"          updated_time as timestamp",
-				"     ),",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError') ~> sink1"
+				"          datasetid = $datasetid) ~> derivedColumn1"
 			]
 		}
 	}
