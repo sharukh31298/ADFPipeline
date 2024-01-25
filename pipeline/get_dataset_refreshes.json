@@ -61,6 +61,22 @@
 							"typeProperties": {
 								"source": {
 									"type": "RestSource",
+									"additionalColumns": [
+										{
+											"name": "datasetid",
+											"value": {
+												"value": "@item().id",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "groupid",
+											"value": {
+												"value": "@item().workspaceId",
+												"type": "Expression"
+											}
+										}
+									],
 									"httpRequestTimeout": "00:01:40",
 									"requestInterval": "00.00:00:00.010",
 									"requestMethod": "GET",
@@ -74,7 +90,7 @@
 									"upsertSettings": {
 										"useTempDB": true,
 										"keys": [
-											"requestId"
+											"Refresh_id"
 										]
 									},
 									"sqlWriterUseTableLock": false,
@@ -131,6 +147,15 @@
 										},
 										{
 											"source": {
+												"path": "['serviceExceptionJson']"
+											},
+											"sink": {
+												"name": "serviceExceptionJson",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
 												"path": "['status']"
 											},
 											"sink": {
@@ -140,15 +165,25 @@
 										},
 										{
 											"source": {
-												"path": "$['[\\'serviceExceptionJson\\']']"
+												"path": "$['datasetid']"
 											},
 											"sink": {
-												"name": "serviceExceptionJson",
+												"name": "dataset_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['groupid']"
+											},
+											"sink": {
+												"name": "group_id",
 												"type": "String"
 											}
 										}
 									],
-									"collectionReference": ""
+									"collectionReference": "$['value']",
+									"mapComplexValuesToString": true
 								}
 							},
 							"inputs": [
