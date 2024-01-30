@@ -67,6 +67,13 @@
 												"value": "@item().id",
 												"type": "Expression"
 											}
+										},
+										{
+											"name": "workspaceid",
+											"value": {
+												"value": "@item().workspaceid",
+												"type": "Expression"
+											}
 										}
 									],
 									"httpRequestTimeout": "00:01:40",
@@ -76,7 +83,63 @@
 										"supportRFC5988": "true"
 									}
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['name']"
+											},
+											"sink": {
+												"name": "name",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['displayName']"
+											},
+											"sink": {
+												"name": "displayame",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['order']"
+											},
+											"sink": {
+												"name": "report_order",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['reportid']"
+											},
+											"sink": {
+												"name": "report_id",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['workspaceid']"
+											},
+											"sink": {
+												"name": "workspace_id",
+												"type": "String"
+											}
+										}
+									],
+									"collectionReference": "$['value']"
+								}
 							},
 							"inputs": [
 								{
@@ -92,6 +155,12 @@
 											"type": "Expression"
 										}
 									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_getreport_pages",
+									"type": "DatasetReference"
 								}
 							]
 						}
