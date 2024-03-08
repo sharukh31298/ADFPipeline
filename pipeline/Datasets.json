@@ -1,9 +1,9 @@
 {
-	"name": "getdatasets",
+	"name": "Datasets",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
+				"name": "Get Dataset Details",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -45,7 +45,7 @@
 									"path": "['id']"
 								},
 								"sink": {
-									"name": "id",
+									"name": "DatasetSourceKey",
 									"type": "String"
 								}
 							},
@@ -54,7 +54,7 @@
 									"path": "['name']"
 								},
 								"sink": {
-									"name": "name",
+									"name": "DatasetName",
 									"type": "String"
 								}
 							},
@@ -63,7 +63,7 @@
 									"path": "['webUrl']"
 								},
 								"sink": {
-									"name": "webUrl",
+									"name": "DatasetWebUrl",
 									"type": "String"
 								}
 							},
@@ -72,17 +72,8 @@
 									"path": "['addRowsAPIEnabled']"
 								},
 								"sink": {
-									"name": "addRowsAPIEnabled",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['configuredBy']"
-								},
-								"sink": {
-									"name": "configuredBy",
-									"type": "String"
+									"name": "AddRowsAPIEnabled",
+									"type": "Boolean"
 								}
 							},
 							{
@@ -90,8 +81,8 @@
 									"path": "['isRefreshable']"
 								},
 								"sink": {
-									"name": "isRefreshable",
-									"type": "String"
+									"name": "IsRefreshable",
+									"type": "Boolean"
 								}
 							},
 							{
@@ -99,8 +90,8 @@
 									"path": "['isEffectiveIdentityRequired']"
 								},
 								"sink": {
-									"name": "isEffectiveIdentityRequired",
-									"type": "String"
+									"name": "IsEffectiveIdentityRequired",
+									"type": "Boolean"
 								}
 							},
 							{
@@ -108,8 +99,8 @@
 									"path": "['isEffectiveIdentityRolesRequired']"
 								},
 								"sink": {
-									"name": "isEffectiveIdentityRolesRequired",
-									"type": "String"
+									"name": "IsEffectiveIdentityRolesRequired",
+									"type": "Boolean"
 								}
 							},
 							{
@@ -117,7 +108,7 @@
 									"path": "['targetStorageMode']"
 								},
 								"sink": {
-									"name": "targetStorageMode",
+									"name": "TargetStorageMode",
 									"type": "String"
 								}
 							},
@@ -126,7 +117,7 @@
 									"path": "['createdDate']"
 								},
 								"sink": {
-									"name": "createdDate",
+									"name": "ConfiguredBy",
 									"type": "String"
 								}
 							},
@@ -135,7 +126,7 @@
 									"path": "['contentProviderType']"
 								},
 								"sink": {
-									"name": "contentProviderType",
+									"name": "ContentProviderType",
 									"type": "String"
 								}
 							},
@@ -144,7 +135,7 @@
 									"path": "['createReportEmbedURL']"
 								},
 								"sink": {
-									"name": "createReportEmbedURL",
+									"name": "CreateReportEmbedURL",
 									"type": "String"
 								}
 							},
@@ -153,7 +144,7 @@
 									"path": "['qnaEmbedURL']"
 								},
 								"sink": {
-									"name": "qnaEmbedURL",
+									"name": "QNAEmbedURL",
 									"type": "String"
 								}
 							},
@@ -162,8 +153,8 @@
 									"path": "['isInPlaceSharingEnabled']"
 								},
 								"sink": {
-									"name": "isInPlaceSharingEnabled",
-									"type": "String"
+									"name": "IsInPlaceSharingEnabled",
+									"type": "Boolean"
 								}
 							},
 							{
@@ -171,25 +162,25 @@
 									"path": "['workspaceId']"
 								},
 								"sink": {
-									"name": "workspaceId",
+									"name": "WorkspaceId",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
-									"path": "['autoSyncReadOnlyReplicas']"
+									"path": "['queryScaleOutSettings']['autoSyncReadOnlyReplicas']"
 								},
 								"sink": {
-									"name": "autoSyncReadOnlyReplicas",
+									"name": "AutoSyncReadOnlyReplicas",
 									"type": "String"
 								}
 							},
 							{
 								"source": {
-									"path": "['maxReadOnlyReplicas']"
+									"path": "['queryScaleOutSettings']['maxReadOnlyReplicas']"
 								},
 								"sink": {
-									"name": "maxReadOnlyReplicas",
+									"name": "MaxReadOnlyReplicas",
 									"type": "String"
 								}
 							}
@@ -199,13 +190,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "getdataset_api_ds",
+						"referenceName": "Dataset_API",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "getdataset_sql_ds",
+						"referenceName": "Dataset_SQL",
 						"type": "DatasetReference"
 					}
 				]
