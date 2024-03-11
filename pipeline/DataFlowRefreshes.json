@@ -1,9 +1,9 @@
 {
-	"name": "getdataflow_refresh",
+	"name": "DataFlowRefreshes",
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Get Dataflows",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -21,18 +21,18 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "getdataflow_sql_ds",
+						"referenceName": "DataFlow_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "Dataflow ID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Get Dataflows",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -41,13 +41,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Get Dataflows').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Copy data1",
+							"name": "Get Dataflow Refresh Details",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -63,14 +63,14 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "groupid",
+											"name": "WorkSpaceID",
 											"value": {
 												"value": "@item().workspaceId",
 												"type": "Expression"
 											}
 										},
 										{
-											"name": "dataflowid",
+											"name": "DataFlowID",
 											"value": {
 												"value": "@item().objectid",
 												"type": "Expression"
@@ -86,15 +86,8 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"writeBehavior": "upsert",
-									"upsertSettings": {
-										"useTempDB": true,
-										"keys": [
-											"id"
-										]
-									},
-									"sqlWriterUseTableLock": false,
-									"disableMetricsCollection": false
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
 								},
 								"enableStaging": false,
 								"translator": {
@@ -105,7 +98,7 @@
 												"path": "['id']"
 											},
 											"sink": {
-												"name": "id",
+												"name": "DataflowRefreshesSourcekey",
 												"type": "String"
 											}
 										},
@@ -114,7 +107,7 @@
 												"path": "['refreshType']"
 											},
 											"sink": {
-												"name": "refreshType",
+												"name": "RefreshType",
 												"type": "String"
 											}
 										},
@@ -123,7 +116,7 @@
 												"path": "['startTime']"
 											},
 											"sink": {
-												"name": "startTime",
+												"name": "StartTime",
 												"type": "DateTime"
 											}
 										},
@@ -132,7 +125,7 @@
 												"path": "['endTime']"
 											},
 											"sink": {
-												"name": "endTime",
+												"name": "EndTime",
 												"type": "DateTime"
 											}
 										},
@@ -141,25 +134,25 @@
 												"path": "['status']"
 											},
 											"sink": {
-												"name": "status",
+												"name": "Status",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['groupid']"
+												"path": "$['WorkSpaceID']"
 											},
 											"sink": {
-												"name": "workspace_id",
+												"name": "WorkSpaceID",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['dataflowid']"
+												"path": "$['DataFlowID']"
 											},
 											"sink": {
-												"name": "dataflow_id",
+												"name": "DataflowID",
 												"type": "String"
 											}
 										}
@@ -169,14 +162,14 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "getdataflow_refreshes_api_ds",
+									"referenceName": "DataFlowRefreshes_API",
 									"type": "DatasetReference",
 									"parameters": {
-										"groupid": {
+										"WorkSpaceID": {
 											"value": "@item().workspaceId",
 											"type": "Expression"
 										},
-										"dataflowid": {
+										"DataFlowID": {
 											"value": "@item().objectid",
 											"type": "Expression"
 										}
@@ -185,7 +178,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "getdataflow_refreshes_sql_ds",
+									"referenceName": "DataFlowRefreshes_SQL",
 									"type": "DatasetReference"
 								}
 							]
