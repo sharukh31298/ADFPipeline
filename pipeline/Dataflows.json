@@ -1,9 +1,9 @@
 {
-	"name": "getdataflows",
+	"name": "Dataflows",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
+				"name": "Get Dataflow Details",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -26,13 +26,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"objectId"
-							]
-						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -45,7 +39,7 @@
 									"path": "['objectId']"
 								},
 								"sink": {
-									"name": "objectId",
+									"name": "DataflowSourceKey",
 									"type": "String"
 								}
 							},
@@ -54,7 +48,7 @@
 									"path": "['name']"
 								},
 								"sink": {
-									"name": "name",
+									"name": "DataflowName",
 									"type": "String"
 								}
 							},
@@ -63,7 +57,7 @@
 									"path": "['description']"
 								},
 								"sink": {
-									"name": "description",
+									"name": "Description",
 									"type": "String"
 								}
 							},
@@ -72,7 +66,7 @@
 									"path": "['workspaceId']"
 								},
 								"sink": {
-									"name": "workspaceId",
+									"name": "WorkSpaceID",
 									"type": "String"
 								}
 							},
@@ -81,7 +75,7 @@
 									"path": "['configuredBy']"
 								},
 								"sink": {
-									"name": "configuredBy",
+									"name": "ConfiguredBy",
 									"type": "String"
 								}
 							}
@@ -91,13 +85,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "getdataflow_api_ds",
+						"referenceName": "Dataflow_API",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "getdataflow_sql_ds",
+						"referenceName": "Dataflow_SQL",
 						"type": "DatasetReference"
 					}
 				]
