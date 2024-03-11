@@ -1,9 +1,9 @@
 {
-	"name": "getgroupusers",
+	"name": "WorkSpacesUsers",
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Get WorkSpaces",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -21,18 +21,18 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "getgroups_sql_db",
+						"referenceName": "WorkSpaces_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "WorkSpace ID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Get WorkSpaces",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -41,13 +41,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Get WorkSpaces').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Copy data1",
+							"name": "Get WorkSpace Users",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -63,7 +63,7 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "group_id",
+											"name": "WorkSpaceID",
 											"value": {
 												"value": "@item().id",
 												"type": "Expression"
@@ -91,7 +91,7 @@
 												"path": "['emailAddress']"
 											},
 											"sink": {
-												"name": "emailAddress",
+												"name": "EmailAddress",
 												"type": "String"
 											}
 										},
@@ -100,7 +100,7 @@
 												"path": "['groupUserAccessRight']"
 											},
 											"sink": {
-												"name": "groupUserAccessRight",
+												"name": "GroupUserAccessRight",
 												"type": "String"
 											}
 										},
@@ -109,7 +109,7 @@
 												"path": "['displayName']"
 											},
 											"sink": {
-												"name": "displayName",
+												"name": "UserName",
 												"type": "String"
 											}
 										},
@@ -118,7 +118,7 @@
 												"path": "['identifier']"
 											},
 											"sink": {
-												"name": "identifier",
+												"name": "Identifier",
 												"type": "String"
 											}
 										},
@@ -127,7 +127,7 @@
 												"path": "['principalType']"
 											},
 											"sink": {
-												"name": "principalType",
+												"name": "PrincipalType",
 												"type": "String"
 											}
 										},
@@ -136,7 +136,7 @@
 												"path": "['graphId']"
 											},
 											"sink": {
-												"name": "graphId",
+												"name": "WorkSpaceUserSourceKey",
 												"type": "String"
 											}
 										},
@@ -145,16 +145,16 @@
 												"path": "['userType']"
 											},
 											"sink": {
-												"name": "userType",
+												"name": "UserType",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['group_id']"
+												"path": "$['WorkSpaceID']"
 											},
 											"sink": {
-												"name": "group_id",
+												"name": "WorkSpaceID",
 												"type": "String"
 											}
 										}
@@ -165,10 +165,10 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "getgroupsusers_api_ds",
+									"referenceName": "WorkSpaceUsers_API",
 									"type": "DatasetReference",
 									"parameters": {
-										"id": {
+										"WorkSpaceID": {
 											"value": "@item().id",
 											"type": "Expression"
 										}
@@ -177,7 +177,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "getgroupsusers_sql_ds",
+									"referenceName": "WorkSpaceUsers_SQL",
 									"type": "DatasetReference"
 								}
 							]
