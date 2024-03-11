@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Get Reports",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -21,18 +21,18 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "getreports_sql_ds",
+						"referenceName": "Reports_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "ReportID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Get Reports",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -41,13 +41,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Get Reports').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Copy data1",
+							"name": "Get ReportUsers Details",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -63,7 +63,7 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "report_id",
+											"name": "ReportID",
 											"value": {
 												"value": "@item().id",
 												"type": "Expression"
@@ -171,10 +171,10 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "getusers_api_ds",
+									"referenceName": "ReportUsers_API",
 									"type": "DatasetReference",
 									"parameters": {
-										"report_id": {
+										"ReportID": {
 											"value": "@item().id",
 											"type": "Expression"
 										}
