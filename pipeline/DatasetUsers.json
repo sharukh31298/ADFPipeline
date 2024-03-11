@@ -1,9 +1,9 @@
 {
-	"name": "getdatasetusers",
+	"name": "DatasetUsers",
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Get Datasets",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -21,18 +21,18 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "getdataset_sql_ds",
+						"referenceName": "Dataset_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "DatasetID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Get Datasets",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -41,13 +41,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Get Datasets').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Copy data1",
+							"name": "Get Dataset Users",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -63,14 +63,14 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "dataset_id",
+											"name": "DatasetID",
 											"value": {
 												"value": "@item().id",
 												"type": "Expression"
 											}
 										},
 										{
-											"name": "workspace_id",
+											"name": "WorkSpaceID",
 											"value": {
 												"value": "@item().workspaceId",
 												"type": "Expression"
@@ -98,8 +98,8 @@
 												"path": "['datasetUserAccessRight']"
 											},
 											"sink": {
-												"name": "datasetUserAccessRight",
-												"type": "String"
+												"name": "DatasetUserAccessRight",
+												"type": "Int32"
 											}
 										},
 										{
@@ -107,7 +107,7 @@
 												"path": "['emailAddress']"
 											},
 											"sink": {
-												"name": "emailAddress",
+												"name": "EmailAddress",
 												"type": "String"
 											}
 										},
@@ -116,7 +116,7 @@
 												"path": "['displayName']"
 											},
 											"sink": {
-												"name": "displayName",
+												"name": "UserName",
 												"type": "String"
 											}
 										},
@@ -125,7 +125,7 @@
 												"path": "['identifier']"
 											},
 											"sink": {
-												"name": "identifier",
+												"name": "Identifier",
 												"type": "String"
 											}
 										},
@@ -134,7 +134,7 @@
 												"path": "['graphId']"
 											},
 											"sink": {
-												"name": "graphId",
+												"name": "DatasetUserSourceKey",
 												"type": "String"
 											}
 										},
@@ -143,7 +143,7 @@
 												"path": "['principalType']"
 											},
 											"sink": {
-												"name": "principalType",
+												"name": "PrincipalType",
 												"type": "String"
 											}
 										},
@@ -152,25 +152,25 @@
 												"path": "['userType']"
 											},
 											"sink": {
-												"name": "userType",
+												"name": "UserType",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['dataset_id']"
+												"path": "$['DatasetID']"
 											},
 											"sink": {
-												"name": "dataset_id",
+												"name": "DatasetID",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['workspace_id']"
+												"path": "$['WorkSpaceID']"
 											},
 											"sink": {
-												"name": "workspace_id",
+												"name": "WorkSpaceID",
 												"type": "String"
 											}
 										}
@@ -180,10 +180,10 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "getdatasetusers_api_ds",
+									"referenceName": "DatasetUsers_API",
 									"type": "DatasetReference",
 									"parameters": {
-										"dataset_id": {
+										"DatasetID": {
 											"value": "@item().id",
 											"type": "Expression"
 										}
@@ -192,7 +192,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "getdatasetusers_sql_ds",
+									"referenceName": "DatasetUsers_SQL",
 									"type": "DatasetReference"
 								}
 							]
