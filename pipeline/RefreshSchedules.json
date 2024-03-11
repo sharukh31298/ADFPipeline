@@ -1,9 +1,9 @@
 {
-	"name": "get_refresh_schedules",
+	"name": "RefreshSchedules",
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Get Datasets",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -21,18 +21,18 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "getdataset_sql_ds",
+						"referenceName": "Dataset_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "DatasetID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Get Datasets",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -41,13 +41,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Get Datasets').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Data flow1",
+							"name": "Refresh Schedule Dataflow",
 							"type": "ExecuteDataFlow",
 							"dependsOn": [],
 							"policy": {
@@ -74,12 +74,12 @@
 									},
 									"datasetParameters": {
 										"source1": {
-											"groupid": {
-												"value": "@item().id",
+											"WorkSpaceID": {
+												"value": "@item().workspaceId",
 												"type": "Expression"
 											},
-											"datasetid": {
-												"value": "@item().datasetid",
+											"DatasetID": {
+												"value": "@item().id",
 												"type": "Expression"
 											}
 										}
