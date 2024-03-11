@@ -1,9 +1,9 @@
 {
-	"name": "viewreport",
+	"name": "ViewReports",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
+				"name": "Get Activity",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -38,7 +38,7 @@
 									"path": "['Id']"
 								},
 								"sink": {
-									"name": "Id",
+									"name": "ViewReportSourceKey",
 									"type": "String"
 								}
 							},
@@ -74,7 +74,7 @@
 									"path": "['OrganizationId']"
 								},
 								"sink": {
-									"name": "OrganizationId",
+									"name": "OrganizationID",
 									"type": "String"
 								}
 							},
@@ -84,7 +84,7 @@
 								},
 								"sink": {
 									"name": "UserType",
-									"type": "Int32"
+									"type": "Boolean"
 								}
 							},
 							{
@@ -110,7 +110,7 @@
 									"path": "['UserId']"
 								},
 								"sink": {
-									"name": "UserId",
+									"name": "UserID",
 									"type": "String"
 								}
 							},
@@ -120,6 +120,15 @@
 								},
 								"sink": {
 									"name": "ClientIP",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['UserAgent']"
+								},
+								"sink": {
+									"name": "UserAgent",
 									"type": "String"
 								}
 							},
@@ -173,7 +182,7 @@
 									"path": "['CapacityId']"
 								},
 								"sink": {
-									"name": "CapacityId",
+									"name": "CapacityID",
 									"type": "String"
 								}
 							},
@@ -191,7 +200,16 @@
 									"path": "['WorkspaceId']"
 								},
 								"sink": {
-									"name": "WorkspaceId",
+									"name": "WorkspaceID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['AppName']"
+								},
+								"sink": {
+									"name": "AppName",
 									"type": "String"
 								}
 							},
@@ -200,7 +218,7 @@
 									"path": "['ObjectId']"
 								},
 								"sink": {
-									"name": "ObjectId",
+									"name": "ObjectID",
 									"type": "String"
 								}
 							},
@@ -209,7 +227,7 @@
 									"path": "['DatasetId']"
 								},
 								"sink": {
-									"name": "DatasetId",
+									"name": "DatasetID",
 									"type": "String"
 								}
 							},
@@ -218,16 +236,7 @@
 									"path": "['ReportId']"
 								},
 								"sink": {
-									"name": "ReportId",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['EmbedTokenId']"
-								},
-								"sink": {
-									"name": "EmbedTokenId",
+									"name": "ReportID",
 									"type": "String"
 								}
 							},
@@ -254,8 +263,8 @@
 									"path": "['IsSuccess']"
 								},
 								"sink": {
-									"name": "IsSuccess",
-									"type": "String"
+									"name": "IsSucess",
+									"type": "Boolean"
 								}
 							},
 							{
@@ -272,7 +281,7 @@
 									"path": "['RequestId']"
 								},
 								"sink": {
-									"name": "RequestId",
+									"name": "RequestID",
 									"type": "String"
 								}
 							},
@@ -281,7 +290,16 @@
 									"path": "['ActivityId']"
 								},
 								"sink": {
-									"name": "ActivityId",
+									"name": "ActivityID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['AppReportId']"
+								},
+								"sink": {
+									"name": "AppReportID",
 									"type": "String"
 								}
 							},
@@ -305,6 +323,15 @@
 							},
 							{
 								"source": {
+									"path": "['AppId']"
+								},
+								"sink": {
+									"name": "AppID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
 									"path": "['ArtifactKind']"
 								},
 								"sink": {
@@ -318,7 +345,34 @@
 								},
 								"sink": {
 									"name": "RefreshEnforcementPolicy",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"path": "$['continuationUri']"
+								},
+								"sink": {
+									"name": "ContinuationURL",
 									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['continuationToken']"
+								},
+								"sink": {
+									"name": "ContinuationToken",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['lastResultSet']"
+								},
+								"sink": {
+									"name": "lastResultSet",
+									"type": "Boolean"
 								}
 							}
 						],
@@ -327,13 +381,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "viewreport_api_ds",
+						"referenceName": "ViewReports_API",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "viewreports_sql_ds",
+						"referenceName": "ViewReports_SQL",
 						"type": "DatasetReference"
 					}
 				]
