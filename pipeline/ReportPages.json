@@ -1,9 +1,9 @@
 {
-	"name": "getreport_pages",
+	"name": "ReportPages",
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Get Reports",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -21,18 +21,18 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "getreports_sql_ds",
+						"referenceName": "Reports_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "ReportID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Get Reports",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -41,13 +41,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Get Reports').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Copy data1",
+							"name": "Get Report Page Details",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -63,14 +63,14 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "reportid",
+											"name": "Reportid",
 											"value": {
 												"value": "@item().id",
 												"type": "Expression"
 											}
 										},
 										{
-											"name": "workspaceid",
+											"name": "WorkSpaceid",
 											"value": {
 												"value": "@item().workspaceid",
 												"type": "Expression"
@@ -98,7 +98,7 @@
 												"path": "['name']"
 											},
 											"sink": {
-												"name": "name",
+												"name": "ReportPageName",
 												"type": "String"
 											}
 										},
@@ -107,7 +107,7 @@
 												"path": "['displayName']"
 											},
 											"sink": {
-												"name": "displayname",
+												"name": "ReportPageDisplayName",
 												"type": "String"
 											}
 										},
@@ -117,24 +117,24 @@
 											},
 											"sink": {
 												"name": "report_order",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"path": "$['Reportid']"
+											},
+											"sink": {
+												"name": "ReportID",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['reportid']"
+												"path": "$['WorkSpaceid']"
 											},
 											"sink": {
-												"name": "report_id",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['workspaceid']"
-											},
-											"sink": {
-												"name": "workspace_id",
+												"name": "WorkSpaceID",
 												"type": "String"
 											}
 										}
@@ -144,14 +144,14 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "getreport_pages_api_ds",
+									"referenceName": "ReportPages_API",
 									"type": "DatasetReference",
 									"parameters": {
-										"reportid": {
+										"ReportID": {
 											"value": "@item().id",
 											"type": "Expression"
 										},
-										"groupid": {
+										"WorkSpaceID": {
 											"value": "@item().workspaceid",
 											"type": "Expression"
 										}
@@ -160,7 +160,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_getreport_pages",
+									"referenceName": "ReportPages_SQL",
 									"type": "DatasetReference"
 								}
 							]
