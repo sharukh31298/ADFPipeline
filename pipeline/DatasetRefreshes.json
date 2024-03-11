@@ -1,9 +1,9 @@
 {
-	"name": "get_dataset_refreshes",
+	"name": "DatasetRefreshes",
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Get Datasets",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -21,18 +21,18 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "getdataset_sql_ds",
+						"referenceName": "Dataset_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ForEach1",
+				"name": "DatasetID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Get Datasets",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -41,13 +41,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Get Datasets').output.value",
 						"type": "Expression"
 					},
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "Copy data1",
+							"name": "Get DatasetRefreshes Details",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -63,16 +63,16 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "datasetid",
+											"name": "WorkspaceID",
 											"value": {
-												"value": "@item().id",
+												"value": "@item().workspaceId",
 												"type": "Expression"
 											}
 										},
 										{
-											"name": "groupid",
+											"name": "DatasetID",
 											"value": {
-												"value": "@item().workspaceId",
+												"value": "@item().id",
 												"type": "Expression"
 											}
 										}
@@ -86,15 +86,8 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"writeBehavior": "upsert",
-									"upsertSettings": {
-										"useTempDB": true,
-										"keys": [
-											"Refresh_id"
-										]
-									},
-									"sqlWriterUseTableLock": false,
-									"disableMetricsCollection": false
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
 								},
 								"enableStaging": false,
 								"translator": {
@@ -102,100 +95,91 @@
 									"mappings": [
 										{
 											"source": {
-												"path": "['requestId']"
+												"path": "$['value'][0]['requestId']"
 											},
 											"sink": {
-												"name": "requestId",
+												"name": "RequestId",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['id']"
+												"path": "$['value'][0]['id']"
 											},
 											"sink": {
-												"name": "Refresh_id",
+												"name": "DatasetRefreshesSourceKey",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['refreshType']"
+												"path": "$['value'][0]['refreshType']"
 											},
 											"sink": {
-												"name": "refreshType",
+												"name": "RefreshType",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['startTime']"
+												"path": "$['value'][0]['startTime']"
 											},
 											"sink": {
-												"name": "startTime",
+												"name": "StartTime",
+												"type": "DateTime"
+											}
+										},
+										{
+											"source": {
+												"path": "$['value'][0]['endTime']"
+											},
+											"sink": {
+												"name": "EndTime",
+												"type": "DateTime"
+											}
+										},
+										{
+											"source": {
+												"path": "$['value'][0]['status']"
+											},
+											"sink": {
+												"name": "Status",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['endTime']"
+												"path": "$['WorkspaceID']"
 											},
 											"sink": {
-												"name": "endTime",
+												"name": "WorkSpaceID",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['serviceExceptionJson']"
+												"path": "$['DatasetID']"
 											},
 											"sink": {
-												"name": "serviceExceptionJson",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['status']"
-											},
-											"sink": {
-												"name": "status",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['datasetid']"
-											},
-											"sink": {
-												"name": "dataset_id",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['groupid']"
-											},
-											"sink": {
-												"name": "group_id",
+												"name": "DatasetID",
 												"type": "String"
 											}
 										}
 									],
-									"collectionReference": "$['value']",
+									"collectionReference": "",
 									"mapComplexValuesToString": true
 								}
 							},
 							"inputs": [
 								{
-									"referenceName": "get_dataset_refrehses_api_ds",
+									"referenceName": "DatasetRefreshes_API",
 									"type": "DatasetReference",
 									"parameters": {
-										"groupid": {
+										"WorkSpaceID": {
 											"value": "@item().workspaceId",
 											"type": "Expression"
 										},
-										"datasetid": {
+										"DatasetID": {
 											"value": "@item().id",
 											"type": "Expression"
 										}
@@ -204,7 +188,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "getdataset_refreshes_sql_ds",
+									"referenceName": "DatasetRefreshes_SQL",
 									"type": "DatasetReference"
 								}
 							]
