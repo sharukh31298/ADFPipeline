@@ -1,5 +1,5 @@
 {
-	"name": "getreportusers",
+	"name": "GetReportUsers",
 	"properties": {
 		"activities": [
 			{
@@ -65,7 +65,7 @@
 										{
 											"name": "ReportID",
 											"value": {
-												"value": "@item().id",
+												"value": "@item().ReportSourceKey",
 												"type": "Expression"
 											}
 										}
@@ -79,13 +79,7 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"writeBehavior": "upsert",
-									"upsertSettings": {
-										"useTempDB": true,
-										"keys": [
-											"graph_id"
-										]
-									},
+									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false,
 									"disableMetricsCollection": false
 								},
@@ -98,8 +92,8 @@
 												"path": "['reportUserAccessRight']"
 											},
 											"sink": {
-												"name": "report_user_access_right",
-												"type": "varchar"
+												"name": "ReportUserAccessRight",
+												"type": "String"
 											}
 										},
 										{
@@ -107,8 +101,8 @@
 												"path": "['emailAddress']"
 											},
 											"sink": {
-												"name": "email_address",
-												"type": "varchar"
+												"name": "EmailAddress",
+												"type": "String"
 											}
 										},
 										{
@@ -116,8 +110,8 @@
 												"path": "['displayName']"
 											},
 											"sink": {
-												"name": "display_name",
-												"type": "varchar"
+												"name": "UserName",
+												"type": "String"
 											}
 										},
 										{
@@ -125,8 +119,8 @@
 												"path": "['identifier']"
 											},
 											"sink": {
-												"name": "identifier",
-												"type": "varchar"
+												"name": "Identifier",
+												"type": "String"
 											}
 										},
 										{
@@ -134,8 +128,8 @@
 												"path": "['graphId']"
 											},
 											"sink": {
-												"name": "graph_id",
-												"type": "varchar"
+												"name": "ReportUserSourceKey",
+												"type": "String"
 											}
 										},
 										{
@@ -143,8 +137,8 @@
 												"path": "['principalType']"
 											},
 											"sink": {
-												"name": "principal_type",
-												"type": "varchar"
+												"name": "PrincipalType",
+												"type": "String"
 											}
 										},
 										{
@@ -152,17 +146,17 @@
 												"path": "['userType']"
 											},
 											"sink": {
-												"name": "user_type",
-												"type": "varchar"
+												"name": "UserType",
+												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['report_id']"
+												"path": "$['ReportID']"
 											},
 											"sink": {
-												"name": "report_id",
-												"type": "varchar"
+												"name": "ReportID",
+												"type": "String"
 											}
 										}
 									],
@@ -175,7 +169,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"ReportID": {
-											"value": "@item().id",
+											"value": "@item().ReportSourceKey",
 											"type": "Expression"
 										}
 									}
@@ -183,7 +177,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "getusers_sql_ds",
+									"referenceName": "GetReportUsers_SQL",
 									"type": "DatasetReference"
 								}
 							]
