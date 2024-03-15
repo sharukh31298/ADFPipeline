@@ -17,6 +17,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "RestSource",
+						"additionalColumns": [
+							{
+								"name": "Last Refreshed Time",
+								"value": {
+									"value": "@pipeline().TriggerTime",
+									"type": "Expression"
+								}
+							}
+						],
 						"httpRequestTimeout": "00:01:40",
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
@@ -26,8 +35,12 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true
+						},
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"translator": {
@@ -125,15 +138,6 @@
 							},
 							{
 								"source": {
-									"path": "['UserAgent']"
-								},
-								"sink": {
-									"name": "UserAgent",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "['Activity']"
 								},
 								"sink": {
@@ -201,15 +205,6 @@
 								},
 								"sink": {
 									"name": "WorkspaceID",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['AppName']"
-								},
-								"sink": {
-									"name": "AppName",
 									"type": "String"
 								}
 							},
@@ -296,15 +291,6 @@
 							},
 							{
 								"source": {
-									"path": "['AppReportId']"
-								},
-								"sink": {
-									"name": "AppReportID",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "['DistributionMethod']"
 								},
 								"sink": {
@@ -318,15 +304,6 @@
 								},
 								"sink": {
 									"name": "ConsumptionMethod",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['AppId']"
-								},
-								"sink": {
-									"name": "AppID",
 									"type": "String"
 								}
 							},
@@ -374,6 +351,15 @@
 									"name": "lastResultSet",
 									"type": "Boolean"
 								}
+							},
+							{
+								"source": {
+									"path": "$['Last Refreshed Time']"
+								},
+								"sink": {
+									"name": "LastRefreshedTime",
+									"type": "DateTime"
+								}
 							}
 						],
 						"collectionReference": "$['activityEventEntities']"
@@ -393,6 +379,11 @@
 				]
 			}
 		],
+		"variables": {
+			"LastRefreshedTime": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"lastPublishTime": "2023-11-29T09:03:18Z"
 	},
