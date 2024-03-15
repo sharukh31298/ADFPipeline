@@ -17,15 +17,6 @@
 				"typeProperties": {
 					"source": {
 						"type": "RestSource",
-						"additionalColumns": [
-							{
-								"name": "Last Refreshed Time",
-								"value": {
-									"value": "@pipeline().TriggerTime",
-									"type": "Expression"
-								}
-							}
-						],
 						"httpRequestTimeout": "00:01:40",
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
@@ -35,13 +26,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"ViewReportSourceKey"
-							]
-						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -353,15 +338,6 @@
 								"sink": {
 									"name": "lastResultSet",
 									"type": "Boolean"
-								}
-							},
-							{
-								"source": {
-									"path": "$['Last Refreshed Time']"
-								},
-								"sink": {
-									"name": "LastRefreshedTime",
-									"type": "DateTime"
 								}
 							}
 						],
