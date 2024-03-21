@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "Select * from [dbo].[WorkSpaces] where Status = 'Active'",
+						"sqlReaderQuery": "Select * from [dbo].[WorkSpaces] where Status = 'Active';\n\nTruncate Table WorkspaceUsers;",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -46,7 +46,6 @@
 						"type": "Expression"
 					},
 					"isSequential": false,
-					"batchCount": 10,
 					"activities": [
 						{
 							"name": "Get WorkSpace Users",
@@ -187,198 +186,6 @@
 						}
 					]
 				}
-			},
-			{
-				"name": "WorkSpaceUsers History Data",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"mappings": [
-							{
-								"source": {
-									"name": "WorkSpaceUserSourceKey",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "WorkSpaceUserSourceKey",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "WorkSpaceID",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "WorkSpaceID",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "EmailAddress",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "EmailAddress",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserName",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserName",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "Identifier",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "Identifier",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserType",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserType",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "GroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "GroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "PrincipalType",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "PrincipalType",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "CreatedDate",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								},
-								"sink": {
-									"name": "CreatedDate",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								}
-							},
-							{
-								"source": {
-									"name": "ModifiedDate",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								},
-								"sink": {
-									"name": "ModifiedDate",
-									"type": "DateTime",
-									"physicalType": "datetime"
-								}
-							},
-							{
-								"source": {
-									"name": "CreatedBy",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "CreatedBy",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "ModifiedBy",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "ModifiedBy",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							}
-						],
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "WorkSpaceUsers_SQL",
-						"type": "DatasetReference"
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "WorkSpaceUsers_SQL_History",
-						"type": "DatasetReference"
-					}
-				]
 			}
 		],
 		"annotations": [],
