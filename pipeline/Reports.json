@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Reports Details",
+				"name": "Reports Staging",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
@@ -26,6 +26,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
+						"preCopyScript": "Truncate Table dbo.Reports_Staging;",
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
@@ -109,7 +110,389 @@
 				],
 				"outputs": [
 					{
+						"referenceName": "Reports_SQL_Staging",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Report Live Data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Reports Staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select * from dbo.Reports_Staging r\nLeft join WorkSpaces w\nOn r.WorkSpaceID = w.WorkSpaceSourceKey\nwhere w.Status='Active'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"ReportSourceKey"
+							]
+						},
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "ReportSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "DatasetID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "DatasetID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportType",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportName",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportName",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportWebUrl",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportWebUrl",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportEmbedUrl",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportEmbedUrl",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Reports_SQL_Staging",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
 						"referenceName": "Reports_SQL",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Report History Data",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Reports Staging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "ReportSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "DatasetID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "DatasetID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportType",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportName",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportName",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportWebUrl",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportWebUrl",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ReportEmbedUrl",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportEmbedUrl",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Reports_SQL_Staging",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Reports_SQL_History",
 						"type": "DatasetReference"
 					}
 				]
