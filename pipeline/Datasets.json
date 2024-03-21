@@ -226,12 +226,12 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select * from Datasets_Staging d\nLeft join WorkSpaces w\nOn d.WorkspaceId = w.WorkSpaceSourceKey\nwhere w.Status='Active'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "select * from Datasets_Staging d\nLeft join WorkSpaces w\nOn d.WorkspaceId = w.WorkSpaceSourceKey\nwhere w.Status='Active'",
 						"writeBehavior": "upsert",
 						"upsertSettings": {
 							"useTempDB": true,
