@@ -63,7 +63,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "@concat('select WorkSpaceSourceKey from [dbo].[Workspaces_batch] where BatchNo=',string(item()))",
+										"value": "@concat('select WorkSpaceSourceKey from [dbo].[Workspaces_batch] where BatchNo=',string(item().BatchNo))",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
@@ -250,7 +250,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@less(item(),activity('Get WorkSpace Batches').output.count)",
+									"value": "@less(item().BatchNo,activity('Get WorkSpace Batches').output.count)",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
