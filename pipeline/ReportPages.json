@@ -17,6 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select r.ReportID,r.ReportSourceKey,r.WorkSpaceID,r.DatasetID,r.ReportType,r.ReportName,r.ReportWebUrl,r.ReportEmbedUrl,r.CreatedDate,r.ModifiedDate,r.CreatedBy,r.ModifiedBy,w.Status\t\nfrom dbo.Reports r\nLeft join WorkSpaces w\nOn r.WorkSpaceID = w.WorkSpaceSourceKey\nwhere w.Status='Active'",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -169,6 +170,11 @@
 				}
 			}
 		],
+		"variables": {
+			"CountWorkspace": {
+				"type": "Integer"
+			}
+		},
 		"annotations": []
 	}
 }
