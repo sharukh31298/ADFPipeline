@@ -17,7 +17,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select r.ReportID,r.ReportSourceKey,r.WorkSpaceID,r.DatasetID,r.ReportType,r.ReportName,r.ReportWebUrl,r.ReportEmbedUrl,r.CreatedDate,r.ModifiedDate,r.CreatedBy,r.ModifiedBy,w.Status\t\nfrom dbo.Reports r\nLeft join WorkSpaces w\nOn r.WorkSpaceID = w.WorkSpaceSourceKey\nwhere w.Status='Active'",
+						"sqlReaderQuery": {
+							"value": "@concat('select ReportSourceKey,WorkspaceId from [dbo].[Reports_batch] where BatchNo=',pipeline().parameters.BatchNo)\n",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -170,6 +173,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"BatchNo": {
+				"type": "string"
+			}
+		},
 		"variables": {
 			"CountWorkspace": {
 				"type": "Integer"
