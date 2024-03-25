@@ -52,7 +52,7 @@
 							"type": "IfCondition",
 							"dependsOn": [
 								{
-									"activity": "Execute pipeline users",
+									"activity": "Execute Pipeline ReportPages",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -78,7 +78,7 @@
 							}
 						},
 						{
-							"name": "Execute pipeline users",
+							"name": "Execute Pipeline ReportPages",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"policy": {
@@ -136,7 +136,7 @@
 				}
 			},
 			{
-				"name": "WorkSpaceUsers History",
+				"name": "ReportPages History",
 				"type": "Copy",
 				"dependsOn": [
 					{
@@ -171,24 +171,12 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "WorkSpaceUserId",
-									"type": "Int32",
-									"physicalType": "int"
-								},
-								"sink": {
-									"name": "WorkSpaceUserId",
-									"type": "Int32",
-									"physicalType": "int"
-								}
-							},
-							{
-								"source": {
-									"name": "WorkSpaceUserSourceKey",
+									"name": "ReportID",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "WorkSpaceUserSourceKey",
+									"name": "ReportID",
 									"type": "String",
 									"physicalType": "varchar"
 								}
@@ -207,74 +195,38 @@
 							},
 							{
 								"source": {
-									"name": "EmailAddress",
+									"name": "ReportPageName",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "EmailAddress",
+									"name": "ReportPageName",
 									"type": "String",
 									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"name": "UserName",
+									"name": "ReportPageDisplayName",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "UserName",
+									"name": "ReportPageDisplayName",
 									"type": "String",
 									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"name": "Identifier",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "report_order",
+									"type": "Int32",
+									"physicalType": "int"
 								},
 								"sink": {
-									"name": "Identifier",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserType",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserType",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "GroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "GroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "PrincipalType",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "PrincipalType",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "report_order",
+									"type": "Int32",
+									"physicalType": "int"
 								}
 							},
 							{
@@ -335,13 +287,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "WorkSpaceUsers_SQL",
+						"referenceName": "ReportPages_SQL",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "WorkSpaceUsers_SQL_History",
+						"referenceName": "ReportPages_SQL_History",
 						"type": "DatasetReference"
 					}
 				]
