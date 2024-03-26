@@ -48,36 +48,6 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "If not max batch",
-							"type": "IfCondition",
-							"dependsOn": [
-								{
-									"activity": "Execute Pipeline DatasetRefreshes",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"expression": {
-									"value": "@less(item().BatchNo,activity('Get Dataset Batches').output.count)",
-									"type": "Expression"
-								},
-								"ifTrueActivities": [
-									{
-										"name": "Wait 1 hour",
-										"type": "Wait",
-										"dependsOn": [],
-										"userProperties": [],
-										"typeProperties": {
-											"waitTimeInSeconds": 3600
-										}
-									}
-								]
-							}
-						},
-						{
 							"name": "Execute Pipeline DatasetRefreshes",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
