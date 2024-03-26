@@ -48,36 +48,6 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "If not max batch",
-							"type": "IfCondition",
-							"dependsOn": [
-								{
-									"activity": "Execute Pipeline ReportPages",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"expression": {
-									"value": "@less(item().BatchNo,activity('Get ReportPages in Batches').output.count)",
-									"type": "Expression"
-								},
-								"ifTrueActivities": [
-									{
-										"name": "Wait 2 Mins",
-										"type": "Wait",
-										"dependsOn": [],
-										"userProperties": [],
-										"typeProperties": {
-											"waitTimeInSeconds": 120
-										}
-									}
-								]
-							}
-						},
-						{
 							"name": "Execute Pipeline ReportPages",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
