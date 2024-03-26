@@ -92,7 +92,9 @@
 								"sink": {
 									"type": "AzureSqlSink",
 									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false
+									"sqlWriterUseTableLock": false,
+									"tableOption": "autoCreate",
+									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
 								"translator": {
@@ -103,25 +105,7 @@
 												"path": "['datasetUserAccessRight']"
 											},
 											"sink": {
-												"name": "DatasetUserAccessRight",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['emailAddress']"
-											},
-											"sink": {
-												"name": "EmailAddress",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['displayName']"
-											},
-											"sink": {
-												"name": "UserName",
+												"name": "datasetUserAccessRight",
 												"type": "String"
 											}
 										},
@@ -130,16 +114,7 @@
 												"path": "['identifier']"
 											},
 											"sink": {
-												"name": "Identifier",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['graphId']"
-											},
-											"sink": {
-												"name": "DatasetUserSourceKey",
+												"name": "identifier",
 												"type": "String"
 											}
 										},
@@ -148,16 +123,7 @@
 												"path": "['principalType']"
 											},
 											"sink": {
-												"name": "PrincipalType",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['userType']"
-											},
-											"sink": {
-												"name": "UserType",
+												"name": "principalType",
 												"type": "String"
 											}
 										},
@@ -201,7 +167,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "DatasetUsers_SQL",
+									"referenceName": "AzureSqlTable1",
 									"type": "DatasetReference"
 								}
 							]
