@@ -48,36 +48,6 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "If not max batch",
-							"type": "IfCondition",
-							"dependsOn": [
-								{
-									"activity": "Execute pipeline users",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"expression": {
-									"value": "@less(item().BatchNo,activity('Get WorkSpace Batches').output.count)",
-									"type": "Expression"
-								},
-								"ifTrueActivities": [
-									{
-										"name": "Wait 1 Hour",
-										"type": "Wait",
-										"dependsOn": [],
-										"userProperties": [],
-										"typeProperties": {
-											"waitTimeInSeconds": 3600
-										}
-									}
-								]
-							}
-						},
-						{
 							"name": "Execute pipeline users",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
