@@ -1,0 +1,93 @@
+{
+	"name": "Gateways",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "$['value'][0]['id']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['value'][0]['gatewayId']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['value'][0]['name']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['value'][0]['type']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['value'][0]['publicKey']['exponent']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['value'][0]['publicKey']['modulus']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['value'][0]['gatewayAnnotation']"
+								}
+							}
+						]
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "APIs_Datasets",
+						"type": "DatasetReference",
+						"parameters": {
+							"RelativeURL": {
+								"value": "@{concat('/v1.0/myorg/groups/',pipeline().parameters.WorkspaceID,'/datasets/',pipeline().parameters.DatasetID,'/Default.DiscoverGateways')}",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"parameters": {
+			"DatasetID": {
+				"type": "string"
+			},
+			"WorkspaceID": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}
