@@ -96,16 +96,7 @@
 									"mappings": [
 										{
 											"source": {
-												"path": "$['value'][0]['datasourceType']"
-											},
-											"sink": {
-												"name": "principalType",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['value'][0]['connectionDetails']['server']"
+												"path": "$['value']['datasourceType']"
 											},
 											"sink": {
 												"name": "datasetUserAccessRight",
@@ -114,7 +105,25 @@
 										},
 										{
 											"source": {
-												"path": "$['value'][0]['connectionDetails']['database']"
+												"path": "$['value']['connectionDetails']['path']"
+											},
+											"sink": {
+												"name": "principalType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['value']['connectionDetails']['kind']"
+											},
+											"sink": {
+												"name": "principalType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['value']['datasourceId']"
 											},
 											"sink": {
 												"name": "identifier",
@@ -138,8 +147,36 @@
 												"name": "DatasetID",
 												"type": "String"
 											}
+										},
+										{
+											"source": {
+												"path": "$['$[\\'value\\'][\\'connectionDetails\\'][\\'server\\']']"
+											},
+											"sink": {
+												"name": "principalType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['$[\\'value\\'][\\'connectionDetails\\'][\\'database\\']']"
+											},
+											"sink": {
+												"name": "principalType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['$[\\'value\\'][\\'connectionDetails\\'][\\'url\\']']"
+											},
+											"sink": {
+												"name": "principalType",
+												"type": "String"
+											}
 										}
 									],
+									"collectionReference": "$['value']",
 									"mapComplexValuesToString": true
 								}
 							},
