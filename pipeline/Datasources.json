@@ -1,0 +1,171 @@
+{
+	"name": "Datasources",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Datasets",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select Datasetsourcekey,WorkspaceID from datasets",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Dataset_SQL",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Datasets').output.value",
+						"type": "Expression"
+					},
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "Get Datasources",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"additionalColumns": [
+										{
+											"name": "WorkSpaceID",
+											"value": {
+												"value": "@item().WorkSpaceID",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "DatasetID",
+											"value": {
+												"value": "@item().DatasetSourcekey",
+												"type": "Expression"
+											}
+										}
+									],
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "$['value'][0]['id']"
+											},
+											"sink": {
+												"name": "GatewaySourceKey",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['value'][0]['name']"
+											},
+											"sink": {
+												"name": "GatewayName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['value'][0]['type']"
+											},
+											"sink": {
+												"name": "Type",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['WorkspaceID']"
+											},
+											"sink": {
+												"name": "WorkSpaceID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['DatasetID']"
+											},
+											"sink": {
+												"name": "DatasetID",
+												"type": "String"
+											}
+										}
+									],
+									"mapComplexValuesToString": true
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "APIs_Datasets",
+									"type": "DatasetReference",
+									"parameters": {
+										"RelativeURL": {
+											"value": "@{concat('/v1.0/myorg/groups/',item().WorkspaceID,'/datasets/',item().DatasetSourcekey,'/datasources')}\n",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Gateways_SQL",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": []
+	}
+}
