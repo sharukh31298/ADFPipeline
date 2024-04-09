@@ -96,7 +96,7 @@
 									"mappings": [
 										{
 											"source": {
-												"path": "$['value'][0]['id']"
+												"path": "['id']"
 											},
 											"sink": {
 												"name": "GatewaySourceKey",
@@ -105,7 +105,16 @@
 										},
 										{
 											"source": {
-												"path": "$['value'][0]['name']"
+												"path": "['gatewayId']"
+											},
+											"sink": {
+												"name": "Gateway",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['name']"
 											},
 											"sink": {
 												"name": "GatewayName",
@@ -114,10 +123,28 @@
 										},
 										{
 											"source": {
-												"path": "$['value'][0]['type']"
+												"path": "['type']"
 											},
 											"sink": {
 												"name": "Type",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['publicKey']['exponent']"
+											},
+											"sink": {
+												"name": "Exponent",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['publicKey']['modulus']"
+											},
+											"sink": {
+												"name": "Modulus",
 												"type": "String"
 											}
 										},
@@ -140,6 +167,7 @@
 											}
 										}
 									],
+									"collectionReference": "$['value']",
 									"mapComplexValuesToString": true
 								}
 							},
