@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Datasets",
+				"name": "Get Data",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select Datasetsourcekey,WorkspaceID from datasets",
+						"sqlReaderQuery": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Gateway_batch] where BatchNo=',pipeline().parameters.BatchNo)",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -33,7 +33,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Datasets",
+						"activity": "Get Data",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -42,7 +42,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get Datasets').output.value",
+						"value": "@activity('Get Data').output.value",
 						"type": "Expression"
 					},
 					"batchCount": 50,
@@ -64,16 +64,16 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "WorkspaceID",
+											"name": "DatasetID",
 											"value": {
-												"value": "@item().WorkSpaceID",
+												"value": "@item().DatasetSourcekey",
 												"type": "Expression"
 											}
 										},
 										{
-											"name": "DatasetID",
+											"name": "WorkspaceID",
 											"value": {
-												"value": "@item().DatasetSourcekey",
+												"value": "@item().WorkspaceID",
 												"type": "Expression"
 											}
 										}
@@ -108,8 +108,8 @@
 												"path": "['gatewayId']"
 											},
 											"sink": {
-												"name": "Gateway",
-												"type": "String"
+												"name": "GatewayID",
+												"type": "Int32"
 											}
 										},
 										{
@@ -150,11 +150,16 @@
 										},
 										{
 											"source": {
-												"path": "$['WorkspaceID']"
+												"path": "['gatewayAnnotation']"
 											},
 											"sink": {
-												"name": "WorkSpaceID",
+												"name": "GatewayAnnotation",
 												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['@odata.context']"
 											}
 										},
 										{
@@ -163,6 +168,15 @@
 											},
 											"sink": {
 												"name": "DatasetID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['WorkspaceID']"
+											},
+											"sink": {
+												"name": "WorkSpaceID",
 												"type": "String"
 											}
 										}
@@ -194,6 +208,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"BatchNo": {
+				"type": "string"
+			}
+		},
 		"annotations": []
 	}
 }
