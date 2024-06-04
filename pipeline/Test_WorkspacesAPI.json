@@ -1,0 +1,169 @@
+{
+	"name": "Test_WorkspacesAPI",
+	"properties": {
+		"activities": [
+			{
+				"name": "Test_Workspaces",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"additionalColumns": [
+							{
+								"name": "ClientId",
+								"value": {
+									"value": "@pipeline().parameters.ClientID",
+									"type": "Expression"
+								}
+							}
+						],
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "WorkSpaceSourceKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['isReadOnly']"
+								},
+								"sink": {
+									"name": "IsReadOnly",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"path": "['isOnDedicatedCapacity']"
+								},
+								"sink": {
+									"name": "IsonDedicatedCapacity",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"path": "['capacityMigrationStatus']"
+								},
+								"sink": {
+									"name": "CapacityMigrationStatus",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['description']"
+								},
+								"sink": {
+									"name": "WorkSpaceDescription",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['type']"
+								},
+								"sink": {
+									"name": "WorkSpaceType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['state']"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['hasWorkspaceLevelSettings ']"
+								},
+								"sink": {
+									"name": "HasWorkspaceLevelSetting",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "WorkSpaceName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['ClientId']"
+								},
+								"sink": {
+									"name": "ClientId",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['value']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Test_Workspaces",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Test_WorkspacesSQL",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"ClientID": {
+				"type": "String"
+			}
+		},
+		"variables": {
+			"ClientID": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Testing pipelines"
+		},
+		"annotations": []
+	}
+}
