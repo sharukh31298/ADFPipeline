@@ -40,70 +40,6 @@
 				}
 			},
 			{
-				"name": "Stored procedure1",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Set variable1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[TrackersforPipeline]",
-					"storedProcedureParameters": {
-						"PipelineEndTime": {
-							"value": {
-								"value": "@variables('V6')",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						},
-						"PipelineName": {
-							"value": {
-								"value": "@pipeline().Pipeline",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"PipelineStartTime": {
-							"value": {
-								"value": "@variables('V7')",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						},
-						"RunID": {
-							"value": {
-								"value": "@pipeline().RunId",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"Status": {
-							"value": {
-								"value": "@variables('V1')",
-								"type": "Expression"
-							},
-							"type": "String"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Test_Pipelines",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
 				"name": "Set variable2",
 				"type": "SetVariable",
 				"dependsOn": [
@@ -258,6 +194,15 @@
 				"type": "String"
 			},
 			"ExecutionEndTime": {
+				"type": "String"
+			},
+			"Ist": {
+				"type": "String"
+			},
+			"IST": {
+				"type": "String"
+			},
+			"Time": {
 				"type": "String"
 			}
 		},

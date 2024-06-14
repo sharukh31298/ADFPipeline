@@ -205,11 +205,11 @@
 				}
 			},
 			{
-				"name": "Stored procedure1",
+				"name": "Stored procedure",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Test_Workspaces",
+						"activity": "Set ExecutionStartTime",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -224,11 +224,90 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[TrackersforPipeline]"
+					"storedProcedureName": "[dbo].[TrackersforPipeline]",
+					"storedProcedureParameters": {
+						"PipelineEndTime": {
+							"value": {
+								"value": "@variables('V6')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineStartTime": {
+							"value": {
+								"value": "@variables('V7')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"Status": {
+							"value": {
+								"value": "@variables('Status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
 				},
 				"linkedServiceName": {
 					"referenceName": "Test_Pipelines",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Utc",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set ExecutionStartTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V7",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Time",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set ExecutionEndTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "V6",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
 				}
 			}
 		],
