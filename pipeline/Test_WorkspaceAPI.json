@@ -61,12 +61,26 @@
 				"typeProperties": {
 					"storedProcedureName": "[dbo].[TrackersforPipeline]",
 					"storedProcedureParameters": {
+						"PipelineEndTime": {
+							"value": {
+								"value": "@variables('V6')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
 						"PipelineName": {
 							"value": {
 								"value": "@pipeline().Pipeline",
 								"type": "Expression"
 							},
 							"type": "String"
+						},
+						"PipelineStartTime": {
+							"value": {
+								"value": "@variables('V7')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
 						},
 						"RunID": {
 							"value": {
@@ -111,7 +125,7 @@
 				}
 			},
 			{
-				"name": "Set variable3",
+				"name": "ExecutionEndTime",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -132,7 +146,7 @@
 				}
 			},
 			{
-				"name": "Set variable4",
+				"name": "ExecutionStartTime",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -153,11 +167,11 @@
 				}
 			},
 			{
-				"name": "Set variable5",
+				"name": "V6",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Set variable3",
+						"activity": "ExecutionEndTime",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -174,11 +188,11 @@
 				}
 			},
 			{
-				"name": "Set variable5_copy1",
+				"name": "V7",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Set variable4",
+						"activity": "ExecutionStartTime",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -235,6 +249,15 @@
 				"type": "String"
 			},
 			"V7": {
+				"type": "String"
+			},
+			"Status": {
+				"type": "String"
+			},
+			"ExecutionStartTime": {
+				"type": "String"
+			},
+			"ExecutionEndTime": {
 				"type": "String"
 			}
 		},
