@@ -561,8 +561,58 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Set Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Workspaces Status",
+					"value": "@activity('WorkSpace Staging').Status"
+				}
+			},
+			{
+				"name": "Set Execution startTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Workspaces_Execution StartTime",
+					"value": "@activity('WorkSpace Staging').Execution StartTime"
+				}
 			}
 		],
+		"variables": {
+			"Workspaces Status": {
+				"type": "String"
+			},
+			"Workspaces_Execution StartTime": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "UBTI"
 		},
