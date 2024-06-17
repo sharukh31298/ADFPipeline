@@ -226,6 +226,58 @@
 					"variableName": "WorkSpaces_EndTime",
 					"value": "@activity('Get WorkSpaces').ExecutionEndTime"
 				}
+			},
+			{
+				"name": "Set WorkSpaceUsers_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set WorkSpaces_StartTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaces_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
+			},
+			{
+				"name": "Set WorkSpacesUsers_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set WorkSpaces EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaces_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
 		"parameters": {
@@ -241,6 +293,12 @@
 				"type": "String"
 			},
 			"WorkSpaces_EndTime": {
+				"type": "String"
+			},
+			"WorkSpaces_IST": {
+				"type": "String"
+			},
+			"WorkSpaces_IST2": {
 				"type": "String"
 			}
 		},
