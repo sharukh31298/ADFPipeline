@@ -182,11 +182,11 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkSpaceUsers_Status",
-					"value": ""
+					"value": "@activity('Get WorkSpaces').Status"
 				}
 			},
 			{
-				"name": "Set variable2",
+				"name": "Set WorkSpaces_StartTime",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -200,10 +200,14 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaces_ExecutionStartTime",
+					"value": "@activity('Get WorkSpaces').ExecutionStartTime"
+				}
 			},
 			{
-				"name": "Set variable3",
+				"name": "Set WorkSpaces EndTime",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -217,7 +221,11 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaces_EndTime",
+					"value": "@activity('Get WorkSpaces').ExecutionEndTime"
+				}
 			}
 		],
 		"parameters": {
@@ -227,6 +235,12 @@
 		},
 		"variables": {
 			"WorkSpaceUsers_Status": {
+				"type": "String"
+			},
+			"WorkSpaces_ExecutionStartTime": {
+				"type": "String"
+			},
+			"WorkSpaces_EndTime": {
 				"type": "String"
 			}
 		},
