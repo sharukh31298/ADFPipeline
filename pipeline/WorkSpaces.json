@@ -603,6 +603,69 @@
 					"variableName": "Workspaces_Execution StartTime",
 					"value": "@activity('WorkSpace Staging').Execution StartTime"
 				}
+			},
+			{
+				"name": "Set Execution EndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Workspaces_Execution EndTime",
+					"value": "@activity('WorkSpace Staging').ExecutionEndTime"
+				}
+			},
+			{
+				"name": "Set IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Execution EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Workspaces_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set IST_",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Execution startTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Workspaces_StartTime IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
 		"variables": {
@@ -610,6 +673,15 @@
 				"type": "String"
 			},
 			"Workspaces_Execution StartTime": {
+				"type": "String"
+			},
+			"Workspaces_Execution EndTime": {
+				"type": "String"
+			},
+			"Workspaces_IST": {
+				"type": "String"
+			},
+			"Workspaces_StartTime IST": {
 				"type": "String"
 			}
 		},
