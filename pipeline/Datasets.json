@@ -801,8 +801,130 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Set Datasets_Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Dataset Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasets_status",
+					"value": "@activity('Dataset Staging').Status"
+				}
+			},
+			{
+				"name": "Set Datasets_StartTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Dataset Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasets_startTime",
+					"value": "@activity('Dataset Staging').ExecutionStartTime"
+				}
+			},
+			{
+				"name": "Set Datasets_EndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Dataset Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasets_EndTime",
+					"value": "@activity('Dataset Staging').ExecutionEndTime"
+				}
+			},
+			{
+				"name": "Set Datasets_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Datasets_StartTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasets_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set Datasets_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Datasets_EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasets_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
+		"variables": {
+			"Datasets_status": {
+				"type": "String"
+			},
+			"Datasets_startTime": {
+				"type": "String"
+			},
+			"Datasets_EndTime": {
+				"type": "String"
+			},
+			"Datasets_IST": {
+				"type": "String"
+			},
+			"Datasets_IST2": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "UBTI"
 		},
