@@ -210,8 +210,130 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set Datasources_EndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasources_EndTime",
+					"value": "@activity('Get Datasets).ExecutionEndTime"
+				}
+			},
+			{
+				"name": "Set Datasources_StartTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasources_StartTime",
+					"value": "@activity('Get Datasets).ExecutionStartTime"
+				}
+			},
+			{
+				"name": "Set Datasources_Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasources_Status",
+					"value": "@activity('Get Datasets).Status"
+				}
+			},
+			{
+				"name": "Set Datasources_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Datasources_StartTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasources_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set Datasources_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Datasources_EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasources_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
+		"variables": {
+			"Datasources_Status": {
+				"type": "String"
+			},
+			"Datasources_StartTime": {
+				"type": "String"
+			},
+			"Datasources_EndTime": {
+				"type": "String"
+			},
+			"Datasources_IST": {
+				"type": "String"
+			},
+			"Datasources_IST2": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "UBTI"
 		},
