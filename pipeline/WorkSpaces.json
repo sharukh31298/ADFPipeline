@@ -666,6 +666,91 @@
 					"variableName": "Workspaces_IST2",
 					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
 				}
+			},
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Set WorkSpace Staging_IST2",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@variables('Workspaces_EndTime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@variables('Workspaces_StartTime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@variables('Workspaces_Status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"variables": {
