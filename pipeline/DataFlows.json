@@ -429,8 +429,130 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Set DataFlows_Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataFlow Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlows_Status",
+					"value": "@activity('Reports Staging').Status"
+				}
+			},
+			{
+				"name": "Set DataFlows_StartTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataFlow Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlows_StartTime",
+					"value": "@activity('Reports Staging').ExecutionStartTime"
+				}
+			},
+			{
+				"name": "Set DataFlows_EndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataFlow Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlows_EndTime",
+					"value": "@activity('Reports Staging').ExecutionEndTime"
+				}
+			},
+			{
+				"name": "Set DataFlows_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set DataFlows_StartTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlows_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set DataFlows_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set DataFlows_EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlows_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
+		"variables": {
+			"DataFlows_Status": {
+				"type": "String"
+			},
+			"DataFlows_StartTime": {
+				"type": "String"
+			},
+			"DataFlows_EndTime": {
+				"type": "String"
+			},
+			"DataFlows_IST": {
+				"type": "String"
+			},
+			"DataFlows_IST2": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "UBTI"
 		},
