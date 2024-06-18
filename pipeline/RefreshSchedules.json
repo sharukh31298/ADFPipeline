@@ -94,8 +94,130 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set RefreshSchedules_StartTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RefreshSchedules",
+					"value": "@activity('Get Datasets').ExecutionStartTime"
+				}
+			},
+			{
+				"name": "Set RefreshSchedules_Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RefreshSchedules_Status",
+					"value": "@activity('Get Datasets').Status"
+				}
+			},
+			{
+				"name": "Set RefreshSchedules_EndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RefreshSchedules_EndTime",
+					"value": "@activity('Get Datasets').ExecutionEndTime"
+				}
+			},
+			{
+				"name": "Set RefreshSchedules_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set RefreshSchedules_StartTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RefreshSchedules_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set RefreshSchedules_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set RefreshSchedules_EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RefreshSchedules_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
+		"variables": {
+			"RefreshSchedules_Status": {
+				"type": "String"
+			},
+			"RefreshSchedules": {
+				"type": "String"
+			},
+			"RefreshSchedules_EndTime": {
+				"type": "String"
+			},
+			"RefreshSchedules_IST": {
+				"type": "String"
+			},
+			"RefreshSchedules_IST2": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "UBTI"
 		},
