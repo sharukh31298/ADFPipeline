@@ -189,11 +189,133 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set DataFlowRefreshes_Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Dataflows",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlowRefreshes_Status",
+					"value": "@activity('Get Dataflows').Status"
+				}
+			},
+			{
+				"name": "Set DataFlowRefreshes_StartTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Dataflows",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlowRefreshes_StartTime",
+					"value": "@activity('Get Dataflows').ExecutionStartTime"
+				}
+			},
+			{
+				"name": "Set DataFlowRefreshes_EndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Dataflows",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlowRefreshes_EndTime",
+					"value": "@activity('Get Dataflows').ExecutionEndTime"
+				}
+			},
+			{
+				"name": "Set DataFlowRefreshes_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set DataFlowRefreshes_StartTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlowRefreshes_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set DataFlowRefreshes_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set DataFlowRefreshes_EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFlowRefreshes_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
 		"parameters": {
 			"BatchNo": {
 				"type": "string"
+			}
+		},
+		"variables": {
+			"DataFlowRefreshes_Status": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_StartTime": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_EndTime": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_IST": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_IST2": {
+				"type": "String"
 			}
 		},
 		"folder": {
