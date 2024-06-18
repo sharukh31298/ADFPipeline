@@ -498,7 +498,7 @@
 				]
 			},
 			{
-				"name": "Set variable1",
+				"name": "Set Reports Staging_Execution StartT",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -512,10 +512,14 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Reports Staging_StartTime",
+					"value": "@activity('Reports Staging').Execution StartTime"
+				}
 			},
 			{
-				"name": "Set variable2",
+				"name": "Set Reporting_Staging_Status",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -529,10 +533,14 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Reports_Staging_Status",
+					"value": "@activity('Reports Staging').Status"
+				}
 			},
 			{
-				"name": "Set variable3",
+				"name": "Set Reporting_Staging EndTime",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -546,14 +554,18 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Reports Staging_Execution EndTime",
+					"value": "@activity('Reports Staging').ExecutionEndTime"
+				}
 			},
 			{
-				"name": "Set variable4",
+				"name": "Set Reports Staging",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Set variable3",
+						"activity": "Set Reporting_Staging EndTime",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -563,14 +575,18 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Reports_Staging_IST",
+					"value": ""
+				}
 			},
 			{
 				"name": "Set variable5",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Set variable2",
+						"activity": "Set Reporting_Staging_Status",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -583,6 +599,20 @@
 				"userProperties": []
 			}
 		],
+		"variables": {
+			"Reports_Staging_Status": {
+				"type": "String"
+			},
+			"Reports Staging_StartTime": {
+				"type": "String"
+			},
+			"Reports Staging_Execution EndTime": {
+				"type": "String"
+			},
+			"Reports_Staging_IST": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "UBTI"
 		},
