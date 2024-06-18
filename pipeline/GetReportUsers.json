@@ -186,7 +186,7 @@
 				}
 			},
 			{
-				"name": "Set variable1",
+				"name": "Set ReportUsers",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -200,10 +200,14 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportUsers_Status",
+					"value": "@activity('Get Reports').Status"
+				}
 			},
 			{
-				"name": "Set variable2",
+				"name": "Set ReportUsers_StartTime",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -217,10 +221,14 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportUsers_StartTime",
+					"value": "@activity('Reports Staging').ExecutionStartTime"
+				}
 			},
 			{
-				"name": "Set variable3",
+				"name": "Set ReportUsers_EndTime",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -234,9 +242,72 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportUsers_EndTime",
+					"value": "@activity('Reports Staging').ExecutionEndTime"
+				}
+			},
+			{
+				"name": "Set ReportUsers_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set ReportUsers_StartTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportUsers_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set ReportUsers_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set ReportUsers_EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportUsers_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
+		"variables": {
+			"ReportUsers_Status": {
+				"type": "String"
+			},
+			"ReportUsers_StartTime": {
+				"type": "String"
+			},
+			"ReportUsers_EndTime": {
+				"type": "String"
+			},
+			"ReportUsers_IST": {
+				"type": "String"
+			},
+			"ReportUsers_IST2": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "UBTI"
 		},
