@@ -172,6 +172,111 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set ReportsPages_Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Reports",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportPages_Status",
+					"value": "@activity('Get Reports').Status"
+				}
+			},
+			{
+				"name": "Set ReportPages_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set ReportPages_EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportPages_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set ReportPages",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Reports",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportPages_StartTime",
+					"value": "@activity('Get Reports').ExecutionStartTime"
+				}
+			},
+			{
+				"name": "Set ReportPages_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set ReportPages",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportPages_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set ReportPages_EndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Reports",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportPages_EndTime",
+					"value": "@activity('Get Reports').ExecutionEndTime"
+				}
 			}
 		],
 		"parameters": {
@@ -182,6 +287,21 @@
 		"variables": {
 			"CountWorkspace": {
 				"type": "Integer"
+			},
+			"ReportPages_Status": {
+				"type": "String"
+			},
+			"ReportPages_StartTime": {
+				"type": "String"
+			},
+			"ReportPages_IST": {
+				"type": "String"
+			},
+			"ReportPages_IST2": {
+				"type": "String"
+			},
+			"ReportPages_EndTime": {
+				"type": "String"
 			}
 		},
 		"folder": {
