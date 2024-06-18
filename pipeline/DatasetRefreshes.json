@@ -200,11 +200,133 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Set DatasetsRefreshes_Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DatasetsRefreshes_IST2",
+					"value": "@activity('Get Datasets').Status"
+				}
+			},
+			{
+				"name": "Set DatasetsRefreshes_StartTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DatasetsRefreshes_StartTime",
+					"value": "@activity('Get Datasets').ExecutionStartTime"
+				}
+			},
+			{
+				"name": "Set DatasetsRefreshes_EndTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DatasetsRefreshes_EndTime",
+					"value": "@activity('Get Datasets').ExecutionEndTime"
+				}
+			},
+			{
+				"name": "Set DatasetsRefreshes_IST",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set DatasetsRefreshes_StartTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DatasetsRefreshes_IST",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
+			},
+			{
+				"name": "Set DatasetsRefreshes_IST2",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set DatasetsRefreshes_EndTime",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DatasetsRefreshes_IST2",
+					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+				}
 			}
 		],
 		"parameters": {
 			"BatchNo": {
 				"type": "string"
+			}
+		},
+		"variables": {
+			"DatasetsRefreshes_status": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_StartTime": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_EndTime": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_IST": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_IST2": {
+				"type": "String"
 			}
 		},
 		"folder": {
