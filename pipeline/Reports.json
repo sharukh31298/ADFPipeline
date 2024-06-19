@@ -601,6 +601,91 @@
 					"variableName": "Reports Staging_IST",
 					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
 				}
+			},
+			{
+				"name": "Stored procedure",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Set Reports Staging_Execution StartT",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@variables('Reports Staging_Execution EndTime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@variables('Reports Staging_StartTime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@variables('Reports_Staging_Status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"variables": {
@@ -617,6 +702,156 @@
 				"type": "String"
 			},
 			"Reports Staging_IST": {
+				"type": "String"
+			},
+			"ReportPages_Status": {
+				"type": "String"
+			},
+			"ReportPages_StartTime": {
+				"type": "String"
+			},
+			"ReportPages_IST": {
+				"type": "String"
+			},
+			"ReportPages_IST2": {
+				"type": "String"
+			},
+			"ReportPages_EndTime": {
+				"type": "String"
+			},
+			"RefreshSchedules_Status": {
+				"type": "String"
+			},
+			"RefreshSchedules": {
+				"type": "String"
+			},
+			"RefreshSchedules_EndTime": {
+				"type": "String"
+			},
+			"RefreshSchedules_IST": {
+				"type": "String"
+			},
+			"RefreshSchedules_IST2": {
+				"type": "String"
+			},
+			"ReportUsers_Status": {
+				"type": "String"
+			},
+			"ReportUsers_StartTime": {
+				"type": "String"
+			},
+			"ReportUsers_EndTime": {
+				"type": "String"
+			},
+			"ReportUsers_IST": {
+				"type": "String"
+			},
+			"ReportUsers_IST2": {
+				"type": "String"
+			},
+			"Datasources_Status": {
+				"type": "String"
+			},
+			"Datasources_StartTime": {
+				"type": "String"
+			},
+			"Datasources_EndTime": {
+				"type": "String"
+			},
+			"Datasources_IST": {
+				"type": "String"
+			},
+			"Datasources_IST2": {
+				"type": "String"
+			},
+			"DatasetUsers_Status": {
+				"type": "String"
+			},
+			"DatasetUsers_StartTime": {
+				"type": "String"
+			},
+			"DatasetUsers_EndTime": {
+				"type": "String"
+			},
+			"DatasetUsers_IST": {
+				"type": "String"
+			},
+			"DatasetUsers_IST2": {
+				"type": "String"
+			},
+			"Datasets_status": {
+				"type": "String"
+			},
+			"Datasets_startTime": {
+				"type": "String"
+			},
+			"Datasets_EndTime": {
+				"type": "String"
+			},
+			"Datasets_IST": {
+				"type": "String"
+			},
+			"Datasets_IST2": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_status": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_StartTime": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_EndTime": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_IST": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_IST2": {
+				"type": "String"
+			},
+			"DataFlows_Status": {
+				"type": "String"
+			},
+			"DataFlows_StartTime": {
+				"type": "String"
+			},
+			"DataFlows_EndTime": {
+				"type": "String"
+			},
+			"DataFlows_IST": {
+				"type": "String"
+			},
+			"DataFlows_IST2": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_Status": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_StartTime": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_EndTime": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_IST": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_IST2": {
+				"type": "String"
+			},
+			"ViewReports_Status": {
+				"type": "String"
+			},
+			"ViewReports_StartTime": {
+				"type": "String"
+			},
+			"ViewReports_EndTime": {
+				"type": "String"
+			},
+			"ViewReports_IST": {
+				"type": "String"
+			},
+			"ViewReports_IST2": {
 				"type": "String"
 			}
 		},
