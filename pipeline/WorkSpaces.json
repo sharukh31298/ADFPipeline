@@ -563,13 +563,13 @@
 				]
 			},
 			{
-				"name": "Set Status",
+				"name": "Set WorkSpaces Status",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -590,7 +590,7 @@
 					{
 						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -601,7 +601,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "Workspaces_StartTime",
-					"value": "@activity('WorkSpace Staging').Execution StartTime"
+					"value": "@activity('WorkSpace Staging').ExecutionStartTime"
 				}
 			},
 			{
@@ -611,7 +611,7 @@
 					{
 						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -663,16 +663,16 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Workspaces_IST2",
+					"variableName": "Workspaces_IST",
 					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
 				}
 			},
 			{
-				"name": "Stored procedure1",
+				"name": "Stored procedure",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Set WorkSpace Staging_IST2",
+						"activity": "Set WorkSpaces Status",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -720,27 +720,6 @@
 						"Status": {
 							"value": {
 								"value": "@variables('Workspaces_Status')",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"TriggerName": {
-							"value": {
-								"value": "@pipeline().TriggerName",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"TriggerTime": {
-							"value": {
-								"value": "@pipeline().TriggerTime",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						},
-						"TriggerType": {
-							"value": {
-								"value": "@pipeline().TriggerType",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -793,7 +772,7 @@
 			"Reports Staging_Execution EndTime": {
 				"type": "String"
 			},
-			"Reports_Staging_IST": {
+			"Reports Staging_IST2": {
 				"type": "String"
 			},
 			"Reports Staging_IST": {
@@ -932,6 +911,21 @@
 				"type": "String"
 			},
 			"DataFlowRefreshes_IST2": {
+				"type": "String"
+			},
+			"ViewReports_Status": {
+				"type": "String"
+			},
+			"ViewReports_StartTime": {
+				"type": "String"
+			},
+			"ViewReports_EndTime": {
+				"type": "String"
+			},
+			"ViewReports_IST": {
+				"type": "String"
+			},
+			"ViewReports_IST2": {
 				"type": "String"
 			}
 		},
