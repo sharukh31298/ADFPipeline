@@ -103,15 +103,6 @@
 										},
 										{
 											"source": {
-												"path": "['displayName']"
-											},
-											"sink": {
-												"name": "UserName",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
 												"path": "['identifier']"
 											},
 											"sink": {
@@ -182,7 +173,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkSpaceUsers_Status",
-					"value": "@activity('Get WorkSpaces').Status"
+					"value": {
+						"value": "@activity('Get WorkSpaces').Status",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -203,7 +197,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkSpaceUsers_StartTime",
-					"value": "@activity('Get WorkSpaces').ExecutionStartTime"
+					"value": {
+						"value": "@activity('Get WorkSpaces').ExecutionStartTime",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -224,7 +221,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkSpaceUsers_EndTime",
-					"value": "@activity('Get WorkSpaces').ExecutionEndTime"
+					"value": {
+						"value": "@activity('Get WorkSpaces').ExecutionEndTime",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -245,7 +245,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkSpacesUsers_IST",
-					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+					"value": {
+						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -266,7 +269,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkSpacesUsers_IST2",
-					"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')"
+					"value": {
+						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -352,6 +358,27 @@
 				"linkedServiceName": {
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Set WorkspaceUser_copy1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace ID in Loop",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaceUsers_Status",
+					"value": "@activity('Get WorkSpaces').Status"
 				}
 			}
 		],
