@@ -5,7 +5,14 @@
 			{
 				"name": "Test_Workspaces",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Test",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -319,6 +326,26 @@
 					"value": {
 						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Test",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://az-kv-pbimonitor-dev.vault.azure.net/secrets/TestClientsecret/35c88f618de24887ad31d4ebe4116938",
+					"authentication": {
+						"type": "MSI"
 					}
 				}
 			}
