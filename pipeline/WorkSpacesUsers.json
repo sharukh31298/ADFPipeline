@@ -284,6 +284,12 @@
 						"dependencyConditions": [
 							"Completed"
 						]
+					},
+					{
+						"activity": "Set WorkspaceUser_copy1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
 				"policy": {
@@ -378,7 +384,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkSpaceUsers_Status",
-					"value": "@activity('Get WorkSpaces').Status"
+					"value": {
+						"value": "@activity('WorkSpace ID in Loop').Status",
+						"type": "Expression"
+					}
 				}
 			}
 		],
