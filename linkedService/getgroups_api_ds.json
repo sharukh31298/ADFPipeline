@@ -1,13 +1,23 @@
 {
 	"name": "getgroups_api_ds",
 	"properties": {
+		"parameters": {
+			"TokenID": {
+				"type": "string",
+				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+			},
+			"ClientID": {
+				"type": "String",
+				"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+			}
+		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
 			"url": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5000",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "OAuth2ClientCredential",
-			"clientId": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be",
+			"clientId": "@{linkedService().ClientID}",
 			"clientSecret": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
@@ -16,7 +26,7 @@
 				},
 				"secretName": "TestClientsecret"
 			},
-			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',008502d6-3f79-46f0-ab37-9354e3fe80ff',/oauth2/v2.0/token')}",
+			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().TokenID,'/oauth2/v2.0/token')}",
 			"scope": "https://analysis.windows.net/powerbi/api/.default"
 		}
 	},
