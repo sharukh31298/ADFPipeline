@@ -24,6 +24,13 @@
 									"value": "@pipeline().parameters.ClientId",
 									"type": "Expression"
 								}
+							},
+							{
+								"name": "OrganisationId",
+								"value": {
+									"value": "@pipeline().parameters.OrganisationId",
+									"type": "Expression"
+								}
 							}
 						],
 						"httpRequestTimeout": "00:01:40",
@@ -130,6 +137,15 @@
 								},
 								"sink": {
 									"name": "ClientId",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['OrganisationId']"
+								},
+								"sink": {
+									"name": "OrganisationId",
 									"type": "String"
 								}
 							}
@@ -376,6 +392,9 @@
 			"Scope": {
 				"type": "string",
 				"defaultValue": "https://analysis.windows.net/powerbi/api/.default"
+			},
+			"OrganisationId": {
+				"type": "string"
 			}
 		},
 		"variables": {
