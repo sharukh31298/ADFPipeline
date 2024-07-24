@@ -131,7 +131,25 @@
 				"inputs": [
 					{
 						"referenceName": "Test_Workspaces",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"ClientId": {
+								"value": "@pipeline().parameters.ClientId",
+								"type": "Expression"
+							},
+							"TenantId": {
+								"value": "@pipeline().parameters.TenantId",
+								"type": "Expression"
+							},
+							"AzSecret": {
+								"value": "@pipeline().parameters.AZSecretName",
+								"type": "Expression"
+							},
+							"Scope": {
+								"value": "@pipeline().parameters.Scope",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -324,29 +342,19 @@
 			}
 		],
 		"parameters": {
-			"ClientID": {
-				"type": "String"
+			"ClientId": {
+				"type": "string"
 			},
-			"Duration": {
-				"type": "String"
+			"TenantId": {
+				"type": "string"
 			},
-			"PipelineName": {
-				"type": "String"
+			"AZSecretName": {
+				"type": "string",
+				"defaultValue": "Client2"
 			},
-			"RunEnd": {
-				"type": "String"
-			},
-			"RunStart": {
-				"type": "String"
-			},
-			"Status": {
-				"type": "String"
-			},
-			"TriggeredBy": {
-				"type": "String"
-			},
-			"RunID": {
-				"type": "String"
+			"Scope": {
+				"type": "string",
+				"defaultValue": "https://analysis.windows.net/powerbi/api/.default"
 			}
 		},
 		"variables": {
