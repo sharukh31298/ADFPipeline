@@ -28,7 +28,10 @@
 					"referenceName": "AzureKeyValut",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "Client2"
+				"secretName": {
+					"value": "@linkedService().AzSecret",
+					"type": "Expression"
+				}
 			},
 			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().Tenant ID,'/oauth2/v2.0/token')}",
 			"scope": "@{linkedService().Scope}"
