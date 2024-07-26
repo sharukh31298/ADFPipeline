@@ -50,6 +50,8 @@
 						{
 							"name": "ExecutePipelineTestWorkspace",
 							"type": "ExecutePipeline",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"secureInput": false
@@ -94,12 +96,18 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"method": "POST"
+								"method": "GET",
+								"url": {
+									"value": "@item().Test_WorkspacesAPI",
+									"type": "Expression"
+								}
 							}
 						},
 						{
 							"name": "WebHook1",
 							"type": "WebHook",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"secureOutput": false,
