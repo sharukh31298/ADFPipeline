@@ -1,0 +1,57 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web_Activity",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"url": {
+						"value": "@concat('https://management.azure.com/subscriptions/',pipeline().parameters.SubscriptionID,'/resourceGroups/',pipeline().parameters.ResourceGroup,'/providers/Microsoft.DataFactory/factories/',pipeline().parameters.DataFactoryName,'/pipelines/',pipeline().parameters.PipelineName,'/createRun?api-version=2018-06-01')",
+						"type": "Expression"
+					},
+					"body": {
+						"value": "{}",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com/"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"SubscriptionID": {
+				"type": "string",
+				"defaultValue": "a683694f-e3fc-4cd0-8f1d-b63f8ff20604"
+			},
+			"ResourceGroup": {
+				"type": "string",
+				"defaultValue": "ubti-d-wind-PBIMonitor"
+			},
+			"DataFactoryName": {
+				"type": "string",
+				"defaultValue": "ubtiPBIMonitor"
+			},
+			"PipelineName": {
+				"type": "string",
+				"defaultValue": "pipeline2"
+			}
+		},
+		"annotations": []
+	}
+}

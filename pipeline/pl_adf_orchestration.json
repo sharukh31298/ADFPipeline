@@ -50,6 +50,8 @@
 						{
 							"name": "ExecutePipelineTestWorkspace",
 							"type": "ExecutePipeline",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"secureInput": false
@@ -84,8 +86,6 @@
 						{
 							"name": "Web_Activity",
 							"type": "WebActivity",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
@@ -97,8 +97,18 @@
 							"userProperties": [],
 							"typeProperties": {
 								"method": "POST",
+								"headers": {
+									"content-type": {
+										"value": "application/json",
+										"type": "Expression"
+									}
+								},
 								"url": {
 									"value": "@concat('https://management.azure.com/subscriptions/',pipeline().parameters.SubscriptionID,'/resourceGroups/',pipeline().parameters.ResourceGroup,'/providers/Microsoft.DataFactory/factories/',pipeline().DataFactory,'/pipelines/',pipeline().parameters.PipelineName,'/createRun?api-version=2018-06-01')",
+									"type": "Expression"
+								},
+								"body": {
+									"value": "{}",
 									"type": "Expression"
 								},
 								"authentication": {
@@ -121,7 +131,8 @@
 				"defaultValue": "ubti-d-wind-PBIMonitor"
 			},
 			"DataFactoryName": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "ubtiPBIMonitor"
 			},
 			"PipelineName": {
 				"type": "string",
