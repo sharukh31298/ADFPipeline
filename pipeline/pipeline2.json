@@ -3,15 +3,227 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Wait1",
-				"type": "Wait",
+				"name": "WorkSpace_test",
+				"type": "Copy",
 				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 10
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "WorkSpaceSourceKey",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['isReadOnly']"
+								},
+								"sink": {
+									"name": "IsReadOnly",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"path": "['isOnDedicatedCapacity']"
+								},
+								"sink": {
+									"name": "IsonDedicatedCapacity",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"path": "['capacityMigrationStatus']"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['type']"
+								},
+								"sink": {
+									"name": "WorkSpaceType",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['state']"
+								},
+								"sink": {
+									"name": "CapacityMigrationStatus",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['hasWorkspaceLevelSettings ']"
+								},
+								"sink": {
+									"name": "HasWorkspaceLevelSetting",
+									"type": "Boolean"
+								}
+							},
+							{
+								"source": {
+									"path": "['name']"
+								},
+								"sink": {
+									"name": "WorkSpaceName",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['value']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "WorkSpaces_API",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Test_WorkspacesSQL",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Stored procedure",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace_test",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@variables('PipelineEndtime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@variables('PipelineStarttime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@variables('PipelineStatus')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
+		"variables": {
+			"PipelineStatus": {
+				"type": "String",
+				"defaultValue": "@activity('WorkSpace_test').Status"
+			},
+			"PipelineStarttime": {
+				"type": "String",
+				"defaultValue": "@activity('WorkSpace_test).ExecutionStartTime"
+			},
+			"PipelineEndtime": {
+				"type": "String",
+				"defaultValue": "@activity('WorkSpace_test').ExecutionEndTime"
+			}
+		},
 		"annotations": []
 	}
 }
