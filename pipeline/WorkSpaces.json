@@ -563,169 +563,13 @@
 				]
 			},
 			{
-				"name": "Set WorkSpaces Status",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "WorkSpace Staging",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "WorkSpace History",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "WorkSpace Live Data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "Workspaces_Status",
-					"value": {
-						"value": "@activity('WorkSpace Staging').Status",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set Execution startTime",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "WorkSpace Staging",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "WorkSpace History",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "WorkSpace Live Data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "Workspaces_StartTime",
-					"value": {
-						"value": "@activity('WorkSpace Staging').ExecutionStartTime",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set Execution EndTime",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "WorkSpace Staging",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "WorkSpace History",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "WorkSpace Live Data",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "Workspaces_EndTime",
-					"value": {
-						"value": "@activity('WorkSpace Staging').ExecutionEndTime",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set WorkSpace Staging_IST",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Set Execution EndTime",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "WorkSpacesUsers_IST",
-					"value": {
-						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set WorkSpace Staging_IST2",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Set Execution startTime",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "Workspaces_IST",
-					"value": {
-						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-						"type": "Expression"
-					}
-				}
-			},
-			{
 				"name": "Stored procedure",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Set WorkSpaces Status",
+						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -742,7 +586,7 @@
 					"storedProcedureParameters": {
 						"EndTime": {
 							"value": {
-								"value": "@variables('Workspaces_IST')",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
@@ -763,14 +607,14 @@
 						},
 						"StartTime": {
 							"value": {
-								"value": "@variables('Workspaces_StartTime')",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
 						},
 						"Status": {
 							"value": {
-								"value": "@variables('Workspaces_Status')",
+								"value": "@activity('WorkSpace Staging').Status",
 								"type": "Expression"
 							},
 							"type": "String"

@@ -156,112 +156,9 @@
 				}
 			},
 			{
-				"name": "Set WorkspaceUser",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpaces",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "WorkSpaceUsers_Status",
-					"value": {
-						"value": "@activity('Get WorkSpaces').Status",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set WorkSpaces_StartTime",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpaces",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "WorkSpaceUsers_StartTime",
-					"value": {
-						"value": "@activity('Get WorkSpaces').ExecutionStartTime",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set WorkSpaces EndTime",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpaces",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "WorkSpaceUsers_EndTime",
-					"value": {
-						"value": "@activity('Get WorkSpaces').ExecutionEndTime",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set WorkSpaceUsers_IST",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Set WorkSpaces_StartTime",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "WorkSpacesUsers_IST",
-					"value": {
-						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-						"type": "Expression"
-					}
-				}
-			},
-			{
 				"name": "Set WorkSpacesUsers_IST2",
 				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Set WorkSpaces EndTime",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
 					"secureInput": false
@@ -280,13 +177,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Set WorkSpaces_StartTime",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "Set WorkspaceUser_copy1",
+						"activity": "Get WorkSpaces",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -305,7 +196,7 @@
 					"storedProcedureParameters": {
 						"EndTime": {
 							"value": {
-								"value": "@variables('WorkSpacesUsers_IST2')",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
@@ -326,14 +217,14 @@
 						},
 						"StartTime": {
 							"value": {
-								"value": "@variables('WorkSpacesUsers_IST')",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
 						},
 						"Status": {
 							"value": {
-								"value": "@variables('WorkSpaceUsers_Status')",
+								"value": "@activity('Get WorkSpaces').Status",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -364,30 +255,6 @@
 				"linkedServiceName": {
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
-				}
-			},
-			{
-				"name": "Set WorkspaceUser_copy1",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "WorkSpace ID in Loop",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "WorkSpaceUsers_Status",
-					"value": {
-						"value": "@activity('WorkSpace ID in Loop').Status",
-						"type": "Expression"
-					}
 				}
 			}
 		],
