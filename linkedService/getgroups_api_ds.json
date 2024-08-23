@@ -28,9 +28,12 @@
 					"referenceName": "AzureKeyValut",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "TestClientsecret"
+				"secretName": {
+					"value": "@linkedService().AzureSecret",
+					"type": "Expression"
+				}
 			},
-			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().TentantID,'/oauth2/v2.0/token')}",
+			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().TenantID,'/oauth2/v2.0/token')}",
 			"scope": "https://analysis.windows.net/powerbi/api/.default"
 		}
 	},
