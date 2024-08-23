@@ -26,7 +26,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "Truncate Table [dbo].[WorkSpaces_Staging];",
+						"preCopyScript": "Truncate Table [dbo].[WorkSpaces_Staging_AllTenant];",
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
@@ -769,6 +769,23 @@
 			}
 		],
 		"concurrency": 2,
+		"parameters": {
+			"ClientId": {
+				"type": "string"
+			},
+			"TenantId": {
+				"type": "string"
+			},
+			"AZSecretName": {
+				"type": "string"
+			},
+			"Scope": {
+				"type": "string"
+			},
+			"OrganisationId": {
+				"type": "string"
+			}
+		},
 		"variables": {
 			"Workspaces_Status": {
 				"type": "String"
