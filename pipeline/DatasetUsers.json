@@ -174,123 +174,184 @@
 				}
 			},
 			{
-				"name": "Set DatasetUsers_Status",
-				"type": "SetVariable",
+				"name": "Sp_TrackProcessSuccess",
+				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
 						"activity": "Get Datasets",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
 				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "DatasetUsers_Status",
-					"value": {
-						"value": "@activity('Get Datasets').Status",
-						"type": "Expression"
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"ErrorMessage": {
+							"value": "NA",
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@activity('Get Datasets').Status",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
 					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
-				"name": "Set DatasetUsers_StartTime",
-				"type": "SetVariable",
+				"name": "Sp_TrackProcessFailure",
+				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
 						"activity": "Get Datasets",
 						"dependencyConditions": [
-							"Completed"
+							"Failed"
 						]
 					}
 				],
 				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
 					"secureOutput": false,
 					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "DatasetUsers_StartTime",
-					"value": {
-						"value": "@activity('Get Datasets').ExecutionStartTime",
-						"type": "Expression"
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"ErrorMessage": {
+							"value": {
+								"value": "@activity('Get Datasets').error?.message",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@activity('Get Datasets').Status",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
 					}
-				}
-			},
-			{
-				"name": "Set DatasetUsers_EndTime",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get Datasets",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
 				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "DatasetUsers_EndTime",
-					"value": {
-						"value": "@activity('Get Datasets').ExecutionEndTime",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set DatasetUsers_IST",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Set DatasetUsers_StartTime",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "DatasetUsers_IST",
-					"value": {
-						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set DatasetUsers_IST2",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Set DatasetUsers_EndTime",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "DatasetUsers_IST2",
-					"value": {
-						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-						"type": "Expression"
-					}
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
