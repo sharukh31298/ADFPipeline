@@ -8372,6 +8372,22 @@
 						"typeProperties": {
 							"source": {
 								"type": "RestSource",
+								"additionalColumns": [
+									{
+										"name": "ClientId",
+										"value": {
+											"value": "@pipeline().parameters.ClientId",
+											"type": "Expression"
+										}
+									},
+									{
+										"name": "OrganizationId",
+										"value": {
+											"value": "@pipeline().parameters.OrganisationId",
+											"type": "Expression"
+										}
+									}
+								],
 								"httpRequestTimeout": "00:01:40",
 								"requestInterval": "00.00:00:00.010",
 								"requestMethod": "GET",
@@ -8467,6 +8483,24 @@
 										},
 										"sink": {
 											"name": "WorkSpaceName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['ClientId']"
+										},
+										"sink": {
+											"name": "ClientId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['OrganizationId']"
+										},
+										"sink": {
+											"name": "OrganisationId",
 											"type": "String"
 										}
 									}
