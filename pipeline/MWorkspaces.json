@@ -1,0 +1,86 @@
+{
+	"name": "MWorkspaces",
+	"properties": {
+		"activities": [
+			{
+				"name": "Workspaces_Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "WorkSpaces",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"ClientId": {
+							"value": "@pipeline().parameters.ClientId",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						},
+						"AZSecretName": {
+							"value": "@pipeline().parameters.AZSecretName",
+							"type": "Expression"
+						},
+						"OrganisationId": {
+							"value": "@pipeline().parameters.OrganisationId",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "WorkspacesUsers_Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Workspaces_Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "WorkSpacesUsers_Batch",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"parameters": {
+			"ClientId": {
+				"type": "String",
+				"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+			},
+			"TenantId": {
+				"type": "String",
+				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+			},
+			"AZSecretName": {
+				"type": "String",
+				"defaultValue": "UBTIClientSecretName"
+			},
+			"OrganisationId": {
+				"type": "String",
+				"defaultValue": "001"
+			}
+		},
+		"folder": {
+			"name": "Master Pipelines"
+		},
+		"annotations": []
+	}
+}
