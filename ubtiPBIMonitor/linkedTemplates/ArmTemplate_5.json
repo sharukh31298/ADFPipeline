@@ -2057,7 +2057,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select * from ",
+								"sqlReaderQuery": "select DatasetSourceKey,WorkspaceId from datasets",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -2116,6 +2116,20 @@
 													"name": "WorkSpaceID",
 													"value": {
 														"value": "@item().WorkspaceId",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "TenantId",
+													"value": {
+														"value": "@pipeline().parameters.TenantId",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "OrganisationId",
+													"value": {
+														"value": "@pipeline().parameters.OrganisationId",
 														"type": "Expression"
 													}
 												}
@@ -2400,6 +2414,14 @@
 				"parameters": {
 					"BatchNo": {
 						"type": "string"
+					},
+					"TenantId": {
+						"type": "string",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+					},
+					"OrganisationId": {
+						"type": "string",
+						"defaultValue": "001"
 					}
 				},
 				"variables": {
@@ -2699,7 +2721,7 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "Truncate table ",
+								"preCopyScript": "Truncate table Datasets",
 								"writeBehavior": "upsert",
 								"upsertSettings": {
 									"useTempDB": true,
@@ -8511,30 +8533,6 @@
 								"mappings": [
 									{
 										"source": {
-											"name": "TenantID",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "TenantID",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "OrganisationID",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "OrganisationID",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
 											"name": "WorkSpaceSourceKey",
 											"type": "String",
 											"physicalType": "varchar"
@@ -8927,8 +8925,15 @@
 						"type": "String",
 						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
 					},
-					"OrganisationId": {
+					"ClientId": {
 						"type": "String",
+						"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+					},
+					"ClientKeyCode": {
+						"type": "string"
+					},
+					"OrganisationId": {
+						"type": "string",
 						"defaultValue": "001"
 					}
 				},
@@ -9167,10 +9172,6 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select WorkSpaceSourceKey from [dbo].[Workspaces_batch] where BatchNo =',pipeline().parameters.BatchNo)",
-									"type": "Expression"
-								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
