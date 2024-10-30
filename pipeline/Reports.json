@@ -17,6 +17,22 @@
 				"typeProperties": {
 					"source": {
 						"type": "RestSource",
+						"additionalColumns": [
+							{
+								"name": "TenantId",
+								"value": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "OrganisationId",
+								"value": {
+									"value": "@pipeline().parameters.OrganisationId",
+									"type": "Expression"
+								}
+							}
+						],
 						"httpRequestTimeout": "00:01:40",
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
@@ -91,46 +107,28 @@
 							},
 							{
 								"source": {
-									"path": "['createdDateTime']"
-								},
-								"sink": {
-									"name": "CreatedDate",
-									"type": "DateTime"
-								}
-							},
-							{
-								"source": {
-									"path": "['modifiedDateTime']"
-								},
-								"sink": {
-									"name": "ModifiedDate",
-									"type": "DateTime"
-								}
-							},
-							{
-								"source": {
-									"path": "['modifiedBy']"
-								},
-								"sink": {
-									"name": "ModifiedBy",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['createdBy']"
-								},
-								"sink": {
-									"name": "CreatedBy",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "['workspaceId']"
 								},
 								"sink": {
 									"name": "WorkSpaceID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['TenantId']"
+								},
+								"sink": {
+									"name": "TenantID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['OrganisationId']"
+								},
+								"sink": {
+									"name": "OrganisationID",
 									"type": "String"
 								}
 							}
@@ -245,12 +243,12 @@
 								"source": {
 									"name": "ReportName",
 									"type": "String",
-									"physicalType": "varchar"
+									"physicalType": "nvarchar"
 								},
 								"sink": {
 									"name": "ReportName",
 									"type": "String",
-									"physicalType": "varchar"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -321,6 +319,30 @@
 								},
 								"sink": {
 									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "OrganisationID",
 									"type": "String",
 									"physicalType": "varchar"
 								}
@@ -432,12 +454,12 @@
 								"source": {
 									"name": "ReportName",
 									"type": "String",
-									"physicalType": "varchar"
+									"physicalType": "nvarchar"
 								},
 								"sink": {
 									"name": "ReportName",
 									"type": "String",
-									"physicalType": "varchar"
+									"physicalType": "nvarchar"
 								}
 							},
 							{
@@ -508,6 +530,30 @@
 								},
 								"sink": {
 									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "OrganisationID",
 									"type": "String",
 									"physicalType": "varchar"
 								}
@@ -715,6 +761,16 @@
 				}
 			}
 		],
+		"parameters": {
+			"TenantId": {
+				"type": "string",
+				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+			},
+			"OrganisationId": {
+				"type": "string",
+				"defaultValue": "001"
+			}
+		},
 		"variables": {
 			"Reports_Staging_Status": {
 				"type": "String"
