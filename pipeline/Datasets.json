@@ -17,6 +17,22 @@
 				"typeProperties": {
 					"source": {
 						"type": "RestSource",
+						"additionalColumns": [
+							{
+								"name": "TenantId",
+								"value": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "OrganisationId",
+								"value": {
+									"value": "@pipeline().parameters.OrganizationId",
+									"type": "Expression"
+								}
+							}
+						],
 						"httpRequestTimeout": "00:01:40",
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
@@ -185,6 +201,24 @@
 								},
 								"sink": {
 									"name": "MaxReadOnlyReplicas",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['TenantId']"
+								},
+								"sink": {
+									"name": "TenantID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "$['OrganisationId']"
+								},
+								"sink": {
+									"name": "OrganisationID",
 									"type": "String"
 								}
 							}
@@ -485,6 +519,30 @@
 									"type": "String",
 									"physicalType": "varchar"
 								}
+							},
+							{
+								"source": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
 							}
 						],
 						"typeConversion": true,
@@ -780,6 +838,30 @@
 									"type": "String",
 									"physicalType": "varchar"
 								}
+							},
+							{
+								"source": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
 							}
 						],
 						"typeConversion": true,
@@ -984,6 +1066,16 @@
 				}
 			}
 		],
+		"parameters": {
+			"TenantId": {
+				"type": "string",
+				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+			},
+			"OrganizationId": {
+				"type": "string",
+				"defaultValue": "001"
+			}
+		},
 		"variables": {
 			"Datasets_status": {
 				"type": "String"

@@ -17,6 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select ReportSourceKey from [dbo].[Reports]",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -66,6 +67,20 @@
 											"name": "ReportID",
 											"value": {
 												"value": "@item().ReportSourceKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "TenantId",
+											"value": {
+												"value": "@pipeline().parameters.TenantId",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "OrganisationId",
+											"value": {
+												"value": "@pipeline().parameters.OrganisationId",
 												"type": "Expression"
 											}
 										}
@@ -144,19 +159,28 @@
 										},
 										{
 											"source": {
-												"path": "['userType']"
+												"path": "$['ReportID']"
 											},
 											"sink": {
-												"name": "UserType",
+												"name": "ReportID",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['ReportID']"
+												"path": "$['TenantId']"
 											},
 											"sink": {
-												"name": "ReportID",
+												"name": "TenantID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['OrganisationId']"
+											},
+											"sink": {
+												"name": "OrganisationID",
 												"type": "String"
 											}
 										}
@@ -369,8 +393,13 @@
 			}
 		],
 		"parameters": {
-			"BatchNo": {
-				"type": "string"
+			"TenantId": {
+				"type": "string",
+				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+			},
+			"OrganisationId": {
+				"type": "string",
+				"defaultValue": "001"
 			}
 		},
 		"variables": {
