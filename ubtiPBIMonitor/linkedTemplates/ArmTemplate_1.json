@@ -118,7 +118,7 @@
 		},
 		"getdataset_api_ls_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/datasets"
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/datasets?$top=5"
 		},
 		"getdataset_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
@@ -150,15 +150,15 @@
 		},
 		"getgroups_api_ds_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5000"
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5"
 		},
 		"getgroups_api_ds_properties_typeProperties_clientId": {
 			"type": "string",
-			"defaultValue": "@{linkedService().ClientID}"
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		},
 		"getgroupsusers_api_ls_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkSpaceID,'/users')}\n"
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/groups/',linkedService().WorkSpaceID,'/users')}\n"
 		},
 		"getgroupsusers_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
@@ -346,7 +346,7 @@
 							"referenceName": "AzureKeyValut",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "TestClientsecret"
+						"secretName": "UBTIClientSecretName"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
@@ -501,7 +501,7 @@
 							"referenceName": "AzureKeyValut",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "TestClientsecret"
+						"secretName": "UBTIClientSecretName"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
@@ -561,7 +561,7 @@
 							"referenceName": "AzureKeyValut",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "TestClientsecret"
+						"secretName": "UBTIClientSecretName"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
@@ -595,7 +595,7 @@
 							"referenceName": "AzureKeyValut",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "TestClientsecret"
+						"secretName": "UBTIClientSecretName"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
@@ -621,7 +621,7 @@
 							"referenceName": "AzureKeyValut",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "TestClientsecret"
+						"secretName": "UBTIClientSecretName"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
@@ -718,7 +718,7 @@
 							"referenceName": "AzureKeyValut",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "TestClientsecret"
+						"secretName": "UBTIClientSecretName"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
@@ -731,20 +731,6 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"parameters": {
-					"ClientID": {
-						"type": "string"
-					},
-					"TenantID": {
-						"type": "string"
-					},
-					"Scope": {
-						"type": "string"
-					},
-					"AzureSecret": {
-						"type": "string"
-					}
-				},
 				"annotations": [],
 				"type": "RestService",
 				"typeProperties": {
@@ -758,13 +744,10 @@
 							"referenceName": "AzureKeyValut",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": {
-							"value": "@linkedService().AzureSecret",
-							"type": "Expression"
-						}
+						"secretName": "UBTIClientSecretName"
 					},
-					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().TenantID,'/oauth2/v2.0/token')}",
-					"scope": "@{linkedService().Scope}"
+					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
 				}
 			},
 			"dependsOn": []
@@ -813,7 +796,7 @@
 							"referenceName": "AzureKeyValut",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "TestClientsecret"
+						"secretName": "UBTIClientSecretName"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"

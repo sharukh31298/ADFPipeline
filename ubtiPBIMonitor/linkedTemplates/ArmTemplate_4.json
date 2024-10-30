@@ -370,7 +370,7 @@
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "ViewReports"
+					"table": "ViewReports_Staging"
 				}
 			},
 			"dependsOn": []
@@ -631,6 +631,14 @@
 					{
 						"name": "ModifiedBy",
 						"type": "varchar"
+					},
+					{
+						"name": "TenantID",
+						"type": "varchar"
+					},
+					{
+						"name": "OrganisationID",
+						"type": "varchar"
 					}
 				],
 				"typeProperties": {
@@ -708,39 +716,7 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "getgroups_api_ds",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"ClientID": {
-							"value": "@dataset().ClientId",
-							"type": "Expression"
-						},
-						"TenantID": {
-							"value": "@dataset().TenantId",
-							"type": "Expression"
-						},
-						"Scope": {
-							"value": "@dataset().Scope",
-							"type": "Expression"
-						},
-						"AzureSecret": {
-							"value": "@dataset().AzureSecret",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"ClientId": {
-						"type": "String"
-					},
-					"TenantId": {
-						"type": "String"
-					},
-					"Scope": {
-						"type": "String"
-					},
-					"AzureSecret": {
-						"type": "String"
-					}
+					"type": "LinkedServiceReference"
 				},
 				"folder": {
 					"name": "UBTI Datasets_Dev"
@@ -769,7 +745,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "WorkSpaces_AllTenant"
+					"table": "WorkSpaces"
 				}
 			},
 			"dependsOn": []
@@ -891,7 +867,7 @@
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "WorkSpaces_Staging_AllTenant"
+					"table": "WorkSpaces_Staging"
 				}
 			},
 			"dependsOn": []

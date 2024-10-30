@@ -2057,10 +2057,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Dataset_batch] where BatchNo=',pipeline().parameters.BatchNo)",
-									"type": "Expression"
-								},
+								"sqlReaderQuery": "select * from ",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -2451,6 +2448,22 @@
 						"typeProperties": {
 							"source": {
 								"type": "RestSource",
+								"additionalColumns": [
+									{
+										"name": "TenantId",
+										"value": {
+											"value": "@pipeline().parameters.TenantId",
+											"type": "Expression"
+										}
+									},
+									{
+										"name": "OrganisationId",
+										"value": {
+											"value": "@pipeline().parameters.OrganizationId",
+											"type": "Expression"
+										}
+									}
+								],
 								"httpRequestTimeout": "00:01:40",
 								"requestInterval": "00.00:00:00.010",
 								"requestMethod": "GET",
@@ -2621,6 +2634,24 @@
 											"name": "MaxReadOnlyReplicas",
 											"type": "String"
 										}
+									},
+									{
+										"source": {
+											"path": "$['TenantId']"
+										},
+										"sink": {
+											"name": "TenantID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['OrganisationId']"
+										},
+										"sink": {
+											"name": "OrganisationID",
+											"type": "String"
+										}
 									}
 								],
 								"collectionReference": "$['value']"
@@ -2668,6 +2699,7 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": "Truncate table ",
 								"writeBehavior": "upsert",
 								"upsertSettings": {
 									"useTempDB": true,
@@ -2918,6 +2950,30 @@
 										},
 										"sink": {
 											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TenantID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "TenantID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OrganisationID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "OrganisationID",
 											"type": "String",
 											"physicalType": "varchar"
 										}
@@ -3218,6 +3274,30 @@
 											"type": "String",
 											"physicalType": "varchar"
 										}
+									},
+									{
+										"source": {
+											"name": "TenantID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "TenantID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OrganisationID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "OrganisationID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
 									}
 								],
 								"typeConversion": true,
@@ -3426,6 +3506,16 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"TenantId": {
+						"type": "string",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+					},
+					"OrganizationId": {
+						"type": "string",
+						"defaultValue": "001"
+					}
 				},
 				"variables": {
 					"Datasets_status": {
@@ -4132,6 +4222,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": "select ReportSourceKey from [dbo].[Reports]",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -4184,6 +4275,20 @@
 														"value": "@item().ReportSourceKey",
 														"type": "Expression"
 													}
+												},
+												{
+													"name": "TenantId",
+													"value": {
+														"value": "@pipeline().parameters.TenantId",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "OrganisationId",
+													"value": {
+														"value": "@pipeline().parameters.OrganisationId",
+														"type": "Expression"
+													}
 												}
 											],
 											"httpRequestTimeout": "00:01:40",
@@ -4195,6 +4300,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
+											"preCopyScript": "Truncate Table [dbo].[ReportUsers]",
 											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
@@ -4259,19 +4365,28 @@
 												},
 												{
 													"source": {
-														"path": "[['userType']"
+														"path": "$['ReportID']"
 													},
 													"sink": {
-														"name": "UserType",
+														"name": "ReportID",
 														"type": "String"
 													}
 												},
 												{
 													"source": {
-														"path": "$['ReportID']"
+														"path": "$['TenantId']"
 													},
 													"sink": {
-														"name": "ReportID",
+														"name": "TenantID",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['OrganisationId']"
+													},
+													"sink": {
+														"name": "OrganisationID",
 														"type": "String"
 													}
 												}
@@ -4486,6 +4601,16 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"TenantId": {
+						"type": "string",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+					},
+					"OrganisationId": {
+						"type": "string",
+						"defaultValue": "001"
+					}
 				},
 				"variables": {
 					"ReportUsers_Status": {
@@ -5064,6 +5189,22 @@
 						"typeProperties": {
 							"source": {
 								"type": "RestSource",
+								"additionalColumns": [
+									{
+										"name": "TenantId",
+										"value": {
+											"value": "@pipeline().parameters.TenantId",
+											"type": "Expression"
+										}
+									},
+									{
+										"name": "OrganisationId",
+										"value": {
+											"value": "@pipeline().parameters.OrganisationId",
+											"type": "Expression"
+										}
+									}
+								],
 								"httpRequestTimeout": "00:01:40",
 								"requestInterval": "00.00:00:00.010",
 								"requestMethod": "GET",
@@ -5138,46 +5279,28 @@
 									},
 									{
 										"source": {
-											"path": "[['createdDateTime']"
-										},
-										"sink": {
-											"name": "CreatedDate",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"path": "[['modifiedDateTime']"
-										},
-										"sink": {
-											"name": "ModifiedDate",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"path": "[['modifiedBy']"
-										},
-										"sink": {
-											"name": "ModifiedBy",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['createdBy']"
-										},
-										"sink": {
-											"name": "CreatedBy",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
 											"path": "[['workspaceId']"
 										},
 										"sink": {
 											"name": "WorkSpaceID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['TenantId']"
+										},
+										"sink": {
+											"name": "TenantID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['OrganisationId']"
+										},
+										"sink": {
+											"name": "OrganisationID",
 											"type": "String"
 										}
 									}
@@ -5294,12 +5417,12 @@
 										"source": {
 											"name": "ReportName",
 											"type": "String",
-											"physicalType": "varchar"
+											"physicalType": "nvarchar"
 										},
 										"sink": {
 											"name": "ReportName",
 											"type": "String",
-											"physicalType": "varchar"
+											"physicalType": "nvarchar"
 										}
 									},
 									{
@@ -5370,6 +5493,30 @@
 										},
 										"sink": {
 											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TenantID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "TenantID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OrganisationID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "OrganisationID",
 											"type": "String",
 											"physicalType": "varchar"
 										}
@@ -5483,12 +5630,12 @@
 										"source": {
 											"name": "ReportName",
 											"type": "String",
-											"physicalType": "varchar"
+											"physicalType": "nvarchar"
 										},
 										"sink": {
 											"name": "ReportName",
 											"type": "String",
-											"physicalType": "varchar"
+											"physicalType": "nvarchar"
 										}
 									},
 									{
@@ -5559,6 +5706,30 @@
 										},
 										"sink": {
 											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TenantID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "TenantID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "OrganisationID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "OrganisationID",
 											"type": "String",
 											"physicalType": "varchar"
 										}
@@ -5770,6 +5941,16 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"TenantId": {
+						"type": "string",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+					},
+					"OrganisationId": {
+						"type": "string",
+						"defaultValue": "001"
+					}
 				},
 				"variables": {
 					"Reports_Staging_Status": {
@@ -6200,7 +6381,7 @@
 					}
 				},
 				"folder": {
-					"name": "Testing pipelines"
+					"name": "Sample Pipelines"
 				},
 				"annotations": []
 			},
@@ -6215,7 +6396,14 @@
 					{
 						"name": "View Activity Live Data",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "View Activity Staging",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -6237,7 +6425,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table dbo.ViewReports",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ViewReportSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -6575,7 +6769,7 @@
 						"type": "Copy",
 						"dependsOn": [
 							{
-								"activity": "View Activity Live Data",
+								"activity": "View Activity Staging",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -7317,6 +7511,364 @@
 							"referenceName": "ADF_Pipeline_Status_Log",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "View Activity Staging",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"AbsoluteUrl": "$['continuationUri']"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['Id']"
+										},
+										"sink": {
+											"name": "ViewReportSourceKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['RecordType']"
+										},
+										"sink": {
+											"name": "RecordType",
+											"type": "Int32"
+										}
+									},
+									{
+										"source": {
+											"path": "[['CreationTime']"
+										},
+										"sink": {
+											"name": "CreationTime",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "[['Operation']"
+										},
+										"sink": {
+											"name": "Operation",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['OrganizationId']"
+										},
+										"sink": {
+											"name": "OrganizationID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['UserType']"
+										},
+										"sink": {
+											"name": "UserType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['UserKey']"
+										},
+										"sink": {
+											"name": "UserKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['Workload']"
+										},
+										"sink": {
+											"name": "Workload",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['UserId']"
+										},
+										"sink": {
+											"name": "UserID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ClientIP']"
+										},
+										"sink": {
+											"name": "ClientIP",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['Activity']"
+										},
+										"sink": {
+											"name": "Activity",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ItemName']"
+										},
+										"sink": {
+											"name": "ItemName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['WorkSpaceName']"
+										},
+										"sink": {
+											"name": "WorkSpaceName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['DatasetName']"
+										},
+										"sink": {
+											"name": "DatasetName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ReportName']"
+										},
+										"sink": {
+											"name": "ReportName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['CapacityId']"
+										},
+										"sink": {
+											"name": "CapacityID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['CapacityName']"
+										},
+										"sink": {
+											"name": "CapacityName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['WorkspaceId']"
+										},
+										"sink": {
+											"name": "WorkspaceID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ObjectId']"
+										},
+										"sink": {
+											"name": "ObjectID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['DatasetId']"
+										},
+										"sink": {
+											"name": "DatasetID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ReportId']"
+										},
+										"sink": {
+											"name": "ReportID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ArtifactId']"
+										},
+										"sink": {
+											"name": "ArtifactId",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ArtifactName']"
+										},
+										"sink": {
+											"name": "ArtifactName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['IsSuccess']"
+										},
+										"sink": {
+											"name": "IsSucess",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ReportType']"
+										},
+										"sink": {
+											"name": "ReportType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['RequestId']"
+										},
+										"sink": {
+											"name": "RequestID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ActivityId']"
+										},
+										"sink": {
+											"name": "ActivityID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['DistributionMethod']"
+										},
+										"sink": {
+											"name": "DistributionMethod",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ConsumptionMethod']"
+										},
+										"sink": {
+											"name": "ConsumptionMethod",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['ArtifactKind']"
+										},
+										"sink": {
+											"name": "ArtifactKind",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['RefreshEnforcementPolicy']"
+										},
+										"sink": {
+											"name": "RefreshEnforcementPolicy",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "$['continuationUri']"
+										},
+										"sink": {
+											"name": "ContinuationURL",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['continuationToken']"
+										},
+										"sink": {
+											"name": "ContinuationToken",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['lastResultSet']"
+										},
+										"sink": {
+											"name": "lastResultSet",
+											"type": "Boolean"
+										}
+									}
+								],
+								"collectionReference": "$['activityEventEntities']"
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ViewReports_API",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ViewReports_SQL",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -7552,7 +8104,7 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "Truncate Table [dbo].[WorkSpaces_Staging_AllTenant];",
+								"preCopyScript": "Truncate Table [dbo].[WorkSpaces_Staging];",
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -7668,24 +8220,7 @@
 							{
 								"referenceName": "WorkSpaces_API",
 								"type": "DatasetReference",
-								"parameters": {
-									"ClientId": {
-										"value": "@pipeline().parameters.ClientId",
-										"type": "Expression"
-									},
-									"TenantId": {
-										"value": "@pipeline().parameters.TenantId",
-										"type": "Expression"
-									},
-									"Scope": {
-										"value": "@pipeline().parameters.Scope",
-										"type": "Expression"
-									},
-									"AzureSecret": {
-										"value": "@pipeline().parameters.AZSecretName",
-										"type": "Expression"
-									}
-								}
+								"parameters": {}
 							}
 						],
 						"outputs": [
@@ -8388,21 +8923,13 @@
 					"elapsedTimeMetric": {}
 				},
 				"parameters": {
-					"ClientId": {
-						"type": "string"
-					},
 					"TenantId": {
-						"type": "string"
-					},
-					"AZSecretName": {
-						"type": "string"
-					},
-					"Scope": {
-						"type": "string",
-						"defaultValue": "https://analysis.windows.net/powerbi/api/.default"
+						"type": "String",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
 					},
 					"OrganisationId": {
-						"type": "string"
+						"type": "String",
+						"defaultValue": "001"
 					}
 				},
 				"variables": {
@@ -8641,7 +9168,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select WorkSpaceSourceKey from [dbo].[Workspaces_batch] where Status=''Active'' and BatchNo=',pipeline().parameters.BatchNo)",
+									"value": "@concat('select WorkSpaceSourceKey from [dbo].[Workspaces_batch] where BatchNo =',pipeline().parameters.BatchNo)",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -8669,7 +9196,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"items": {
-								"value": "@activity('Get WorkSpaces').output.value",
+								"value": "@activity('Get WorkSpaces').output.value\r\n\r\n",
 								"type": "Expression"
 							},
 							"isSequential": false,
@@ -8697,6 +9224,20 @@
 														"value": "@item().WorkSpaceSourceKey",
 														"type": "Expression"
 													}
+												},
+												{
+													"name": "TenantId",
+													"value": {
+														"value": "@pipeline().parameters.TenantId",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "OrganisationId",
+													"value": {
+														"value": "@pipeline().parameters.OrganisationId",
+														"type": "Expression"
+													}
 												}
 											],
 											"httpRequestTimeout": "00:01:40",
@@ -8718,10 +9259,28 @@
 											"mappings": [
 												{
 													"source": {
+														"path": "[['emailAddress']"
+													},
+													"sink": {
+														"name": "EmailAddress",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
 														"path": "[['groupUserAccessRight']"
 													},
 													"sink": {
 														"name": "GroupUserAccessRight",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['displayName']"
+													},
+													"sink": {
+														"name": "UserName",
 														"type": "String"
 													}
 												},
@@ -8745,10 +9304,46 @@
 												},
 												{
 													"source": {
+														"path": "[['graphId']"
+													},
+													"sink": {
+														"name": "WorkSpaceUserSourceKey",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['userType']"
+													},
+													"sink": {
+														"name": "UserType",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
 														"path": "$['WorkSpaceID']"
 													},
 													"sink": {
 														"name": "WorkSpaceID",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['TenantId']"
+													},
+													"sink": {
+														"name": "TenantID",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['OrganisationId']"
+													},
+													"sink": {
+														"name": "OrganisationID",
 														"type": "String"
 													}
 												}
@@ -8968,6 +9563,14 @@
 				"parameters": {
 					"BatchNo": {
 						"type": "string"
+					},
+					"TenantId": {
+						"type": "string",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+					},
+					"OrganisationId": {
+						"type": "string",
+						"defaultValue": "001"
 					}
 				},
 				"variables": {
