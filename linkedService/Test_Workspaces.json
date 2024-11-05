@@ -1,40 +1,23 @@
 {
 	"name": "Test_Workspaces",
 	"properties": {
-		"parameters": {
-			"ClientID": {
-				"type": "String"
-			},
-			"Tenant ID": {
-				"type": "String"
-			},
-			"Scope": {
-				"type": "String"
-			},
-			"AzureSecret": {
-				"type": "string"
-			}
-		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
 			"url": "https://api.powerbi.com/v1.0/myorg/admin/groups?$expand=reports,datasets,dataflows,viewreports,users&$top=5000",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "OAuth2ClientCredential",
-			"clientId": "@{linkedService().ClientID}",
+			"clientId": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be",
 			"clientSecret": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
 					"referenceName": "AzureKeyValut",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": {
-					"value": "@linkedService().AzureSecret",
-					"type": "Expression"
-				}
+				"secretName": "UBTIClientSecretName"
 			},
-			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().Tenant ID,'/oauth2/v2.0/token')}",
-			"scope": "@{linkedService().Scope}"
+			"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+			"scope": "https://analysis.windows.net/powerbi/api/.default"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
