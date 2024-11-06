@@ -161,22 +161,10 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[usp_Master_PipelineExecution]",
+					"storedProcedureName": "[dbo].[usp_StartPipelineExecution]",
 					"storedProcedureParameters": {
-						"CompleteStatus": {
-							"value": null,
-							"type": "String"
-						},
-						"EndTime": {
-							"value": null,
-							"type": "DateTime"
-						},
-						"LID": {
-							"value": "0",
-							"type": "Int32"
-						},
 						"PipelineName": {
-							"value": "Master",
+							"value": "Test",
 							"type": "String"
 						},
 						"RunID": {
@@ -184,7 +172,7 @@
 							"type": "String"
 						},
 						"RunningStatus": {
-							"value": "False",
+							"value": "",
 							"type": "Boolean"
 						},
 						"StartTime": {
@@ -193,10 +181,6 @@
 								"type": "Expression"
 							},
 							"type": "DateTime"
-						},
-						"Status": {
-							"value": "Started",
-							"type": "String"
 						}
 					}
 				},
@@ -225,12 +209,8 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[usp_Master_PipelineExecution]",
+					"storedProcedureName": "[dbo].[usp_UpdatePipelineExecutionStatus]",
 					"storedProcedureParameters": {
-						"CompleteStatus": {
-							"value": null,
-							"type": "String"
-						},
 						"EndTime": {
 							"value": {
 								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
@@ -238,34 +218,19 @@
 							},
 							"type": "DateTime"
 						},
-						"LID": {
+						"LogID": {
 							"value": {
-								"value": "@variables('LID')",
+								"value": "@activity('Stored procedure1').output.firstRow.LogID",
 								"type": "Expression"
 							},
 							"type": "Int32"
 						},
-						"PipelineName": {
-							"value": {
-								"value": "@pipeline().Pipeline",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"RunID": {
-							"value": null,
-							"type": "String"
-						},
 						"RunningStatus": {
-							"value": "True",
+							"value": "0",
 							"type": "Boolean"
 						},
-						"StartTime": {
-							"value": null,
-							"type": "DateTime"
-						},
 						"Status": {
-							"value": null,
+							"value": "Success",
 							"type": "String"
 						}
 					}
@@ -304,7 +269,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 120
+					"waitTimeInSeconds": 5
 				}
 			}
 		],
@@ -350,6 +315,9 @@
 				"defaultValue": "InProgress"
 			},
 			"LID": {
+				"type": "Integer"
+			},
+			"LogID": {
 				"type": "Integer"
 			}
 		},
