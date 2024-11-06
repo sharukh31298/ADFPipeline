@@ -31,29 +31,6 @@
 						}
 					}
 				}
-			},
-			{
-				"name": "WorkspacesUsers_Master",
-				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Workspaces_Master",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "Reports",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": false
-				}
 			}
 		],
 		"parameters": {
@@ -72,6 +49,12 @@
 			"OrganisationId": {
 				"type": "String",
 				"defaultValue": "001"
+			}
+		},
+		"variables": {
+			"InProgress Status": {
+				"type": "String",
+				"defaultValue": "InProgress"
 			}
 		},
 		"folder": {
