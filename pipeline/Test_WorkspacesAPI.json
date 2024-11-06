@@ -7,20 +7,7 @@
 				"type": "Copy",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "In Progress Status",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Stored procedure1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -145,6 +132,8 @@
 			{
 				"name": "In Progress Status",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
@@ -172,51 +161,41 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureName": "[dbo].[usp_Master_PipelineExecution]",
 					"storedProcedureParameters": {
-						"EndTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
-							"type": "Datetime"
-						},
-						"ErrorMessage": {
-							"value": "",
+						"CompleteStatus": {
+							"value": null,
 							"type": "String"
 						},
+						"EndTime": {
+							"value": null,
+							"type": "DateTime"
+						},
+						"LID": {
+							"value": "0",
+							"type": "Int32"
+						},
 						"PipelineName": {
-							"value": "",
+							"value": "Pipeline 1",
 							"type": "String"
 						},
 						"RunID": {
-							"value": "",
+							"value": "2134567890456789",
 							"type": "String"
+						},
+						"RunningStatus": {
+							"value": "False",
+							"type": "Boolean"
 						},
 						"StartTime": {
 							"value": {
 								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
-							"type": "Datetime"
+							"type": "DateTime"
 						},
 						"Status": {
-							"value": "",
-							"type": "String"
-						},
-						"TriggerName": {
-							"value": "",
-							"type": "String"
-						},
-						"TriggerTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
-							"type": "Datetime"
-						},
-						"TriggerType": {
-							"value": "",
+							"value": "Started",
 							"type": "String"
 						}
 					}
@@ -229,11 +208,9 @@
 			{
 				"name": "Wait",
 				"type": "Wait",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "In Progress Status",
+						"activity": "Stored procedure1",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -241,7 +218,77 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 180
+					"waitTimeInSeconds": 120
+				}
+			},
+			{
+				"name": "Stored procedure1_copy1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Wait",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_Master_PipelineExecution]",
+					"storedProcedureParameters": {
+						"CompleteStatus": {
+							"value": "Success",
+							"type": "String"
+						},
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"LID": {
+							"value": {
+								"value": "@activity('Stored procedure1').output",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"PipelineName": {
+							"value": null,
+							"type": "String"
+						},
+						"RunID": {
+							"value": null,
+							"type": "String"
+						},
+						"RunningStatus": {
+							"value": null,
+							"type": "Boolean"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": "Success",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
