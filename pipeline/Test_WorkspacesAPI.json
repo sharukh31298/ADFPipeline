@@ -211,6 +211,8 @@
 			{
 				"name": "Wait",
 				"type": "Wait",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Stored procedure1",
@@ -229,7 +231,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Wait",
+						"activity": "Set variable1",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -255,7 +257,7 @@
 								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
-							"type": "DateTime"
+							"type": "Datetime"
 						},
 						"LID": {
 							"value": {
@@ -292,6 +294,30 @@
 				"linkedServiceName": {
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Wait",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "LID",
+					"value": {
+						"value": "@activity('Stored procedure1').output",
+						"type": "Expression"
+					}
 				}
 			}
 		],
@@ -335,6 +361,9 @@
 			"InProgress Status": {
 				"type": "String",
 				"defaultValue": "InProgress"
+			},
+			"LID": {
+				"type": "Integer"
 			}
 		},
 		"folder": {
