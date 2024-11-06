@@ -168,7 +168,7 @@
 							"type": "String"
 						},
 						"EndTime": {
-							"value": "",
+							"value": null,
 							"type": "DateTime"
 						},
 						"LID": {
@@ -208,8 +208,6 @@
 			{
 				"name": "Wait",
 				"type": "Wait",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Stored procedure1",
@@ -220,14 +218,12 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 120
+					"waitTimeInSeconds": 60
 				}
 			},
 			{
 				"name": "Stored procedure1_copy1",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Set variable1",
@@ -313,7 +309,7 @@
 				"typeProperties": {
 					"variableName": "LID",
 					"value": {
-						"value": "@activity('Stored procedure1').output",
+						"value": "@activity('Stored procedure1').output.value",
 						"type": "Expression"
 					}
 				}
