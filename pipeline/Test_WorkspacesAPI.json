@@ -184,7 +184,7 @@
 							"type": "String"
 						},
 						"RunningStatus": {
-							"value": null,
+							"value": "False",
 							"type": "Boolean"
 						},
 						"StartTime": {
@@ -206,27 +206,11 @@
 				}
 			},
 			{
-				"name": "Wait",
-				"type": "Wait",
-				"dependsOn": [
-					{
-						"activity": "Stored procedure1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"waitTimeInSeconds": 60
-				}
-			},
-			{
 				"name": "Stored procedure1_copy1",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Set variable1",
+						"activity": "Wait1",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -244,7 +228,7 @@
 					"storedProcedureName": "[dbo].[usp_Master_PipelineExecution]",
 					"storedProcedureParameters": {
 						"CompleteStatus": {
-							"value": "Success",
+							"value": null,
 							"type": "String"
 						},
 						"EndTime": {
@@ -255,14 +239,14 @@
 							"type": "DateTime"
 						},
 						"LID": {
-							"value": {
-								"value": "@variables('LID')",
-								"type": "Expression"
-							},
+							"value": "0",
 							"type": "Int32"
 						},
 						"PipelineName": {
-							"value": "Master",
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"RunID": {
@@ -270,7 +254,7 @@
 							"type": "String"
 						},
 						"RunningStatus": {
-							"value": null,
+							"value": "True",
 							"type": "Boolean"
 						},
 						"StartTime": {
@@ -278,7 +262,7 @@
 							"type": "DateTime"
 						},
 						"Status": {
-							"value": "Success",
+							"value": null,
 							"type": "String"
 						}
 					}
@@ -293,14 +277,7 @@
 				"type": "SetVariable",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "Wait",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
 					"secureInput": false
@@ -312,6 +289,22 @@
 						"value": "@activity('Stored procedure1').output.value",
 						"type": "Expression"
 					}
+				}
+			},
+			{
+				"name": "Wait1",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "Stored procedure1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 120
 				}
 			}
 		],
