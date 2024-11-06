@@ -168,7 +168,7 @@
 							"type": "String"
 						},
 						"EndTime": {
-							"value": null,
+							"value": "",
 							"type": "DateTime"
 						},
 						"LID": {
@@ -184,7 +184,7 @@
 							"type": "String"
 						},
 						"RunningStatus": {
-							"value": "False",
+							"value": null,
 							"type": "Boolean"
 						},
 						"StartTime": {
@@ -192,7 +192,7 @@
 								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
-							"type": "Datetime"
+							"type": "DateTime"
 						},
 						"Status": {
 							"value": "Started",
@@ -208,6 +208,8 @@
 			{
 				"name": "Wait",
 				"type": "Wait",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Stored procedure1",
@@ -224,6 +226,8 @@
 			{
 				"name": "Stored procedure1_copy1",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Set variable1",
