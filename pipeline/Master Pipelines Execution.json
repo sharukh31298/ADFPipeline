@@ -123,6 +123,29 @@
 					},
 					"waitOnCompletion": false
 				}
+			},
+			{
+				"name": "Dataflows_Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Datasets_Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "DataFlows",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
 			}
 		],
 		"parameters": {
