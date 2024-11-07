@@ -240,13 +240,8 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"WorkSpaceSourceKey"
-							]
-						},
+						"preCopyScript": "TRUNCATE TABLE [dbo].[WorkSpaces]",
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -1098,6 +1093,12 @@
 			"InProgress Status": {
 				"type": "String",
 				"defaultValue": "InProgress"
+			},
+			"LID": {
+				"type": "Integer"
+			},
+			"LogID": {
+				"type": "Integer"
 			}
 		},
 		"folder": {

@@ -17,6 +17,22 @@
 				"typeProperties": {
 					"source": {
 						"type": "RestSource",
+						"additionalColumns": [
+							{
+								"name": "TenantId",
+								"value": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "OrganisationId",
+								"value": {
+									"value": "@pipeline().parameters.OrganisationId",
+									"type": "Expression"
+								}
+							}
+						],
 						"httpRequestTimeout": "00:01:40",
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
@@ -124,13 +140,8 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"DataflowSourceKey"
-							]
-						},
+						"preCopyScript": "TRUNCATE TABLE [dbo].[Dataflows]",
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -612,6 +623,16 @@
 				}
 			}
 		],
+		"parameters": {
+			"TenantId": {
+				"type": "string",
+				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+			},
+			"OrganisationId": {
+				"type": "string",
+				"defaultValue": "001"
+			}
+		},
 		"variables": {
 			"DataFlows_Status": {
 				"type": "String"
