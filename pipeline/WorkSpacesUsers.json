@@ -3,233 +3,11 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Get WorkSpaces",
-				"type": "Lookup",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "WorkSpaces_SQL",
-						"type": "DatasetReference"
-					},
-					"firstRowOnly": false
-				}
-			},
-			{
-				"name": "WorkSpace ID in Loop",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpaces",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('Get WorkSpaces').output.value\r\n\r\n",
-						"type": "Expression"
-					},
-					"isSequential": false,
-					"batchCount": 50,
-					"activities": [
-						{
-							"name": "Get WorkSpace Users",
-							"type": "Copy",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "RestSource",
-									"additionalColumns": [
-										{
-											"name": "WorkSpaceID",
-											"value": {
-												"value": "@item().WorkSpaceSourceKey",
-												"type": "Expression"
-											}
-										},
-										{
-											"name": "TenantId",
-											"value": {
-												"value": "@pipeline().parameters.TenantId",
-												"type": "Expression"
-											}
-										},
-										{
-											"name": "OrganisationId",
-											"value": {
-												"value": "@pipeline().parameters.OrganisationId",
-												"type": "Expression"
-											}
-										}
-									],
-									"httpRequestTimeout": "00:01:40",
-									"requestInterval": "00.00:00:00.010",
-									"requestMethod": "GET",
-									"paginationRules": {
-										"supportRFC5988": "true"
-									}
-								},
-								"sink": {
-									"type": "AzureSqlSink",
-									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false,
-									"disableMetricsCollection": false
-								},
-								"enableStaging": false,
-								"translator": {
-									"type": "TabularTranslator",
-									"mappings": [
-										{
-											"source": {
-												"path": "['emailAddress']"
-											},
-											"sink": {
-												"name": "EmailAddress",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['groupUserAccessRight']"
-											},
-											"sink": {
-												"name": "GroupUserAccessRight",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['displayName']"
-											},
-											"sink": {
-												"name": "UserName",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['identifier']"
-											},
-											"sink": {
-												"name": "Identifier",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['principalType']"
-											},
-											"sink": {
-												"name": "PrincipalType",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['graphId']"
-											},
-											"sink": {
-												"name": "WorkSpaceUserSourceKey",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['userType']"
-											},
-											"sink": {
-												"name": "UserType",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['WorkSpaceID']"
-											},
-											"sink": {
-												"name": "WorkSpaceID",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['TenantId']"
-											},
-											"sink": {
-												"name": "TenantID",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['OrganisationId']"
-											},
-											"sink": {
-												"name": "OrganisationID",
-												"type": "String"
-											}
-										}
-									],
-									"collectionReference": "$['value']",
-									"mapComplexValuesToString": true
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "WorkSpaceUsers_API",
-									"type": "DatasetReference",
-									"parameters": {
-										"WorkSpaceID": {
-											"value": "@item().WorkSpaceSourceKey",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "WorkSpaceUsers_SQL",
-									"type": "DatasetReference"
-								}
-							]
-						}
-					]
-				}
-			},
-			{
 				"name": "Sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpaces",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -311,14 +89,9 @@
 			{
 				"name": "Sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpaces",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -399,6 +172,108 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "WorkspaceUsers_Statging",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "true"
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"path": "['id']"
+								},
+								"sink": {
+									"name": "WorkSpaceID",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['users'][0]['emailAddress']"
+								},
+								"sink": {
+									"name": "EmailAddress",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['users'][0]['groupUserAccessRight']"
+								},
+								"sink": {
+									"name": "GroupUserAccessRight",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['users'][0]['displayName']"
+								},
+								"sink": {
+									"name": "UserName",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['users'][0]['identifier']"
+								},
+								"sink": {
+									"name": "Identifier",
+									"type": "String"
+								}
+							},
+							{
+								"source": {
+									"path": "['users'][0]['principalType']"
+								},
+								"sink": {
+									"name": "PrincipalType",
+									"type": "String"
+								}
+							}
+						],
+						"collectionReference": "$['value']"
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "WorkSpaceUsers_API",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "AzureSqlTableDS",
+						"type": "DatasetReference"
+					}
+				]
 			}
 		],
 		"parameters": {
@@ -597,7 +472,7 @@
 			}
 		},
 		"folder": {
-			"name": "UBTI_DEV RunStatus"
+			"name": "UBTI_Dev"
 		},
 		"annotations": [],
 		"lastPublishTime": "2023-11-29T06:27:10Z"
