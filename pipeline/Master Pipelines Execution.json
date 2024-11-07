@@ -1,5 +1,5 @@
 {
-	"name": "MWorkspaces",
+	"name": "Master Pipelines Execution",
 	"properties": {
 		"activities": [
 			{
@@ -31,6 +31,75 @@
 						}
 					}
 				}
+			},
+			{
+				"name": "Reports_Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Workspaces_Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Reports",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": false
+				}
+			},
+			{
+				"name": "ReportPages_Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Reports_Master",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ReportPages_Batch",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": false
+				}
+			},
+			{
+				"name": "Datasets_Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Reports_Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Datasets",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": false
+				}
 			}
 		],
 		"parameters": {
@@ -55,6 +124,12 @@
 			"InProgress Status": {
 				"type": "String",
 				"defaultValue": "InProgress"
+			},
+			"LID": {
+				"type": "Integer"
+			},
+			"LogID": {
+				"type": "Integer"
 			}
 		},
 		"folder": {
