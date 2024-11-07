@@ -17,7 +17,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select DatasetSourceKey,WorkspaceId from datasets",
+						"sqlReaderQuery": {
+							"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Dataset_batch] where BatchNo=',pipeline().parameters.BatchNo)",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -394,6 +397,12 @@
 			},
 			"DatasetUsers_IST2": {
 				"type": "String"
+			},
+			"LID": {
+				"type": "Integer"
+			},
+			"LogID": {
+				"type": "Integer"
 			}
 		},
 		"folder": {
