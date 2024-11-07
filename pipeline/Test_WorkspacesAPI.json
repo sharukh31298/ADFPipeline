@@ -164,11 +164,17 @@
 					"storedProcedureName": "[dbo].[usp_StartPipelineExecution]",
 					"storedProcedureParameters": {
 						"PipelineName": {
-							"value": "Test",
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"RunID": {
-							"value": "1234",
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"RunningStatus": {
@@ -220,7 +226,7 @@
 						},
 						"LogID": {
 							"value": {
-								"value": "@activity('Lookup1').output.LogID",
+								"value": "@activity('Lookup1').output.count",
 								"type": "Expression"
 							},
 							"type": "Int32"
@@ -230,7 +236,10 @@
 							"type": "Boolean"
 						},
 						"Status": {
-							"value": "Success",
+							"value": {
+								"value": "@variables('Status')",
+								"type": "Expression"
+							},
 							"type": "String"
 						}
 					}
@@ -269,7 +278,7 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 5
+					"waitTimeInSeconds": 60
 				}
 			},
 			{
@@ -302,6 +311,60 @@
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Stored procedure1_copy1_copy1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Wait1",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_UpdatePipelineExecutionStatus]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"LogID": {
+							"value": {
+								"value": "@activity('Lookup1').output.count",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"RunningStatus": {
+							"value": "True",
+							"type": "Boolean"
+						},
+						"Status": {
+							"value": {
+								"value": "@variables('Status')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
