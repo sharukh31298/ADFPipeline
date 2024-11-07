@@ -220,7 +220,7 @@
 						},
 						"LogID": {
 							"value": {
-								"value": "@activity('Stored procedure1').output.firstRow",
+								"value": "@activity('Lookup1').output.firstRow.LogID",
 								"type": "Expression"
 							},
 							"type": "Int32"
@@ -261,7 +261,7 @@
 				"type": "Wait",
 				"dependsOn": [
 					{
-						"activity": "Stored procedure1",
+						"activity": "Lookup1",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -270,6 +270,37 @@
 				"userProperties": [],
 				"typeProperties": {
 					"waitTimeInSeconds": 5
+				}
+			},
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Stored procedure1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSqlTable1",
+						"type": "DatasetReference"
+					}
 				}
 			}
 		],
