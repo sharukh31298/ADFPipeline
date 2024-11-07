@@ -83,7 +83,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Reports_Master",
+						"activity": "Workspaces_Master",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -98,7 +98,7 @@
 						"referenceName": "Datasets",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false
+					"waitOnCompletion": true
 				}
 			},
 			{
@@ -108,7 +108,7 @@
 					{
 						"activity": "Datasets_Master",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -129,7 +129,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "Datasets_Master",
+						"activity": "Workspaces_Master",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -148,14 +148,44 @@
 				}
 			},
 			{
-				"name": "Execute Pipeline1",
+				"name": "Datarefresh_Master",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Datasets_Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "DataflowRefreshes_Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Dataflows_Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "DataFlowRefreshes",
+						"type": "PipelineReference"
+					},
 					"waitOnCompletion": true
 				}
 			}
