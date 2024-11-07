@@ -135,7 +135,7 @@
 							},
 							{
 								"source": {
-									"path": "['users'][0]['emailAddress']"
+									"path": "emailAddress"
 								},
 								"sink": {
 									"name": "UserEmailAddress",
@@ -144,7 +144,7 @@
 							},
 							{
 								"source": {
-									"path": "['users'][0]['groupUserAccessRight']"
+									"path": "users.groupUserAccessRight"
 								},
 								"sink": {
 									"name": "UserGroupUserAccessRight",
@@ -153,7 +153,7 @@
 							},
 							{
 								"source": {
-									"path": "['users'][0]['displayName']"
+									"path": "users.displayName"
 								},
 								"sink": {
 									"name": "UserDisplayName",
@@ -162,7 +162,7 @@
 							},
 							{
 								"source": {
-									"path": "['users'][0]['identifier']"
+									"path": "users.identifier"
 								},
 								"sink": {
 									"name": "UserIdentifier",
@@ -171,7 +171,7 @@
 							},
 							{
 								"source": {
-									"path": "['users'][0]['principalType']"
+									"path": "users.principalType"
 								},
 								"sink": {
 									"name": "UserPrincipalType",
@@ -197,7 +197,8 @@
 								}
 							}
 						],
-						"collectionReference": "$['value']"
+						"collectionReference": "$['value']",
+						"mapComplexValuesToString": false
 					}
 				},
 				"inputs": [
@@ -216,6 +217,8 @@
 			{
 				"name": "WorkSpace Live Data",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -428,6 +431,66 @@
 									"type": "String",
 									"physicalType": "varchar"
 								}
+							},
+							{
+								"source": {
+									"name": "UserEmailAddress",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserEmailAddress",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserGroupUserAccessRight",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserGroupUserAccessRight",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserDisplayName",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserDisplayName",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserIdentifier",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserIdentifier",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserPrincipalType",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserPrincipalType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
 							}
 						],
 						"typeConversion": true,
@@ -453,6 +516,8 @@
 			{
 				"name": "WorkSpace History",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -639,6 +704,90 @@
 									"type": "String",
 									"physicalType": "varchar"
 								}
+							},
+							{
+								"source": {
+									"name": "UserEmailAddress",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserEmailAddress",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserGroupUserAccessRight",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserGroupUserAccessRight",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserDisplayName",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserDisplayName",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserIdentifier",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserIdentifier",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserPrincipalType",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserPrincipalType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
 							}
 						],
 						"typeConversion": true,
@@ -664,6 +813,8 @@
 			{
 				"name": "sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -765,6 +916,8 @@
 			{
 				"name": "sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
