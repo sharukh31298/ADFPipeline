@@ -56,13 +56,11 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"waitOnCompletion": true,
-								"parameters": {
-									"BatchNo": {
-										"value": "@item().BatchNo",
-										"type": "Expression"
-									}
-								}
+								"pipeline": {
+									"referenceName": "WorkSpacesUsers",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true
 							}
 						}
 					]
@@ -104,18 +102,6 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "WorkSpaceUserId",
-									"type": "Int32",
-									"physicalType": "int"
-								},
-								"sink": {
-									"name": "WorkSpaceUserId",
-									"type": "Int32",
-									"physicalType": "int"
-								}
-							},
-							{
-								"source": {
 									"name": "WorkSpaceUserSourceKey",
 									"type": "String",
 									"physicalType": "varchar"
@@ -254,6 +240,30 @@
 								},
 								"sink": {
 									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "TenantID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "OrganisationID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "OrganisationID",
 									"type": "String",
 									"physicalType": "varchar"
 								}
