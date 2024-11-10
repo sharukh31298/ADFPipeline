@@ -42,7 +42,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "Truncate Table [dbo].[WorkSpaces_Staging];\n\n\n\n\n",
+						"preCopyScript": "Truncate Table [dbo].[WorkSpaces_Staging];\n\n",
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
@@ -135,51 +135,6 @@
 							},
 							{
 								"source": {
-									"path": "['emailAddress']"
-								},
-								"sink": {
-									"name": "EmailAddress",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['groupUserAccessRight']"
-								},
-								"sink": {
-									"name": "GroupUserAccessRight",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['displayName']"
-								},
-								"sink": {
-									"name": "DisplayName",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['identifier']"
-								},
-								"sink": {
-									"name": "Identifier",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['principalType']"
-								},
-								"sink": {
-									"name": "PrincipalType",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "$['TenantId']"
 								},
 								"sink": {
@@ -241,7 +196,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "TRUNCATE TABLE [dbo].[WorkSpaces]\n\n",
+						"preCopyScript": "BEGIN TRANSACTION;\nTRUNCATE TABLE [dbo].[WorkSpaces]\nInsert INTO Workspaces (TenantID,OrganisationID,WorkSpaceSourceKey,WorkSpaceName,WorkSpaceDescription,WorkSpaceType,IsonDedicatedCapacity,CapacityMigrationStatus,Status,IsReadOnly,HasWorkspaceLevelSetting,CreatedDate,ModifiedDate,CreatedBy,ModifiedBy)\nselect  TenantID,OrganisationID,WorkSpaceSourceKey,WorkSpaceName,WorkSpaceDescription,WorkSpaceType,IsonDedicatedCapacity,CapacityMigrationStatus,Status,IsReadOnly,HasWorkspaceLevelSetting,CreatedDate,ModifiedDate,CreatedBy,ModifiedBy\nfrom Workspaces_Staging\nwhere Status = 'Active';\nCOMMIT TRANSACTION\n",
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
@@ -426,66 +381,6 @@
 								},
 								"sink": {
 									"name": "ModifiedBy",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserEmailAddress",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserEmailAddress",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserGroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserGroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserDisplayName",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserDisplayName",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserIdentifier",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserIdentifier",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserPrincipalType",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserPrincipalType",
 									"type": "String",
 									"physicalType": "varchar"
 								}
@@ -697,66 +592,6 @@
 								},
 								"sink": {
 									"name": "ModifiedBy",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserEmailAddress",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserEmailAddress",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserGroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserGroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserDisplayName",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserDisplayName",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserIdentifier",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserIdentifier",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "UserPrincipalType",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "UserPrincipalType",
 									"type": "String",
 									"physicalType": "varchar"
 								}
