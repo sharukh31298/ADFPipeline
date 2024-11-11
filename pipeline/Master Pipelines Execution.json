@@ -369,6 +369,29 @@
 					},
 					"waitOnCompletion": true
 				}
+			},
+			{
+				"name": "WorkspaceUsers__Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Workspaces_Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "WorkSpacesUsers_Batch",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": false
+				}
 			}
 		],
 		"parameters": {
