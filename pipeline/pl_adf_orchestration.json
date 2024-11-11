@@ -21,7 +21,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "AzureSqlTableDS",
+						"referenceName": "Azure_Sql",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -50,8 +50,6 @@
 						{
 							"name": "ExecutePipelineTestWorkspace",
 							"type": "ExecutePipeline",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"secureInput": false
@@ -59,62 +57,26 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "WorkSpaces",
+									"referenceName": "Master Pipelines Execution",
 									"type": "PipelineReference"
 								},
-								"waitOnCompletion": false,
-								"parameters": {
-									"ClientId": {
-										"value": "@item().ClientId",
-										"type": "Expression"
-									},
-									"TenantId": {
-										"value": "@item().TenantId",
-										"type": "Expression"
-									},
-									"AZSecretName": {
-										"value": "@item().AZSecretName",
-										"type": "Expression"
-									},
-									"OrganisationId": {
-										"value": "@item().OrganisationId",
-										"type": "Expression"
-									}
-								}
+								"waitOnCompletion": false
 							}
 						},
 						{
-							"name": "Web_Activity",
-							"type": "WebActivity",
+							"name": "ExecutePipelineTestWorkspace_copy1",
+							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"method": "POST",
-								"headers": {
-									"content-type": {
-										"value": "application/json",
-										"type": "Expression"
-									}
+								"pipeline": {
+									"referenceName": "Reports",
+									"type": "PipelineReference"
 								},
-								"url": {
-									"value": "@concat('https://management.azure.com/subscriptions/',pipeline().parameters.SubscriptionID,'/resourceGroups/',pipeline().parameters.ResourceGroup,'/providers/Microsoft.DataFactory/factories/',pipeline().DataFactory,'/pipelines/',pipeline().parameters.PipelineName,'/createRun?api-version=2018-06-01')",
-									"type": "Expression"
-								},
-								"body": {
-									"value": "@pipeline().parameters.PipelineName",
-									"type": "Expression"
-								},
-								"authentication": {
-									"type": "MSI",
-									"resource": "https://management.azure.com/"
-								}
+								"waitOnCompletion": false
 							}
 						}
 					]
