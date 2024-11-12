@@ -23,24 +23,14 @@
 				"userProperties": [],
 				"typeProperties": {
 					"source": {
-						"type": "RestSource",
-						"httpRequestTimeout": "00:01:40",
-						"requestInterval": "00.00:00:00.010",
-						"requestMethod": "GET",
-						"paginationRules": {
-							"AbsoluteUrl": "$['continuationUri']"
-						}
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "Truncate Table dbo.ViewReports",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"ViewReportSourceKey"
-							]
-						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -50,317 +40,519 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "['Id']"
+									"name": "ViewReportSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ViewReportSourceKey",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['RecordType']"
+									"name": "RecordType",
+									"type": "Int32",
+									"physicalType": "int"
 								},
 								"sink": {
 									"name": "RecordType",
-									"type": "Int32"
+									"type": "Int32",
+									"physicalType": "int"
 								}
 							},
 							{
 								"source": {
-									"path": "['CreationTime']"
+									"name": "CreationTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
 								},
 								"sink": {
 									"name": "CreationTime",
-									"type": "DateTime"
+									"type": "DateTime",
+									"physicalType": "datetime"
 								}
 							},
 							{
 								"source": {
-									"path": "['Operation']"
+									"name": "Operation",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "Operation",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['OrganizationId']"
+									"name": "OrganizationID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "OrganizationID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['UserType']"
+									"name": "UserType",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "UserType",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['UserKey']"
+									"name": "UserKey",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "UserKey",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['Workload']"
+									"name": "Workload",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "Workload",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['UserId']"
+									"name": "UserID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "UserID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ClientIP']"
+									"name": "ClientIP",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ClientIP",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['Activity']"
+									"name": "UserAgent",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserAgent",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Activity",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "Activity",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ItemName']"
+									"name": "ItemName",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ItemName",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['WorkSpaceName']"
+									"name": "WorkSpaceName",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "WorkSpaceName",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['DatasetName']"
+									"name": "DatasetName",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "DatasetName",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ReportName']"
+									"name": "ReportName",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ReportName",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['CapacityId']"
+									"name": "CapacityID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "CapacityID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['CapacityName']"
+									"name": "CapacityName",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "CapacityName",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['WorkspaceId']"
+									"name": "WorkspaceID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "WorkspaceID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ObjectId']"
+									"name": "AppName",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "AppName",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ObjectID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ObjectID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['DatasetId']"
+									"name": "DatasetID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "DatasetID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ReportId']"
+									"name": "ReportID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ReportID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ArtifactId']"
+									"name": "ArtifactId",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ArtifactId",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ArtifactName']"
+									"name": "ArtifactName",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ArtifactName",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['IsSuccess']"
+									"name": "IsSucess",
+									"type": "Boolean",
+									"physicalType": "bit"
 								},
 								"sink": {
 									"name": "IsSucess",
-									"type": "Boolean"
+									"type": "Boolean",
+									"physicalType": "bit"
 								}
 							},
 							{
 								"source": {
-									"path": "['ReportType']"
+									"name": "ReportType",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ReportType",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['RequestId']"
+									"name": "RequestID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "RequestID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ActivityId']"
+									"name": "ActivityID",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ActivityID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['DistributionMethod']"
+									"name": "AppReportID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "AppReportID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "DistributionMethod",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "DistributionMethod",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ConsumptionMethod']"
+									"name": "ConsumptionMethod",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ConsumptionMethod",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['ArtifactKind']"
+									"name": "AppID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "AppID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ArtifactKind",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ArtifactKind",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "['RefreshEnforcementPolicy']"
+									"name": "RefreshEnforcementPolicy",
+									"type": "Boolean",
+									"physicalType": "bit"
 								},
 								"sink": {
 									"name": "RefreshEnforcementPolicy",
-									"type": "Boolean"
+									"type": "Boolean",
+									"physicalType": "bit"
 								}
 							},
 							{
 								"source": {
-									"path": "$['continuationUri']"
+									"name": "ContinuationURL",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ContinuationURL",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "$['continuationToken']"
+									"name": "ContinuationToken",
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ContinuationToken",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"path": "$['lastResultSet']"
+									"name": "lastResultSet",
+									"type": "Boolean",
+									"physicalType": "bit"
 								},
 								"sink": {
 									"name": "lastResultSet",
-									"type": "Boolean"
+									"type": "Boolean",
+									"physicalType": "bit"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							}
 						],
-						"collectionReference": "$['activityEventEntities']"
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
 					}
 				},
 				"inputs": [
 					{
-						"referenceName": "ViewReports_API",
+						"referenceName": "ViewReports_SQL",
 						"type": "DatasetReference"
 					}
 				],
@@ -1142,10 +1334,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true
-						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
