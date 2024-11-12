@@ -34,7 +34,13 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "Truncate Table dbo.ViewReports",
-						"writeBehavior": "insert",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"ViewReportSourceKey"
+							]
+						},
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -1136,7 +1142,10 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
-						"writeBehavior": "insert",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true
+						},
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
