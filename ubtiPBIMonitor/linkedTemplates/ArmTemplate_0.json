@@ -39,6 +39,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Testing'"
 		},
+		"ViewReportsLive_SQL_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ViewReportsLive_SQL'"
+		},
 		"getCapacities_clientSecret": {
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'getCapacities'"
@@ -50,6 +54,10 @@
 		"get_Capacities_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'get_Capacities'"
+		},
+		"us_capturefirestrowlookup_Ls_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'us_capturefirestrowlookup_Ls'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -147,6 +155,18 @@
 			"type": "string",
 			"defaultValue": "https://Az-KV-PBIMonitor-Dev.vault.azure.net/"
 		},
+		"ViewReportsLive_SQL_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"ViewReportsLive_SQL_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"ViewReportsLive_SQL_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
 		"getCapacities_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/capacities"
@@ -154,12 +174,69 @@
 		"getCapacities_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"us_capturefirestrowlookup_Ls_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"us_capturefirestrowlookup_Ls_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"us_capturefirestrowlookup_Ls_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web_Activity",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"content-type": {
+									"value": "application/json",
+									"type": "Expression"
+								}
+							},
+							"url": " https://management.azure.com/subscriptions/a683694f-e3fc-4cd0-8f1d-b63f8ff20604/resourceGroups/ubti-d-wind-PBIMonitor/providers/Microsoft.DataFactory/factories/ubtiPBIMonitor/pipelines/First Time Load Master Pipelines Execution/createRun?api-version=2018-06-01",
+							"body": {
+								"value": "{}",
+								"type": "Expression"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ADF_Pipeline_Status_Log')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -393,6 +470,28 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ViewReportsLive_SQL')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ViewReportsLive_SQL_properties_typeProperties_server')]",
+					"database": "[parameters('ViewReportsLive_SQL_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ViewReportsLive_SQL_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ViewReportsLive_SQL_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/getCapacities')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -441,258 +540,84 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Capacities')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
+			"name": "[concat(parameters('factoryName'), '/us_capturefirestrowlookup_Ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getCapacities",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
 				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('us_capturefirestrowlookup_Ls_properties_typeProperties_server')]",
+					"database": "[parameters('us_capturefirestrowlookup_Ls_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('us_capturefirestrowlookup_Ls_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('us_capturefirestrowlookup_Ls_password')]"
+					}
+				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/getCapacities')]"
-			]
+			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Capacities_History')]",
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "Capacities_History",
+					"referenceName": "us_capturefirestrowlookup_Ls",
 					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
 				},
 				"annotations": [],
 				"type": "AzureSqlTable",
 				"schema": [
 					{
-						"name": "CapacitiesID",
+						"name": "LogID",
 						"type": "int",
 						"precision": 10
 					},
 					{
-						"name": "CapacitiesSourceskey",
+						"name": "PipelineName",
 						"type": "varchar"
 					},
 					{
-						"name": "DisplayName",
+						"name": "Status",
 						"type": "varchar"
 					},
 					{
-						"name": "Admins",
+						"name": "RunID",
 						"type": "varchar"
 					},
 					{
-						"name": "Sku",
-						"type": "varchar"
-					},
-					{
-						"name": "State",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "Region",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
+						"name": "StartTime",
 						"type": "datetime",
 						"precision": 23,
 						"scale": 3
 					},
 					{
-						"name": "ModifiedDate",
+						"name": "EndTime",
 						"type": "datetime",
 						"precision": 23,
 						"scale": 3
 					},
 					{
-						"name": "CreatedBy",
-						"type": "varchar"
+						"name": "RunningStatus",
+						"type": "bit"
 					},
 					{
-						"name": "ModifiedBy",
+						"name": "CompleteStatus",
 						"type": "varchar"
 					}
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "CapacitiesHistory"
+					"table": "Master_Pipeline_Logs"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Capacities_History')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Capacities_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getCapacities_",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "CapacitiesID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CapacitiesSourceskey",
-						"type": "varchar"
-					},
-					{
-						"name": "DisplayName",
-						"type": "varchar"
-					},
-					{
-						"name": "Admins",
-						"type": "varchar"
-					},
-					{
-						"name": "Sku",
-						"type": "varchar"
-					},
-					{
-						"name": "State",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "Region",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Capacities"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/getCapacities_')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Capacities_SQL_Live')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "get_Capacities",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "CapacitiesID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CapacitiesSourceskey",
-						"type": "varchar"
-					},
-					{
-						"name": "DisplayName",
-						"type": "varchar"
-					},
-					{
-						"name": "Admins",
-						"type": "varchar"
-					},
-					{
-						"name": "Sku",
-						"type": "varchar"
-					},
-					{
-						"name": "State",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "Region",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Capacities_Staging"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/get_Capacities')]"
+				"[concat(variables('factoryId'), '/linkedServices/us_capturefirestrowlookup_Ls')]"
 			]
 		}
 	]
