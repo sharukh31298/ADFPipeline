@@ -1,0 +1,39 @@
+{
+	"name": "pipeline2",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web_Activity",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"content-type": {
+							"value": "application/json",
+							"type": "Expression"
+						}
+					},
+					"url": "https://management.azure.com/subscriptions/a683694f-e3fc-4cd0-8f1d-b63f8ff20604/resourceGroups/ubti-d-wind-PBIMonitor/providers/Microsoft.DataFactory/factories/ubtiPBIMonitor/pipelines/First Time Load Master Pipelines Execution/createRun?api-version=2018-06-01",
+					"body": {
+						"value": "{}",
+						"type": "Expression"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://management.azure.com/"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
