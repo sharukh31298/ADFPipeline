@@ -196,7 +196,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "BEGIN TRANSACTION;\nTRUNCATE TABLE [dbo].[WorkSpaces]\nInsert INTO  Workspaces (TenantID,OrganisationID,WorkSpaceSourceKey,WorkSpaceName,WorkSpaceDescription,WorkSpaceType,IsonDedicatedCapacity,CapacityMigrationStatus,Status,IsReadOnly,HasWorkspaceLevelSetting,CreatedDate,ModifiedDate,CreatedBy,ModifiedBy)\nselect  TenantID,OrganisationID,WorkSpaceSourceKey,WorkSpaceName,WorkSpaceDescription,WorkSpaceType,IsonDedicatedCapacity,CapacityMigrationStatus,Status,IsReadOnly,HasWorkspaceLevelSetting,CreatedDate,ModifiedDate,CreatedBy,ModifiedBy\nfrom Workspaces_Staging\nwhere Status = 'Active';\nCOMMIT TRANSACTION\n",
+						"preCopyScript": "TRUNCATE TABLE [dbo].[WorkSpaces]",
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
