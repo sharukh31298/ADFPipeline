@@ -6,12 +6,1027 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
+		},
+		"getgroups_sql_ls_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'getgroups_sql_ls'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=ubti-ssvr-d-pbimonitor.database.windows.net;Initial Catalog=pbimonitor;User ID=adminsql"
+		},
+		"getreports_sql_ds_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'getreports_sql_ds'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=ubti-ssvr-d-pbimonitor.database.windows.net;Initial Catalog=pbimonitor;User ID=adminsql"
+		},
+		"AzureSqlDatabaseLS_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"AzureSqlDatabaseLS_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"AzureSqlDatabaseLS_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Azure_SQL_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Azure_SQL_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"Azure_SQL_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DatasetUsers_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DatasetUsers_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"DatasetUsers_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DatasetuserHistory_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DatasetuserHistory_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"DatasetuserHistory_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"view_report_api_ls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/activityevents?startDateTime=''',substring(addDays(utcNow(), -1), 0,10),'T00%3A00%3A00.000Z''&endDateTime=''',substring(addDays(utcNow(), -1), 0, 10),'T23%3A59%3A59.000Z''&%24filter=Activity%20eq%20''viewreport''')}"
+		},
+		"view_report_api_ls_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/WorkSpaces_API')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_api_ds",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/getdatasetrefresh_currenr_api_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getdatasetrefresh_currenr_api_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/getdatasets_current_api_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getdatasets_current_api_ls",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"Created_Date": {
+							"value": "@dataset().Created_Date",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"Created_Date": {
+						"type": "string",
+						"defaultValue": "@activity('Lookup1').output.firstRow.MaxModifiedDate"
+					}
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/getreports_current_api_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getreports_current_api_ls",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"date": {
+							"value": "@dataset().date",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"date": {
+						"type": "string",
+						"defaultValue": "@activity('Lookup1').output.firstRow.MaxModifiedDate"
+					}
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlDatabaseLS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_server')]",
+					"database": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureSQLCredentials",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "AzureSQLPassword"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Azure_SQL')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Azure_SQL_properties_typeProperties_server')]",
+					"database": "[parameters('Azure_SQL_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Azure_SQL_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureKeyValut",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "AzureSQLPassword"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUsers_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DatasetUsers_sql_properties_typeProperties_server')]",
+					"database": "[parameters('DatasetUsers_sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DatasetUsers_sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureSQLCredentials",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "AzureSQLPassword"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetuserHistory_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DatasetuserHistory_sql_properties_typeProperties_server')]",
+					"database": "[parameters('DatasetuserHistory_sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DatasetuserHistory_sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureSQLCredentials",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "AzureSQLPassword"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/getgroups_sql_ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('getgroups_sql_ls_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureSQLCredentials",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "AzureSQLPassword"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/getreports_sql_ds')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('getreports_sql_ds_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "AzureSQLCredentials",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "AzureSQLPassword"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/view_report_api_ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('view_report_api_ls_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": "true",
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('view_report_api_ls_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "User Password",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "UBTIClientSecretName"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default",
+					"dataFactoryName": "UsageMetricsDF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test_WorkspacesAPI')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Test_Workspaces",
+						"type": "Copy",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['datasets'][0]['isRefreshable']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['datasets'][0]['isEffectiveIdentityRequired']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['datasets'][0]['isEffectiveIdentityRolesRequired']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['datasets'][0]['targetStorageMode']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['datasets'][0]['createdDate']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['datasets'][0]['contentProviderType']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['datasets'][0]['upstreamDatasets'][0]"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['datasets'][0]['users'][0]"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['datasets'][0]['isInPlaceSharingEnabled']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['dataflows'][0]"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['users'][0]['emailAddress']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['users'][0]['groupUserAccessRight']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['users'][0]['displayName']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['users'][0]['identifier']"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['users'][0]['principalType']"
+										},
+										"sink": {}
+									}
+								],
+								"collectionReference": "$['value']",
+								"mapComplexValuesToString": false
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Test_Workspaces",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Test_WorkspacesSQL",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "In Progress Status",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "InProgress Status",
+							"value": {
+								"value": "@variables('Status')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_StartPipelineExecution]",
+							"storedProcedureParameters": {
+								"PipelineName": {
+									"value": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunningStatus": {
+									"value": "False",
+									"type": "Boolean"
+								},
+								"StartTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Stored procedure1_copy1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Wait1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_UpdatePipelineExecutionStatus]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogID": {
+									"value": {
+										"value": "@activity('Lookup1').output.count",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"RunningStatus": {
+									"value": "True",
+									"type": "Boolean"
+								},
+								"Status": {
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "LID",
+							"value": ""
+						}
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 60
+						}
+					},
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Stored procedure1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Stored procedure1_copy1_copy1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Wait1",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_UpdatePipelineExecutionStatus]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogID": {
+									"value": {
+										"value": "@activity('Lookup1').output.count",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"RunningStatus": {
+									"value": "True",
+									"type": "Boolean"
+								},
+								"Status": {
+									"value": {
+										"value": "@variables('Status')",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"ClientID": {
+						"type": "String"
+					},
+					"V1": {
+						"type": "String"
+					},
+					"V2": {
+						"type": "String"
+					},
+					"V3": {
+						"type": "String"
+					},
+					"V4": {
+						"type": "String"
+					},
+					"V6": {
+						"type": "String"
+					},
+					"V7": {
+						"type": "String"
+					},
+					"Status": {
+						"type": "String"
+					},
+					"ExecutionStartTime": {
+						"type": "String"
+					},
+					"ExecutionEndTime": {
+						"type": "String"
+					},
+					"Workspaces Status": {
+						"type": "String"
+					},
+					"Workspaces_Execution StartTime": {
+						"type": "String"
+					},
+					"InProgress Status": {
+						"type": "String",
+						"defaultValue": "InProgress"
+					},
+					"LID": {
+						"type": "Integer"
+					},
+					"LogID": {
+						"type": "Integer"
+					}
+				},
+				"folder": {
+					"name": "Sample Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTableDS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabaseLS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ClientId",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "varchar"
+					},
+					{
+						"name": "ClientSecret",
+						"type": "varchar"
+					},
+					{
+						"name": "OrganisationId",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WorkSpaceUser"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabaseLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Azure_Sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Azure_SQL",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ClientInformation"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Azure_SQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_SQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "workspace_id",
+						"type": "varchar"
+					},
+					{
+						"name": "dataflow_id",
+						"type": "varchar"
+					},
+					{
+						"name": "id",
+						"type": "varchar"
+					},
+					{
+						"name": "refreshType",
+						"type": "varchar"
+					},
+					{
+						"name": "startTime",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "endTime",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "status",
+						"type": "varchar"
+					},
+					{
+						"name": "updated_time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DataflowRefreshes"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_SQL_History')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "workspace_id",
+						"type": "varchar"
+					},
+					{
+						"name": "dataflow_id",
+						"type": "varchar"
+					},
+					{
+						"name": "id",
+						"type": "varchar"
+					},
+					{
+						"name": "refreshType",
+						"type": "varchar"
+					},
+					{
+						"name": "startTime",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "endTime",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "status",
+						"type": "varchar"
+					},
+					{
+						"name": "updated_time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DataflowRefreshesHistory"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlow_SQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "objectId",
+						"type": "varchar"
+					},
+					{
+						"name": "name",
+						"type": "varchar"
+					},
+					{
+						"name": "description",
+						"type": "varchar"
+					},
+					{
+						"name": "workspaceId",
+						"type": "varchar"
+					},
+					{
+						"name": "configuredBy",
+						"type": "varchar"
+					},
+					{
+						"name": "updatedtime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Dataflows"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DataFlow_SQL_History')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -59,7 +1074,9 @@
 					"table": "DataflowHistory"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DataFlow_SQL_Staging')]",
@@ -108,44 +1125,9 @@
 					"table": "Dataflows_Staging"
 				}
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "get_dataset_refrehses_api_ls",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"WorkSpaceID": {
-							"value": "@dataset().WorkSpaceID",
-							"type": "Expression"
-						},
-						"DatasetID": {
-							"value": "@dataset().DatasetID",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"WorkSpaceID": {
-						"type": "string"
-					},
-					"DatasetID": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes_SQL')]",
@@ -167,929 +1149,9 @@
 					"table": "DatasetRefreshes"
 				}
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes_SQL_History')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DatasetRefreshesHistory"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetUserHistory_sql')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DatasetuserHistory_sql",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "DatasetUserID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DatasetUserSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetID",
-						"type": "varchar"
-					},
-					{
-						"name": "EmailAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "UserName",
-						"type": "varchar"
-					},
-					{
-						"name": "Identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "PrincipalType",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DatasetUsersHistory"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetUsers_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getdatasetusers_api_ls",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"DatasetID": {
-							"value": "@dataset().DatasetID",
-							"type": "Expression"
-						},
-						"WorkSpaceID": {
-							"value": "@dataset().WorkSpaceID",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"DatasetID": {
-						"type": "string"
-					},
-					"WorkSpaceID": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetUsers_sql')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DatasetUsers_sql",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "DatasetUserID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DatasetUserSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetID",
-						"type": "varchar"
-					},
-					{
-						"name": "EmailAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "UserName",
-						"type": "varchar"
-					},
-					{
-						"name": "Identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "PrincipalType",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DatasetUsers"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Dataset_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getdataset_api_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Dataset_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "id",
-						"type": "varchar"
-					},
-					{
-						"name": "name",
-						"type": "varchar"
-					},
-					{
-						"name": "webUrl",
-						"type": "varchar"
-					},
-					{
-						"name": "addRowsAPIEnabled",
-						"type": "varchar"
-					},
-					{
-						"name": "configuredBy",
-						"type": "varchar"
-					},
-					{
-						"name": "isRefreshable",
-						"type": "varchar"
-					},
-					{
-						"name": "isEffectiveIdentityRequired",
-						"type": "varchar"
-					},
-					{
-						"name": "isEffectiveIdentityRolesRequired",
-						"type": "varchar"
-					},
-					{
-						"name": "targetStorageMode",
-						"type": "varchar"
-					},
-					{
-						"name": "createdDate",
-						"type": "varchar"
-					},
-					{
-						"name": "contentProviderType",
-						"type": "varchar"
-					},
-					{
-						"name": "createReportEmbedURL",
-						"type": "varchar"
-					},
-					{
-						"name": "qnaEmbedURL",
-						"type": "varchar"
-					},
-					{
-						"name": "isInPlaceSharingEnabled",
-						"type": "varchar"
-					},
-					{
-						"name": "workspaceId",
-						"type": "varchar"
-					},
-					{
-						"name": "autoSyncReadOnlyReplicas",
-						"type": "varchar"
-					},
-					{
-						"name": "maxReadOnlyReplicas",
-						"type": "varchar"
-					},
-					{
-						"name": "updatedtime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Datasets"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Dataset_SQL_History')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "id",
-						"type": "varchar"
-					},
-					{
-						"name": "name",
-						"type": "varchar"
-					},
-					{
-						"name": "webUrl",
-						"type": "varchar"
-					},
-					{
-						"name": "addRowsAPIEnabled",
-						"type": "varchar"
-					},
-					{
-						"name": "configuredBy",
-						"type": "varchar"
-					},
-					{
-						"name": "isRefreshable",
-						"type": "varchar"
-					},
-					{
-						"name": "isEffectiveIdentityRequired",
-						"type": "varchar"
-					},
-					{
-						"name": "isEffectiveIdentityRolesRequired",
-						"type": "varchar"
-					},
-					{
-						"name": "targetStorageMode",
-						"type": "varchar"
-					},
-					{
-						"name": "createdDate",
-						"type": "varchar"
-					},
-					{
-						"name": "contentProviderType",
-						"type": "varchar"
-					},
-					{
-						"name": "createReportEmbedURL",
-						"type": "varchar"
-					},
-					{
-						"name": "qnaEmbedURL",
-						"type": "varchar"
-					},
-					{
-						"name": "isInPlaceSharingEnabled",
-						"type": "varchar"
-					},
-					{
-						"name": "workspaceId",
-						"type": "varchar"
-					},
-					{
-						"name": "autoSyncReadOnlyReplicas",
-						"type": "varchar"
-					},
-					{
-						"name": "maxReadOnlyReplicas",
-						"type": "varchar"
-					},
-					{
-						"name": "updatedtime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DatasetsHistory"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Dataset_SQL_Staging')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "id",
-						"type": "varchar"
-					},
-					{
-						"name": "name",
-						"type": "varchar"
-					},
-					{
-						"name": "webUrl",
-						"type": "varchar"
-					},
-					{
-						"name": "addRowsAPIEnabled",
-						"type": "varchar"
-					},
-					{
-						"name": "configuredBy",
-						"type": "varchar"
-					},
-					{
-						"name": "isRefreshable",
-						"type": "varchar"
-					},
-					{
-						"name": "isEffectiveIdentityRequired",
-						"type": "varchar"
-					},
-					{
-						"name": "isEffectiveIdentityRolesRequired",
-						"type": "varchar"
-					},
-					{
-						"name": "targetStorageMode",
-						"type": "varchar"
-					},
-					{
-						"name": "createdDate",
-						"type": "varchar"
-					},
-					{
-						"name": "contentProviderType",
-						"type": "varchar"
-					},
-					{
-						"name": "createReportEmbedURL",
-						"type": "varchar"
-					},
-					{
-						"name": "qnaEmbedURL",
-						"type": "varchar"
-					},
-					{
-						"name": "isInPlaceSharingEnabled",
-						"type": "varchar"
-					},
-					{
-						"name": "workspaceId",
-						"type": "varchar"
-					},
-					{
-						"name": "autoSyncReadOnlyReplicas",
-						"type": "varchar"
-					},
-					{
-						"name": "maxReadOnlyReplicas",
-						"type": "varchar"
-					},
-					{
-						"name": "updatedtime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Datasets_Staging"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Datasources_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "datasetUserAccessRight",
-						"type": "nvarchar"
-					},
-					{
-						"name": "identifier",
-						"type": "nvarchar"
-					},
-					{
-						"name": "principalType",
-						"type": "nvarchar"
-					},
-					{
-						"name": "DatasetID",
-						"type": "nvarchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Datasources"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/GatewayHistory_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "datasetUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "emailAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "displayName",
-						"type": "varchar"
-					},
-					{
-						"name": "identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "graphId",
-						"type": "varchar"
-					},
-					{
-						"name": "principalType",
-						"type": "varchar"
-					},
-					{
-						"name": "userType",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "GatewayHistory"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Gateway_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "datasetUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "emailAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "displayName",
-						"type": "varchar"
-					},
-					{
-						"name": "identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "graphId",
-						"type": "varchar"
-					},
-					{
-						"name": "principalType",
-						"type": "varchar"
-					},
-					{
-						"name": "userType",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Gateways"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Gateways_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "objectId",
-						"type": "varchar"
-					},
-					{
-						"name": "name",
-						"type": "varchar"
-					},
-					{
-						"name": "description",
-						"type": "varchar"
-					},
-					{
-						"name": "workspaceId",
-						"type": "varchar"
-					},
-					{
-						"name": "configuredBy",
-						"type": "varchar"
-					},
-					{
-						"name": "updatedtime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Gateways"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/GetReportUsers_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "report_user_access_right",
-						"type": "varchar"
-					},
-					{
-						"name": "email_address",
-						"type": "varchar"
-					},
-					{
-						"name": "display_name",
-						"type": "varchar"
-					},
-					{
-						"name": "identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "graph_id",
-						"type": "varchar"
-					},
-					{
-						"name": "principal_type",
-						"type": "varchar"
-					},
-					{
-						"name": "user_type",
-						"type": "varchar"
-					},
-					{
-						"name": "report_id",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ReportUsers"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RefreshSchedules_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "get_refresh_schedules_api_ls",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"WorkSpaceID": {
-							"value": "@dataset().WorkSpaceID",
-							"type": "Expression"
-						},
-						"DatasetID": {
-							"value": "@dataset().DatasetID",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"WorkSpaceID": {
-						"type": "string"
-					},
-					"DatasetID": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RefreshSchedules_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "index_no",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "dataset_id",
-						"type": "varchar"
-					},
-					{
-						"name": "workspace_id",
-						"type": "varchar"
-					},
-					{
-						"name": "days",
-						"type": "varchar"
-					},
-					{
-						"name": "times",
-						"type": "varchar"
-					},
-					{
-						"name": "enabled",
-						"type": "varchar"
-					},
-					{
-						"name": "localTimeZoneId",
-						"type": "varchar"
-					},
-					{
-						"name": "notifyOption",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "RefreshSchedules"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Refreshables_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getrefreshables_api_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
 		}
 	]
 }

@@ -11,9 +11,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'ADF_Pipeline_Status_Log'"
 		},
+		"BaseURl_LS_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'BaseURl_LS'"
+		},
 		"Capacities_History_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Capacities_History'"
+		},
+		"Rest_workspaces_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Rest_workspaces'"
 		},
 		"Test_clientSecret": {
 			"type": "secureString",
@@ -31,6 +39,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Test_Pipelines'"
 		},
+		"Test_Workspaces_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Test_Workspaces'"
+		},
 		"Test_WorkspacesSQL_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Test_WorkspacesSQL'"
@@ -46,18 +58,6 @@
 		"getCapacities_clientSecret": {
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'getCapacities'"
-		},
-		"getCapacities__connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'getCapacities_'"
-		},
-		"get_Capacities_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'get_Capacities'"
-		},
-		"us_capturefirestrowlookup_Ls_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'us_capturefirestrowlookup_Ls'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -86,6 +86,22 @@
 		"AzureSQLCredentials_properties_typeProperties_baseUrl": {
 			"type": "string",
 			"defaultValue": "https://az-kv-pbimonitor-dev.vault.azure.net/"
+		},
+		"BaseURl_LS_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.powerbi.com"
+		},
+		"BaseURl_LS_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"Rest_workspaces_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5000"
+		},
+		"Rest_workspaces_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "f5624cd2-8761-4b84-9b84-2f6ca7120076"
 		},
 		"Test_properties_typeProperties_url": {
 			"type": "string",
@@ -126,6 +142,14 @@
 		"Test_Pipelines_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
+		},
+		"Test_Workspaces_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$expand=reports,datasets,dataflows,users&$top=5000"
+		},
+		"Test_Workspaces_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		},
 		"Test_WorkspacesSQL_properties_typeProperties_server": {
 			"type": "string",
@@ -174,18 +198,6 @@
 		"getCapacities_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
-		},
-		"us_capturefirestrowlookup_Ls_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"us_capturefirestrowlookup_Ls_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "pbimonitor"
-		},
-		"us_capturefirestrowlookup_Ls_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -201,6 +213,8 @@
 					{
 						"name": "Web_Activity",
 						"type": "WebActivity",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -212,15 +226,10 @@
 						"userProperties": [],
 						"typeProperties": {
 							"method": "POST",
-							"headers": {
-								"content-type": {
-									"value": "application/json",
-									"type": "Expression"
-								}
-							},
+							"headers": {},
 							"url": " https://management.azure.com/subscriptions/a683694f-e3fc-4cd0-8f1d-b63f8ff20604/resourceGroups/ubti-d-wind-PBIMonitor/providers/Microsoft.DataFactory/factories/ubtiPBIMonitor/pipelines/First Time Load Master Pipelines Execution/createRun?api-version=2018-06-01",
 							"body": {
-								"value": "{}",
+								"value": "{\n\"ClientId\":\"@{pipeline().parameters.ClientTestingID}\"\n}",
 								"type": "Expression"
 							},
 							"authentication": {
@@ -232,6 +241,56 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ClientTestingID": {
+						"type": "String",
+						"defaultValue": "0"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web_Activity",
+						"type": "WebActivity",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {},
+							"url": "https://prod-28.westus.logic.azure.com:443/workflows/6c8e6d26bf514cbfbcdeb247122e1cb3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=aNdRt-agqKZs9r9cefQXC03zBTgz5RX9fr4vsyl7Vfc",
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://management.azure.com/"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ClientTestingID": {
+						"type": "String",
+						"defaultValue": "0"
+					}
 				},
 				"annotations": []
 			},
@@ -312,6 +371,28 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/BaseURl_LS')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('BaseURl_LS_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('BaseURl_LS_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('BaseURl_LS_clientSecret')]"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Capacities_History')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -320,6 +401,28 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('Capacities_History_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Rest_workspaces')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Rest_workspaces_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('Rest_workspaces_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Rest_workspaces_clientSecret')]"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/f2f4053f-c456-4948-acc7-c85e7841b9d6/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
 				}
 			},
 			"dependsOn": []
@@ -408,6 +511,28 @@
 						"type": "SecureString",
 						"value": "[parameters('Test_Pipelines_password')]"
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test_Workspaces')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Test_Workspaces_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('Test_Workspaces_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Test_Workspaces_clientSecret')]"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
 				}
 			},
 			"dependsOn": []
@@ -512,113 +637,6 @@
 				}
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/getCapacities_')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('getCapacities__connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/get_Capacities')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('get_Capacities_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/us_capturefirestrowlookup_Ls')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('us_capturefirestrowlookup_Ls_properties_typeProperties_server')]",
-					"database": "[parameters('us_capturefirestrowlookup_Ls_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('us_capturefirestrowlookup_Ls_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('us_capturefirestrowlookup_Ls_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureSqlTable1')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "us_capturefirestrowlookup_Ls",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "LogID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "PipelineName",
-						"type": "varchar"
-					},
-					{
-						"name": "Status",
-						"type": "varchar"
-					},
-					{
-						"name": "RunID",
-						"type": "varchar"
-					},
-					{
-						"name": "StartTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "EndTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "RunningStatus",
-						"type": "bit"
-					},
-					{
-						"name": "CompleteStatus",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Master_Pipeline_Logs"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/us_capturefirestrowlookup_Ls')]"
-			]
 		}
 	]
 }
