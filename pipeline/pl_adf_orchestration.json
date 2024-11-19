@@ -30,9 +30,11 @@
 			{
 				"name": "IterateClientValue",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "Retrieve_Client_Value",
+						"activity": "Take Newupdaterow",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -57,7 +59,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "V1_Workspaces",
+									"referenceName": "WorkSpaces",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": false
@@ -83,22 +85,41 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Take Newupdaterow",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Retrieve_Client_Value",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "Azure_SQL",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "select TenantId,AppClientId,AppTenantId,AppClientSecret,CreatedAt from [dbo].[ClientInformation] \nORDER BY CreatedAt DESC\nOFFSET 0 ROWS FETCH NEXT 1 ROW \nONLY;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
-		"parameters": {
-			"SubscriptionID": {
-				"type": "string"
-			},
-			"ResourceGroup": {
-				"type": "string"
-			},
-			"DataFactoryName": {
-				"type": "string"
-			},
-			"PipelineName": {
-				"type": "string"
-			}
-		},
 		"variables": {
 			"clientID": {
 				"type": "String"
