@@ -5,6 +5,8 @@
 			{
 				"name": "Workspaces_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Capturing LogID",
@@ -38,6 +40,8 @@
 			{
 				"name": "Reports_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -61,6 +65,8 @@
 			{
 				"name": "ReportPages_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Reports_Master",
@@ -84,6 +90,8 @@
 			{
 				"name": "Datasets_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -107,6 +115,8 @@
 			{
 				"name": "Datasetusers_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -130,6 +140,8 @@
 			{
 				"name": "Dataflows_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -153,6 +165,8 @@
 			{
 				"name": "Datasetrefresh_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -176,6 +190,8 @@
 			{
 				"name": "DataflowRefreshes_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -199,8 +215,6 @@
 			{
 				"name": "Stored Precodure_startPipelineExecution",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -211,52 +225,70 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[usp_StartPipelineExecution]",
+					"storedProcedureName": "[dbo].[sp_StartPipelineExecution]",
 					"storedProcedureParameters": {
-						"PipelineName": {
-							"value": {
-								"value": "@pipeline().Pipeline",
-								"type": "Expression"
-							},
+						"AppClientId": {
+							"value": "",
 							"type": "String"
 						},
-						"RunID": {
-							"value": {
-								"value": "@pipeline().RunId",
-								"type": "Expression"
-							},
+						"AppClientSecret": {
+							"value": "",
 							"type": "String"
 						},
-						"RunningStatus": {
-							"value": "False",
-							"type": "Boolean"
+						"AppTentantId": {
+							"value": "",
+							"type": "String"
 						},
-						"StartTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
+						"CreatedDate": {
+							"value": "",
 							"type": "DateTime"
 						},
-						"TenantId": {
-							"value": {
-								"value": "@pipeline().parameters.TenantId",
-								"type": "Expression"
-							},
+						"CurrentStatus": {
+							"value": "",
+							"type": "String"
+						},
+						"IsFirstTimeLoad": {
+							"value": "",
+							"type": "Boolean"
+						},
+						"ModifiedDate": {
+							"value": "",
+							"type": "DateTime"
+						},
+						"PipelineRunId": {
+							"value": "",
+							"type": "String"
+						},
+						"ProcessEndTime": {
+							"value": "",
+							"type": "DateTime"
+						},
+						"ProcessStartTime": {
+							"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": "Started",
+							"type": "String"
+						},
+						"TentantId": {
+							"value": "",
+							"type": "Int32"
+						},
+						"TriggerType": {
+							"value": "",
 							"type": "String"
 						}
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "ADF_Pipeline_Status_Log",
+					"referenceName": "LS_Dataloadtracker_SQL",
 					"type": "LinkedServiceReference"
 				}
 			},
 			{
 				"name": "Capturing LogID",
 				"type": "Lookup",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Stored Precodure_startPipelineExecution",
@@ -360,6 +392,8 @@
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
