@@ -17,15 +17,6 @@
 				"typeProperties": {
 					"source": {
 						"type": "RestSource",
-						"additionalColumns": [
-							{
-								"name": "TenantId",
-								"value": {
-									"value": "@pipeline().parameters.TenantId",
-									"type": "Expression"
-								}
-							}
-						],
 						"httpRequestTimeout": "00:01:40",
 						"requestInterval": "00.00:00:00.010",
 						"requestMethod": "GET",
@@ -35,10 +26,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true
-						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -48,62 +36,74 @@
 						"mappings": [
 							{
 								"source": {
-									"path": "$['@odata.context']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['@odata.count']"
-								}
-							},
-							{
-								"source": {
 									"path": "['id']"
+								},
+								"sink": {
+									"name": "WorkSpaceSourceKey",
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"path": "['isReadOnly']"
+								},
+								"sink": {
+									"name": "IsReadOnly",
+									"type": "Boolean"
 								}
 							},
 							{
 								"source": {
 									"path": "['isOnDedicatedCapacity']"
+								},
+								"sink": {
+									"name": "IsonDedicatedCapacity",
+									"type": "Boolean"
 								}
 							},
 							{
 								"source": {
 									"path": "['capacityMigrationStatus']"
-								}
-							},
-							{
-								"source": {
-									"path": "['description']"
+								},
+								"sink": {
+									"name": "CapacityMigrationStatus",
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"path": "['type']"
+								},
+								"sink": {
+									"name": "WorkSpaceType",
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"path": "['state']"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String"
 								}
 							},
 							{
 								"source": {
 									"path": "['hasWorkspaceLevelSettings ']"
+								},
+								"sink": {
+									"name": "HasWorkspaceLevelSetting",
+									"type": "Boolean"
 								}
 							},
 							{
 								"source": {
 									"path": "['name']"
-								}
-							},
-							{
-								"source": {
-									"path": "$['TenantId']"
+								},
+								"sink": {
+									"name": "WorkSpaceName",
+									"type": "String"
 								}
 							}
 						],
@@ -164,18 +164,6 @@
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
-							{
-								"source": {
-									"name": "TenantID",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "TenantID",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
 							{
 								"source": {
 									"name": "WorkSpaceSourceKey",
@@ -542,18 +530,6 @@
 									"type": "String",
 									"physicalType": "varchar"
 								}
-							},
-							{
-								"source": {
-									"name": "TenantID",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "TenantID",
-									"type": "String",
-									"physicalType": "varchar"
-								}
 							}
 						],
 						"typeConversion": true,
@@ -579,6 +555,8 @@
 			{
 				"name": "sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -680,6 +658,8 @@
 			{
 				"name": "sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -783,16 +763,6 @@
 			}
 		],
 		"concurrency": 2,
-		"parameters": {
-			"TenantId": {
-				"type": "String",
-				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
-			},
-			"OrganisationId": {
-				"type": "String",
-				"defaultValue": "001"
-			}
-		},
 		"variables": {
 			"Workspaces_Status": {
 				"type": "String"
