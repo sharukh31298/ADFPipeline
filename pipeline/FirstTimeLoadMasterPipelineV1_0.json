@@ -213,7 +213,7 @@
 				}
 			},
 			{
-				"name": "Stored Precodure_startPipelineExecution",
+				"name": "sp_Dataloadtracker",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
 				"policy": {
@@ -228,19 +228,19 @@
 					"storedProcedureName": "[dbo].[sp_StartPipelineExecution]",
 					"storedProcedureParameters": {
 						"AppClientId": {
-							"value": "",
+							"value": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be",
 							"type": "String"
 						},
 						"AppClientSecret": {
-							"value": "",
+							"value": null,
 							"type": "String"
 						},
 						"AppTentantId": {
-							"value": "",
+							"value": "008502d6-3f79-46f0-ab37-9354e3fe80ff",
 							"type": "String"
 						},
 						"CreatedDate": {
-							"value": "",
+							"value": null,
 							"type": "DateTime"
 						},
 						"CurrentStatus": {
@@ -248,19 +248,22 @@
 							"type": "String"
 						},
 						"IsFirstTimeLoad": {
-							"value": "",
+							"value": "True",
 							"type": "Boolean"
 						},
 						"ModifiedDate": {
-							"value": "",
+							"value": null,
 							"type": "DateTime"
 						},
 						"PipelineRunId": {
-							"value": "",
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"ProcessEndTime": {
-							"value": "",
+							"value": null,
 							"type": "DateTime"
 						},
 						"ProcessStartTime": {
@@ -272,11 +275,11 @@
 							"type": "String"
 						},
 						"TentantId": {
-							"value": "",
+							"value": "1",
 							"type": "Int32"
 						},
 						"TriggerType": {
-							"value": "",
+							"value": "Manual",
 							"type": "String"
 						}
 					}
@@ -289,9 +292,11 @@
 			{
 				"name": "Capturing LogID",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "Stored Precodure_startPipelineExecution",
+						"activity": "sp_Dataloadtracker",
 						"dependencyConditions": [
 							"Succeeded"
 						]
