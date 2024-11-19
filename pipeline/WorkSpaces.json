@@ -83,15 +83,6 @@
 							},
 							{
 								"source": {
-									"path": "['description']"
-								},
-								"sink": {
-									"name": "WorkSpaceDescription",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
 									"path": "['type']"
 								},
 								"sink": {
@@ -131,8 +122,8 @@
 									"path": "$['TenantId']"
 								},
 								"sink": {
-									"name": "TenantID",
-									"type": "String"
+									"name": "TenantId",
+									"type": "Int32"
 								}
 							}
 						],
@@ -156,6 +147,8 @@
 			{
 				"name": "WorkSpace Live Data",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -381,6 +374,8 @@
 			{
 				"name": "WorkSpace History",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -604,6 +599,8 @@
 			{
 				"name": "sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -712,6 +709,8 @@
 			{
 				"name": "sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -823,13 +822,12 @@
 		],
 		"concurrency": 2,
 		"parameters": {
-			"TenantId": {
-				"type": "String",
-				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
-			},
 			"ClientId": {
 				"type": "String",
 				"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+			},
+			"TenantId": {
+				"type": "int"
 			}
 		},
 		"variables": {
