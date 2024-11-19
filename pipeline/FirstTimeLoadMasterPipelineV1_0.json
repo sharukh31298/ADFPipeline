@@ -5,8 +5,6 @@
 			{
 				"name": "Workspaces_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Capturing LogID",
@@ -40,8 +38,6 @@
 			{
 				"name": "Reports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -65,8 +61,6 @@
 			{
 				"name": "ReportPages_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Reports_Master",
@@ -90,8 +84,6 @@
 			{
 				"name": "Datasets_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -115,8 +107,6 @@
 			{
 				"name": "Datasetusers_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -140,8 +130,6 @@
 			{
 				"name": "Dataflows_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -165,8 +153,6 @@
 			{
 				"name": "Datasetrefresh_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -190,8 +176,6 @@
 			{
 				"name": "DataflowRefreshes_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -267,7 +251,10 @@
 							"type": "DateTime"
 						},
 						"ProcessStartTime": {
-							"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
 							"type": "DateTime"
 						},
 						"Status": {
@@ -292,8 +279,6 @@
 			{
 				"name": "Capturing LogID",
 				"type": "Lookup",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "sp_Dataloadtracker",
@@ -326,8 +311,6 @@
 			{
 				"name": "Stored procedure_UpdatePIpelineExecution",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "ReportPages_Master",
@@ -397,8 +380,6 @@
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
