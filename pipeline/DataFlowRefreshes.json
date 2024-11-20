@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlow_batch]  where BatchNo=',pipeline().parameters.BatchNo)",
+							"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows_batch]  where BatchNo=',pipeline().parameters.BatchNo)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -77,6 +77,13 @@
 											"name": "DataFlowID",
 											"value": {
 												"value": "@item().DataflowSourceKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "TenantId",
+											"value": {
+												"value": "@pipeline().parameters.TenantID",
 												"type": "Expression"
 											}
 										}
@@ -158,6 +165,15 @@
 											"sink": {
 												"name": "DataflowID",
 												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['TenantId']"
+											},
+											"sink": {
+												"name": "TenantId",
+												"type": "Int32"
 											}
 										}
 									],
@@ -384,8 +400,7 @@
 				"type": "string"
 			},
 			"TenantID": {
-				"type": "String",
-				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+				"type": "int"
 			}
 		},
 		"variables": {
