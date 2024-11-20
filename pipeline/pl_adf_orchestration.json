@@ -64,28 +64,18 @@
 								"waitOnCompletion": false,
 								"parameters": {
 									"TenantId": {
-										"value": "@pipeline().parameters.TenantId",
+										"value": "@item().TennatId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppTenantId": {
+										"value": "@item().AppTenantId",
 										"type": "Expression"
 									}
 								}
-							}
-						},
-						{
-							"name": "ExecutePipelineTestWorkspace_copy1",
-							"type": "ExecutePipeline",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
-							"dependsOn": [],
-							"policy": {
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "Reports",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": false
 							}
 						}
 					]
