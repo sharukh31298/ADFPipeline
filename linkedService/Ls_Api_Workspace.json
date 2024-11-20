@@ -2,6 +2,11 @@
 	"name": "Ls_Api_Workspace",
 	"properties": {
 		"description": "Workspace_Tenant2",
+		"parameters": {
+			"AzClientSecret": {
+				"type": "String"
+			}
+		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
@@ -15,7 +20,10 @@
 					"referenceName": "AzureKeyValut",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "DemoSecret"
+				"secretName": {
+					"value": "@linkedService().AzClientSecret",
+					"type": "Expression"
+				}
 			},
 			"tokenEndpoint": "https://login.microsoftonline.com/9049e040-2bf1-47a2-ad39-e23869af08ff/oauth2/v2.0/token",
 			"scope": "https://analysis.windows.net/powerbi/api/.default"
