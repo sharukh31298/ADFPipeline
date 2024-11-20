@@ -1,0 +1,539 @@
+{
+	"name": "ReportPages_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Reports",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select ReportSourceKey,WorkspaceId from [dbo].[Reports_batch] where BatchNo=',pipeline().parameters.BatchNo)\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Reports_SQL",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ReportID in Loop",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Reports",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Reports').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "Get Report Page Details",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"additionalColumns": [
+										{
+											"name": "Reportid",
+											"value": {
+												"value": "@item().ReportSourceKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "WorkSpaceid",
+											"value": {
+												"value": "@item().WorkSpaceID",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "TenantId",
+											"value": {
+												"value": "@pipeline().parameters.TenantId",
+												"type": "Expression"
+											}
+										}
+									],
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['name']"
+											},
+											"sink": {
+												"name": "ReportPageName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['displayName']"
+											},
+											"sink": {
+												"name": "ReportPageDisplayName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['order']"
+											},
+											"sink": {
+												"name": "report_order",
+												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"path": "$['Reportid']"
+											},
+											"sink": {
+												"name": "ReportID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['WorkSpaceid']"
+											},
+											"sink": {
+												"name": "WorkSpaceID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['TenantId']"
+											},
+											"sink": {
+												"name": "TenantId",
+												"type": "Int32"
+											}
+										}
+									],
+									"collectionReference": "$['value']"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ReportPagesAPI_Tenant2",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ReportPages_SQL",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "sp_TrackProcessSuccess",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Get Reports",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"ErrorMessage": {
+							"value": "NA",
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@activity('Get Reports').Status",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TenantID": {
+							"value": {
+								"value": "@pipeline().parameters.TenantID",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "sp_TrackProcessFailure",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Get Reports",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"ErrorMessage": {
+							"value": {
+								"value": "@activity('Get Reports').error?.message",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@activity('Get Reports').Status",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"BatchNo": {
+				"type": "string"
+			},
+			"TenantId": {
+				"type": "int"
+			}
+		},
+		"variables": {
+			"CountWorkspace": {
+				"type": "Integer"
+			},
+			"ReportPages_Status": {
+				"type": "String"
+			},
+			"ReportPages_StartTime": {
+				"type": "String"
+			},
+			"ReportPages_IST": {
+				"type": "String"
+			},
+			"ReportPages_IST2": {
+				"type": "String"
+			},
+			"ReportPages_EndTime": {
+				"type": "String"
+			},
+			"RefreshSchedules_Status": {
+				"type": "String"
+			},
+			"RefreshSchedules": {
+				"type": "String"
+			},
+			"RefreshSchedules_EndTime": {
+				"type": "String"
+			},
+			"RefreshSchedules_IST": {
+				"type": "String"
+			},
+			"RefreshSchedules_IST2": {
+				"type": "String"
+			},
+			"ReportUsers_Status": {
+				"type": "String"
+			},
+			"ReportUsers_StartTime": {
+				"type": "String"
+			},
+			"ReportUsers_EndTime": {
+				"type": "String"
+			},
+			"ReportUsers_IST": {
+				"type": "String"
+			},
+			"ReportUsers_IST2": {
+				"type": "String"
+			},
+			"Datasources_Status": {
+				"type": "String"
+			},
+			"Datasources_StartTime": {
+				"type": "String"
+			},
+			"Datasources_EndTime": {
+				"type": "String"
+			},
+			"Datasources_IST": {
+				"type": "String"
+			},
+			"Datasources_IST2": {
+				"type": "String"
+			},
+			"DatasetUsers_Status": {
+				"type": "String"
+			},
+			"DatasetUsers_StartTime": {
+				"type": "String"
+			},
+			"DatasetUsers_EndTime": {
+				"type": "String"
+			},
+			"DatasetUsers_IST": {
+				"type": "String"
+			},
+			"DatasetUsers_IST2": {
+				"type": "String"
+			},
+			"Datasets_status": {
+				"type": "String"
+			},
+			"Datasets_startTime": {
+				"type": "String"
+			},
+			"Datasets_EndTime": {
+				"type": "String"
+			},
+			"Datasets_IST": {
+				"type": "String"
+			},
+			"Datasets_IST2": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_status": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_StartTime": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_EndTime": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_IST": {
+				"type": "String"
+			},
+			"DatasetsRefreshes_IST2": {
+				"type": "String"
+			},
+			"DataFlows_Status": {
+				"type": "String"
+			},
+			"DataFlows_StartTime": {
+				"type": "String"
+			},
+			"DataFlows_EndTime": {
+				"type": "String"
+			},
+			"DataFlows_IST": {
+				"type": "String"
+			},
+			"DataFlows_IST2": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_Status": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_StartTime": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_EndTime": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_IST": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_IST2": {
+				"type": "String"
+			},
+			"ViewReports_Status": {
+				"type": "String"
+			},
+			"ViewReports_StartTime": {
+				"type": "String"
+			},
+			"ViewReports_EndTime": {
+				"type": "String"
+			},
+			"ViewReports_IST": {
+				"type": "String"
+			},
+			"ViewReports_IST2": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "PowerPulseApp_Dev"
+		},
+		"annotations": []
+	}
+}
