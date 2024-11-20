@@ -105,7 +105,21 @@
 				"inputs": [
 					{
 						"referenceName": "DataFlow_API",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"AppTenantId": {
+								"value": "@pipeline().parameters.AppTenantId",
+								"type": "Expression"
+							},
+							"AppClientId": {
+								"value": "@pipeline().parameters.AppClientId",
+								"type": "Expression"
+							},
+							"AppClientCode": {
+								"value": "@pipeline().parameters.AppClientCode",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
@@ -662,9 +676,17 @@
 			}
 		],
 		"parameters": {
+			"AppTenantId": {
+				"type": "string"
+			},
+			"AppClientId": {
+				"type": "string"
+			},
+			"AppClientCode": {
+				"type": "string"
+			},
 			"TenantId": {
-				"type": "int",
-				"defaultValue": 6
+				"type": "int"
 			}
 		},
 		"variables": {
