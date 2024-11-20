@@ -22,17 +22,7 @@
 						"referenceName": "WorkSpaces",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false,
-					"parameters": {
-						"TenantId": {
-							"value": "@pipeline().parameters.TenantId",
-							"type": "Expression"
-						},
-						"ClientId": {
-							"value": "@pipeline().parameters.ClientId",
-							"type": "Expression"
-						}
-					}
+					"waitOnCompletion": false
 				}
 			},
 			{
@@ -210,32 +200,64 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[usp_StartPipelineExecution]",
+					"storedProcedureName": "[dbo].[sp_StartPipelineExecution]",
 					"storedProcedureParameters": {
-						"PipelineName": {
+						"AppClientId": {
 							"value": "",
 							"type": "String"
 						},
-						"RunID": {
+						"AppClientSecret": {
 							"value": "",
 							"type": "String"
 						},
-						"RunningStatus": {
+						"AppTentantId": {
 							"value": "",
-							"type": "Boolean"
+							"type": "String"
 						},
-						"StartTime": {
+						"CreatedDate": {
 							"value": "",
 							"type": "DateTime"
 						},
-						"TenantID": {
+						"CurrentStatus": {
+							"value": "",
+							"type": "String"
+						},
+						"IsFirstTimeLoad": {
+							"value": "",
+							"type": "Boolean"
+						},
+						"ModifiedDate": {
+							"value": "",
+							"type": "DateTime"
+						},
+						"PipelineRunId": {
+							"value": "",
+							"type": "String"
+						},
+						"ProcessEndTime": {
+							"value": "",
+							"type": "DateTime"
+						},
+						"ProcessStartTime": {
+							"value": "",
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": "",
+							"type": "String"
+						},
+						"TentantId": {
+							"value": "",
+							"type": "Int32"
+						},
+						"TriggerType": {
 							"value": "",
 							"type": "String"
 						}
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "ADF_Pipeline_Status_Log",
+					"referenceName": "LS_Dataloadtracker_SQL",
 					"type": "LinkedServiceReference"
 				}
 			},
