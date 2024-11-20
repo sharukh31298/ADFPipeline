@@ -5,8 +5,6 @@
 			{
 				"name": "Workspaces_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Capturing LogID",
@@ -21,23 +19,15 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "WorkSpaces",
+						"referenceName": "V1_Workspaces",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false,
-					"parameters": {
-						"ClientId": {
-							"value": "@pipeline().parameters.ClientId",
-							"type": "Expression"
-						}
-					}
+					"waitOnCompletion": false
 				}
 			},
 			{
 				"name": "Reports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -52,7 +42,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Reports",
+						"referenceName": "Reports_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": false
@@ -61,8 +51,6 @@
 			{
 				"name": "ReportPages_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Reports_Master",
@@ -77,7 +65,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ReportPages_Batch",
+						"referenceName": "ReportPages_Batch_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": false
@@ -86,8 +74,6 @@
 			{
 				"name": "Datasets_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -102,7 +88,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Datasets",
+						"referenceName": "Datasets_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
@@ -111,8 +97,6 @@
 			{
 				"name": "Datasetusers_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -127,7 +111,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "DatasetUsers_Batch",
+						"referenceName": "DatasetUsers_Batch_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": false
@@ -136,8 +120,6 @@
 			{
 				"name": "Dataflows_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -152,7 +134,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "DataFlows",
+						"referenceName": "DataFlows_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
@@ -161,8 +143,6 @@
 			{
 				"name": "Datasetrefresh_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -177,7 +157,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "DatasetRefreshes_Batch",
+						"referenceName": "DatasetRefreshes_Batch_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
@@ -186,8 +166,6 @@
 			{
 				"name": "DataflowRefreshes_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -202,7 +180,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "DataFlowRefreshes_Batch",
+						"referenceName": "DataFlowRefreshes_Batch_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
@@ -211,6 +189,8 @@
 			{
 				"name": "sp_Dataloadtracker",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -396,8 +376,6 @@
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -412,7 +390,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ViewReports",
+						"referenceName": "ViewReports_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
@@ -435,31 +413,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "WorkSpacesUsers_Batch",
+						"referenceName": "WorkSpacesUsers_Batch_Tenant2",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": false
 				}
 			}
 		],
-		"parameters": {
-			"ClientId": {
-				"type": "String",
-				"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
-			},
-			"TenantId": {
-				"type": "String",
-				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
-			},
-			"AZSecretName": {
-				"type": "String",
-				"defaultValue": "UBTIClientSecretName"
-			},
-			"OrganisationId": {
-				"type": "String",
-				"defaultValue": "001"
-			}
-		},
 		"variables": {
 			"InProgress Status": {
 				"type": "String",
