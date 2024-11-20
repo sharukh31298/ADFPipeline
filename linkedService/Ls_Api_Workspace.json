@@ -2,30 +2,22 @@
 	"name": "Ls_Api_Workspace",
 	"properties": {
 		"description": "Workspace_Tenant2",
-		"parameters": {
-			"AppTenantId": {
-				"type": "String"
-			},
-			"AppClientId": {
-				"type": "String"
-			}
-		},
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
 			"url": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=100",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "OAuth2ClientCredential",
-			"clientId": "@{linkedService().AppTenantId}",
+			"clientId": "a9af5bae-6bda-4d01-8419-2df5fc161688",
 			"clientSecret": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
 					"referenceName": "AzureKeyValut",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "UBTIClientSecretName"
+				"secretName": "DemoSecret"
 			},
-			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/linkedService().AppTenantId/oauth2/v2.0/token')}",
+			"tokenEndpoint": "https://login.microsoftonline.com/9049e040-2bf1-47a2-ad39-e23869af08ff/oauth2/v2.0/token",
 			"scope": "https://analysis.windows.net/powerbi/api/.default"
 		}
 	},
