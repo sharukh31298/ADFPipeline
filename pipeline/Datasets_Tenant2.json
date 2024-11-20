@@ -251,7 +251,13 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "Truncate table Datasets",
-						"writeBehavior": "insert",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"DatasetSourceKey"
+							]
+						},
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
