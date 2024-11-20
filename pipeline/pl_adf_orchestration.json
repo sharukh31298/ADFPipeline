@@ -5,6 +5,8 @@
 			{
 				"name": "Retrieve_Client_Value",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -33,7 +35,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Retrieve_Client_Value",
+						"activity": "RetrieveClientValue",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -42,11 +44,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Retrieve_Client_Value').output.value",
+						"value": "@activity('RetrieveClientValue').output.value",
 						"type": "Expression"
 					},
 					"isSequential": false,
-					"batchCount": 4,
 					"activities": [
 						{
 							"name": "ExecutePipelineTestWorkspace",
@@ -64,7 +65,7 @@
 								"waitOnCompletion": false,
 								"parameters": {
 									"TenantId": {
-										"value": "@item().TennatId",
+										"value": "@item().TenantId",
 										"type": "Expression"
 									},
 									"AppClientId": {
@@ -80,19 +81,34 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "RetrieveClientValue",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select TenantId,AppClientId,AppTenantId,AppClientSecret,CreatedAt from [dbo].[ClientInformation] \nORDER BY CreatedAt DESC\nOFFSET 0 ROWS FETCH NEXT 1 ROW \nONLY;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "RetriveClientInformation",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
 			}
 		],
-		"parameters": {
-			"TenantId": {
-				"type": "int"
-			},
-			"AppClientId": {
-				"type": "string"
-			},
-			"AppTenantId": {
-				"type": "string"
-			}
-		},
 		"variables": {
 			"clientID": {
 				"type": "String"

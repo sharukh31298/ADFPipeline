@@ -197,10 +197,9 @@
 				}
 			},
 			{
-				"name": "Stored Precodure_startPipelineExecution",
+				"name": "AddDataLoadTracker",
+				"description": "Added Tracker Id",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -214,35 +213,23 @@
 					"storedProcedureName": "[dbo].[usp_StartPipelineExecution]",
 					"storedProcedureParameters": {
 						"PipelineName": {
-							"value": {
-								"value": "@pipeline().Pipeline",
-								"type": "Expression"
-							},
+							"value": "",
 							"type": "String"
 						},
 						"RunID": {
-							"value": {
-								"value": "@pipeline().RunId",
-								"type": "Expression"
-							},
+							"value": "",
 							"type": "String"
 						},
 						"RunningStatus": {
-							"value": "False",
+							"value": "",
 							"type": "Boolean"
 						},
 						"StartTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
+							"value": "",
 							"type": "DateTime"
 						},
-						"TenantId": {
-							"value": {
-								"value": "@pipeline().parameters.TenantId",
-								"type": "Expression"
-							},
+						"TenantID": {
+							"value": "",
 							"type": "String"
 						}
 					}
@@ -259,7 +246,7 @@
 				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "Stored Precodure_startPipelineExecution",
+						"activity": "AddDataLoadTracker",
 						"dependencyConditions": [
 							"Succeeded"
 						]
