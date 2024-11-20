@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Datasets_batch] where BatchNo=',pipeline().parameters.BatchNo)",
+							"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Dataset_batch] where BatchNo=',pipeline().parameters.BatchNo)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -78,6 +78,13 @@
 											"name": "DatasetID",
 											"value": {
 												"value": "@item().DatasetSourceKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "TenantId",
+											"value": {
+												"value": "@pipeline().parameters.TenantID",
 												"type": "Expression"
 											}
 										}
@@ -154,6 +161,15 @@
 										},
 										{
 											"source": {
+												"path": "$['value'][0]['refreshAttempts'][0]"
+											},
+											"sink": {
+												"name": "RefreshType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
 												"path": "$['WorkspaceID']"
 											},
 											"sink": {
@@ -168,6 +184,15 @@
 											"sink": {
 												"name": "DatasetID",
 												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['TenantId']"
+											},
+											"sink": {
+												"name": "TenantId",
+												"type": "Int32"
 											}
 										}
 									],
@@ -395,8 +420,7 @@
 				"type": "string"
 			},
 			"TenantID": {
-				"type": "String",
-				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+				"type": "int"
 			}
 		},
 		"variables": {
