@@ -5,8 +5,6 @@
 			{
 				"name": "Workspaces_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Capturing LogID",
@@ -24,32 +22,12 @@
 						"referenceName": "WorkSpaces",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"AppTenantId": {
-							"value": "@pipeline().parameters.AppTenantId",
-							"type": "Expression"
-						},
-						"AppClientId": {
-							"value": "@pipeline().parameters.AppClientId",
-							"type": "Expression"
-						},
-						"AppClientCode": {
-							"value": "@pipeline().parameters.AppClientCode",
-							"type": "Expression"
-						},
-						"TenantId": {
-							"value": "@pipeline().parameters.TenantId",
-							"type": "Expression"
-						}
-					}
+					"waitOnCompletion": false
 				}
 			},
 			{
 				"name": "Reports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -73,8 +51,6 @@
 			{
 				"name": "ReportPages_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Reports_Master",
@@ -98,8 +74,6 @@
 			{
 				"name": "Datasets_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -123,8 +97,6 @@
 			{
 				"name": "Datasetusers_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -148,8 +120,6 @@
 			{
 				"name": "Dataflows_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -173,8 +143,6 @@
 			{
 				"name": "Datasetrefresh_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -198,8 +166,6 @@
 			{
 				"name": "DataflowRefreshes_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -221,7 +187,7 @@
 				}
 			},
 			{
-				"name": "Add Data Load Tracker Details",
+				"name": "AddDataLoadTracker",
 				"description": "Added Tracker Id",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [],
@@ -234,15 +200,8 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[DataLoadTrack_Insert]",
+					"storedProcedureName": "[dbo].[sp_StartPipelineExecution]",
 					"storedProcedureParameters": {
-						"AppTentantId": {
-							"value": {
-								"value": "@pipeline().parameters.AppTenantId",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
 						"AppClientId": {
 							"value": {
 								"value": "@pipeline().parameters.AppClientId",
@@ -257,48 +216,57 @@
 							},
 							"type": "String"
 						},
-						"PipelineRunId": {
-							"value": null,
-							"type": "String"
-						},
-						"ProcessStartTime": {
-							"value": null,
-							"type": "Datetime"
-						},
-						"ProcessEndTime": {
-							"value": null,
-							"type": "Datetime"
-						},
-						"Status": {
-							"value": "Running",
-							"type": "String"
-						},
-						"CurrentStatus": {
-							"value": "DataProcessTracker",
-							"type": "String"
-						},
-						"IsFirstTimeLoad": {
-							"value": "True",
-							"type": "Boolean"
-						},
-						"TriggerType": {
-							"value": "Application",
+						"AppTentantId": {
+							"value": {
+								"value": "@pipeline().parameters.AppTenantId",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"CreatedDate": {
-							"value": null,
-							"type": "Datetime"
+							"value": "",
+							"type": "DateTime"
+						},
+						"CurrentStatus": {
+							"value": "",
+							"type": "String"
+						},
+						"IsFirstTimeLoad": {
+							"value": "",
+							"type": "Boolean"
 						},
 						"ModifiedDate": {
-							"value": null,
-							"type": "Datetime"
+							"value": "",
+							"type": "DateTime"
 						},
-						"TenantId": {
+						"PipelineRunId": {
+							"value": "",
+							"type": "String"
+						},
+						"ProcessEndTime": {
+							"type": "DateTime"
+						},
+						"ProcessStartTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": "",
+							"type": "String"
+						},
+						"TentantId": {
 							"value": {
 								"value": "@pipeline().parameters.TenantId",
 								"type": "Expression"
 							},
 							"type": "Int32"
+						},
+						"TriggerType": {
+							"value": "",
+							"type": "String"
 						}
 					}
 				},
@@ -314,7 +282,7 @@
 				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "Add Data Load Tracker Details",
+						"activity": "AddDataLoadTracker",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -415,8 +383,6 @@
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -440,8 +406,6 @@
 			{
 				"name": "WorkspaceUsers__Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -475,15 +439,6 @@
 			},
 			"TenantId": {
 				"type": "int"
-			}
-		},
-		"variables": {
-			"InProgress Status": {
-				"type": "String",
-				"defaultValue": "InProgress"
-			},
-			"LogID": {
-				"type": "Integer"
 			}
 		},
 		"folder": {
