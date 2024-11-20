@@ -1,9 +1,9 @@
 {
-	"name": "ReportPages_copy1",
+	"name": "DataFlowRefreshes_copy1",
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Reports",
+				"name": "Get Dataflows",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -18,25 +18,25 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select ReportSourceKey,WorkspaceId from [dbo].[Reports_batch] where BatchNo=',pipeline().parameters.BatchNo)\n",
+							"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows_batch]  where BatchNo=',pipeline().parameters.BatchNo)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "Reports_SQL",
+						"referenceName": "DataFlow_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "ReportID in Loop",
+				"name": "Dataflow ID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Reports",
+						"activity": "Get Dataflows",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -45,14 +45,13 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get Reports').output.value",
+						"value": "@activity('Get Dataflows').output.value",
 						"type": "Expression"
 					},
 					"isSequential": false,
-					"batchCount": 50,
 					"activities": [
 						{
-							"name": "Get Report Page Details",
+							"name": "Get Dataflow Refresh Details",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -68,23 +67,23 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "Reportid",
-											"value": {
-												"value": "@item().ReportSourceKey",
-												"type": "Expression"
-											}
-										},
-										{
-											"name": "WorkSpaceid",
+											"name": "WorkSpaceID",
 											"value": {
 												"value": "@item().WorkSpaceID",
 												"type": "Expression"
 											}
 										},
 										{
+											"name": "DataFlowID",
+											"value": {
+												"value": "@item().DataflowSourceKey",
+												"type": "Expression"
+											}
+										},
+										{
 											"name": "TenantId",
 											"value": {
-												"value": "@pipeline().parameters.TenantId",
+												"value": "@pipeline().parameters.TenantID",
 												"type": "Expression"
 											}
 										}
@@ -107,46 +106,64 @@
 									"mappings": [
 										{
 											"source": {
-												"path": "['name']"
+												"path": "['id']"
 											},
 											"sink": {
-												"name": "ReportPageName",
+												"name": "DataflowRefreshesSourcekey",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['displayName']"
+												"path": "['refreshType']"
 											},
 											"sink": {
-												"name": "ReportPageDisplayName",
+												"name": "RefreshType",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['order']"
+												"path": "['startTime']"
 											},
 											"sink": {
-												"name": "report_order",
-												"type": "Int32"
+												"name": "StartTime",
+												"type": "DateTime"
 											}
 										},
 										{
 											"source": {
-												"path": "$['Reportid']"
+												"path": "['endTime']"
 											},
 											"sink": {
-												"name": "ReportID",
+												"name": "EndTime",
+												"type": "DateTime"
+											}
+										},
+										{
+											"source": {
+												"path": "['status']"
+											},
+											"sink": {
+												"name": "Status",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['WorkSpaceid']"
+												"path": "$['WorkSpaceID']"
 											},
 											"sink": {
 												"name": "WorkSpaceID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['DataFlowID']"
+											},
+											"sink": {
+												"name": "DataflowID",
 												"type": "String"
 											}
 										},
@@ -165,11 +182,15 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "ReportPagesAPI_Tenant2",
+									"referenceName": "DataFlowRefreshes_API",
 									"type": "DatasetReference",
 									"parameters": {
 										"WorkSpaceID": {
-											"value": "@item().WorkspaceId",
+											"value": "@item().WorkSpaceID",
+											"type": "Expression"
+										},
+										"DataFlowID": {
+											"value": "@item().DataflowSourceKey",
 											"type": "Expression"
 										}
 									}
@@ -177,7 +198,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ReportPages_SQL",
+									"referenceName": "DataFlowRefreshes_SQL",
 									"type": "DatasetReference"
 								}
 							]
@@ -186,11 +207,11 @@
 				}
 			},
 			{
-				"name": "sp_TrackProcessSuccess",
+				"name": "Sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Get Reports",
+						"activity": "Get Dataflows",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -209,7 +230,7 @@
 					"storedProcedureParameters": {
 						"EndTime": {
 							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
@@ -234,14 +255,14 @@
 						},
 						"StartTime": {
 							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('Get Reports').Status",
+								"value": "@activity('Get Dataflows').Status",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -282,11 +303,11 @@
 				}
 			},
 			{
-				"name": "sp_TrackProcessFailure",
+				"name": "Sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Get Reports",
+						"activity": "Get Dataflows",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -305,14 +326,14 @@
 					"storedProcedureParameters": {
 						"EndTime": {
 							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
 						},
 						"ErrorMessage": {
 							"value": {
-								"value": "@activity('Get Reports').error?.message",
+								"value": "@activity('Get Dataflows').error?.message",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -333,14 +354,14 @@
 						},
 						"StartTime": {
 							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('Get Reports').Status",
+								"value": "@activity('Get Dataflows').Status",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -378,134 +399,11 @@
 			"BatchNo": {
 				"type": "string"
 			},
-			"TenantId": {
+			"TenantID": {
 				"type": "int"
 			}
 		},
 		"variables": {
-			"CountWorkspace": {
-				"type": "Integer"
-			},
-			"ReportPages_Status": {
-				"type": "String"
-			},
-			"ReportPages_StartTime": {
-				"type": "String"
-			},
-			"ReportPages_IST": {
-				"type": "String"
-			},
-			"ReportPages_IST2": {
-				"type": "String"
-			},
-			"ReportPages_EndTime": {
-				"type": "String"
-			},
-			"RefreshSchedules_Status": {
-				"type": "String"
-			},
-			"RefreshSchedules": {
-				"type": "String"
-			},
-			"RefreshSchedules_EndTime": {
-				"type": "String"
-			},
-			"RefreshSchedules_IST": {
-				"type": "String"
-			},
-			"RefreshSchedules_IST2": {
-				"type": "String"
-			},
-			"ReportUsers_Status": {
-				"type": "String"
-			},
-			"ReportUsers_StartTime": {
-				"type": "String"
-			},
-			"ReportUsers_EndTime": {
-				"type": "String"
-			},
-			"ReportUsers_IST": {
-				"type": "String"
-			},
-			"ReportUsers_IST2": {
-				"type": "String"
-			},
-			"Datasources_Status": {
-				"type": "String"
-			},
-			"Datasources_StartTime": {
-				"type": "String"
-			},
-			"Datasources_EndTime": {
-				"type": "String"
-			},
-			"Datasources_IST": {
-				"type": "String"
-			},
-			"Datasources_IST2": {
-				"type": "String"
-			},
-			"DatasetUsers_Status": {
-				"type": "String"
-			},
-			"DatasetUsers_StartTime": {
-				"type": "String"
-			},
-			"DatasetUsers_EndTime": {
-				"type": "String"
-			},
-			"DatasetUsers_IST": {
-				"type": "String"
-			},
-			"DatasetUsers_IST2": {
-				"type": "String"
-			},
-			"Datasets_status": {
-				"type": "String"
-			},
-			"Datasets_startTime": {
-				"type": "String"
-			},
-			"Datasets_EndTime": {
-				"type": "String"
-			},
-			"Datasets_IST": {
-				"type": "String"
-			},
-			"Datasets_IST2": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_status": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_StartTime": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_EndTime": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_IST": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_IST2": {
-				"type": "String"
-			},
-			"DataFlows_Status": {
-				"type": "String"
-			},
-			"DataFlows_StartTime": {
-				"type": "String"
-			},
-			"DataFlows_EndTime": {
-				"type": "String"
-			},
-			"DataFlows_IST": {
-				"type": "String"
-			},
-			"DataFlows_IST2": {
-				"type": "String"
-			},
 			"DataFlowRefreshes_Status": {
 				"type": "String"
 			},
@@ -519,21 +417,6 @@
 				"type": "String"
 			},
 			"DataFlowRefreshes_IST2": {
-				"type": "String"
-			},
-			"ViewReports_Status": {
-				"type": "String"
-			},
-			"ViewReports_StartTime": {
-				"type": "String"
-			},
-			"ViewReports_EndTime": {
-				"type": "String"
-			},
-			"ViewReports_IST": {
-				"type": "String"
-			},
-			"ViewReports_IST2": {
 				"type": "String"
 			}
 		},
