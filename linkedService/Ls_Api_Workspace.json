@@ -8,6 +8,9 @@
 			},
 			"AppClientId": {
 				"type": "String"
+			},
+			"AppClientSecret": {
+				"type": "String"
 			}
 		},
 		"annotations": [],
@@ -23,7 +26,10 @@
 					"referenceName": "AzureKeyValut",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "DemoSecret"
+				"secretName": {
+					"value": "@linkedService().AppClientSecret",
+					"type": "Expression"
+				}
 			},
 			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
 			"scope": "https://analysis.windows.net/powerbi/api/.default"
