@@ -46,8 +46,6 @@
 			{
 				"name": "Reports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -65,14 +63,30 @@
 						"referenceName": "Reports",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false
+					"waitOnCompletion": false,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
 				"name": "ReportPages_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Reports_Master",
@@ -87,17 +101,33 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "ReportPages_Batch_Tenant2",
+						"referenceName": "ReportPages",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false
+					"waitOnCompletion": false,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
 				"name": "Datasets_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -115,14 +145,30 @@
 						"referenceName": "Datasets",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
 				"name": "Datasetusers_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -137,17 +183,33 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "DatasetUsers_Batch",
+						"referenceName": "DatasetUsers",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false
+					"waitOnCompletion": false,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
 				"name": "Dataflows_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -165,14 +227,30 @@
 						"referenceName": "DataFlows",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
 				"name": "Datasetrefresh_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -187,17 +265,33 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "DatasetRefreshes_Batch",
+						"referenceName": "DatasetRefreshes",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantID": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
 				"name": "DataflowRefreshes_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -212,17 +306,33 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "DataFlowRefreshes_Batch",
+						"referenceName": "DataFlowRefreshes",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantID": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
 				"name": "sp_Dataloadtracker",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -233,18 +343,27 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[sp_StartPipelineExecution]",
+					"storedProcedureName": "[dbo].[DataLoadTrack_Insert]",
 					"storedProcedureParameters": {
 						"AppClientId": {
-							"value": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be",
+							"value": {
+								"value": "@pipeline().parameters.AppClientId",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"AppClientSecret": {
-							"value": null,
+							"value": {
+								"value": "@pipeline().parameters.AppClientCode",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"AppTentantId": {
-							"value": "008502d6-3f79-46f0-ab37-9354e3fe80ff",
+							"value": {
+								"value": "@pipeline().parameters.AppTenantId",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"CreatedDate": {
@@ -252,7 +371,7 @@
 							"type": "DateTime"
 						},
 						"CurrentStatus": {
-							"value": "",
+							"value": "Started",
 							"type": "String"
 						},
 						"IsFirstTimeLoad": {
@@ -275,22 +394,22 @@
 							"type": "DateTime"
 						},
 						"ProcessStartTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
+							"value": null,
 							"type": "DateTime"
 						},
 						"Status": {
-							"value": "Started",
+							"value": null,
 							"type": "String"
 						},
 						"TentantId": {
-							"value": "1",
+							"value": {
+								"value": "@pipeline().parameters.TenantId",
+								"type": "Expression"
+							},
 							"type": "Int32"
 						},
 						"TriggerType": {
-							"value": "Manual",
+							"value": "Application",
 							"type": "String"
 						}
 					}
@@ -408,8 +527,6 @@
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -427,7 +544,25 @@
 						"referenceName": "ViewReports",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
@@ -447,10 +582,28 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "WorkSpacesUsers_Batch",
+						"referenceName": "WorkSpacesUsers",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false
+					"waitOnCompletion": false,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			}
 		],
