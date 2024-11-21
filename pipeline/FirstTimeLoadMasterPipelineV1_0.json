@@ -5,6 +5,8 @@
 			{
 				"name": "Workspaces_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Capturing LogID",
@@ -385,7 +387,7 @@
 							"type": "DateTime"
 						},
 						"CurrentStatus": {
-							"value": "Started",
+							"value": null,
 							"type": "String"
 						},
 						"IsFirstTimeLoad": {
@@ -412,7 +414,7 @@
 							"type": "DateTime"
 						},
 						"Status": {
-							"value": null,
+							"value": "Started",
 							"type": "String"
 						},
 						"TentantId": {
@@ -491,6 +493,12 @@
 					},
 					{
 						"activity": "DataflowRefreshes_Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "WorkspaceUsers__Master",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -624,6 +632,42 @@
 						"dependencyConditions": [
 							"Failed"
 						]
+					},
+					{
+						"activity": "WorkspaceUsers__Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					},
+					{
+						"activity": "Workspaces_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					},
+					{
+						"activity": "Reports_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					},
+					{
+						"activity": "Datasets_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					},
+					{
+						"activity": "Dataflows_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					},
+					{
+						"activity": "ViewReports_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
 					}
 				],
 				"policy": {
@@ -658,6 +702,25 @@
 					"referenceName": "LS_Dataloadtracker_SQL",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Success and Failures",
+				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Counter",
+					"value": {
+						"value": "@add(variables('Counter'), 1)",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -681,6 +744,10 @@
 			},
 			"LogID": {
 				"type": "Integer"
+			},
+			"Counter": {
+				"type": "Integer",
+				"defaultValue": 0
 			}
 		},
 		"folder": {
