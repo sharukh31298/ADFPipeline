@@ -1,11 +1,21 @@
 {
 	"name": "getdataflow_refreshes_ls",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
 			"WorkSpaceID": {
 				"type": "string"
 			},
 			"DataFlowID": {
+				"type": "string"
+			},
+			"AppTenantId": {
+				"type": "string"
+			},
+			"AppClientId": {
+				"type": "string"
+			},
+			"AppClientCode": {
 				"type": "string"
 			}
 		},
@@ -15,18 +25,13 @@
 			"url": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkSpaceID,'/dataflows/',linkedService().DataFlowID,'/transactions')}",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "OAuth2ClientCredential",
-			"clientId": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be",
+			"clientId": "@{linkedService().AppClientId}",
 			"clientSecret": {
-				"type": "AzureKeyVaultSecret",
-				"store": {
-					"referenceName": "AzureKeyValut",
-					"type": "LinkedServiceReference"
-				},
-				"secretName": "UBTIClientSecretName"
+				"type": "SecureString",
+				"value": "**********"
 			},
-			"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+			"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
 			"scope": "https://analysis.windows.net/powerbi/api/.default"
 		}
-	},
-	"type": "Microsoft.DataFactory/factories/linkedservices"
+	}
 }
