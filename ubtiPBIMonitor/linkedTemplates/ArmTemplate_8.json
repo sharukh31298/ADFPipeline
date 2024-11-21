@@ -4657,8 +4657,6 @@
 					{
 						"name": "Workspaces_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Capturing LogID",
@@ -4700,11 +4698,9 @@
 					{
 						"name": "Reports_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Capturing LogID",
+								"activity": "Workspaces_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -4747,7 +4743,7 @@
 						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Reports_Master",
+								"activity": "WorkspaceUsers__Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -4786,11 +4782,9 @@
 					{
 						"name": "Datasets_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Capturing LogID",
+								"activity": "Reports_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -4833,7 +4827,7 @@
 						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Datasets_Master",
+								"activity": "ReportPages_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -4872,11 +4866,9 @@
 					{
 						"name": "Dataflows_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Capturing LogID",
+								"activity": "Datasets_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -4919,7 +4911,7 @@
 						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Datasets_Master",
+								"activity": "Datasetusers_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -4962,7 +4954,7 @@
 						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Dataflows_Master",
+								"activity": "Datasetrefresh_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -5039,7 +5031,7 @@
 									"type": "DateTime"
 								},
 								"CurrentStatus": {
-									"value": null,
+									"value": "Started",
 									"type": "String"
 								},
 								"IsFirstTimeLoad": {
@@ -5066,7 +5058,7 @@
 									"type": "DateTime"
 								},
 								"Status": {
-									"value": "Started",
+									"value": null,
 									"type": "String"
 								},
 								"TentantId": {
@@ -5121,83 +5113,11 @@
 						}
 					},
 					{
-						"name": "Sp_DataloadtrackerforSuccess",
-						"type": "SqlServerStoredProcedure",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [
-							{
-								"activity": "ReportPages_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Datasetrefresh_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Datasetusers_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "DataflowRefreshes_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "WorkspaceUsers__Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
-							"storedProcedureParameters": {
-								"DataLoadTrackerId": {
-									"value": {
-										"value": "@activity('Capturing LogID').output.count",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"ProcessEndTime": {
-									"value": null,
-									"type": "DateTime"
-								},
-								"Status": {
-									"value": "Success",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "LS_Dataloadtracker_SQL",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
 						"name": "ViewReports_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Capturing LogID",
+								"activity": "Dataflows_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -5236,11 +5156,9 @@
 					{
 						"name": "WorkspaceUsers__Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Workspaces_Master",
+								"activity": "ViewReports_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -5260,65 +5178,30 @@
 						}
 					},
 					{
-						"name": "sp_dataloadtrackerforFailure",
-						"type": "SqlServerStoredProcedure",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
+						"name": "Set variable1",
+						"type": "SetVariable",
 						"dependsOn": [
-							{
-								"activity": "DataflowRefreshes_Master",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
-							{
-								"activity": "ReportPages_Master",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
-							{
-								"activity": "Datasetusers_Master",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
-							{
-								"activity": "Datasetrefresh_Master",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
 							{
 								"activity": "WorkspaceUsers__Master",
 								"dependencyConditions": [
 									"Failed"
 								]
-							},
-							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
-							{
-								"activity": "Reports_Master",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
-							{
-								"activity": "Datasets_Master",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
-							{
-								"activity": "Dataflows_Master",
-								"dependencyConditions": [
-									"Failed"
-								]
-							},
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Result",
+							"value": "Failure"
+						}
+					},
+					{
+						"name": "Set variable2",
+						"type": "SetVariable",
+						"dependsOn": [
 							{
 								"activity": "ViewReports_Master",
 								"dependencyConditions": [
@@ -5327,55 +5210,174 @@
 							}
 						],
 						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
 							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
-							"storedProcedureParameters": {
-								"DataLoadTrackerId": {
-									"value": {
-										"value": "@activity('Capturing LogID').output.count",
-										"type": "Expression"
-									},
-									"type": "Int32"
-								},
-								"ProcessEndTime": {
-									"value": null,
-									"type": "DateTime"
-								},
-								"Status": {
-									"value": "Failure",
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "LS_Dataloadtracker_SQL",
-							"type": "LinkedServiceReference"
+							"variableName": "Result",
+							"value": "Failure"
 						}
 					},
 					{
-						"name": "Capturing Success and Failures",
+						"name": "Set variable3",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
 						"policy": {
 							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "Counter",
-							"value": {
-								"value": "@add(variables('Counter'), 1)",
-								"type": "Expression"
+							"variableName": "Result",
+							"value": "Failure"
+						}
+					},
+					{
+						"name": "Set variable4",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Failed"
+								]
 							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Result",
+							"value": "Failure"
+						}
+					},
+					{
+						"name": "Set variable5",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Result",
+							"value": "Failure"
+						}
+					},
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "DataflowRefreshes_Master",
+								"dependencyConditions": [
+									"Succeeded",
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(variables('Result'),'Success')",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Failure Message",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
+										"storedProcedureParameters": {
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "Int32"
+											},
+											"ProcessEndTime": {
+												"value": "",
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": {
+													"value": "@variables('Result')",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_Dataloadtracker_SQL",
+										"type": "LinkedServiceReference"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Success Message",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
+										"storedProcedureParameters": {
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "Int32"
+											},
+											"ProcessEndTime": {
+												"value": "",
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": {
+													"value": "@variables('Result')",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_Dataloadtracker_SQL",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
 						}
 					}
 				],
@@ -5404,9 +5406,9 @@
 					"LogID": {
 						"type": "Integer"
 					},
-					"Counter": {
-						"type": "Integer",
-						"defaultValue": 0
+					"Result": {
+						"type": "String",
+						"defaultValue": "Success"
 					}
 				},
 				"folder": {
