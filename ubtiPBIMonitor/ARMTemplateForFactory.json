@@ -11237,6 +11237,8 @@
 					{
 						"name": "Workspaces_Master",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Capturing LogID",
@@ -11282,7 +11284,7 @@
 						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Workspaces_Master",
+								"activity": "Capturing LogID",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -11368,7 +11370,7 @@
 						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Workspaces_Master",
+								"activity": "Capturing LogID",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -11454,7 +11456,7 @@
 						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Workspaces_Master",
+								"activity": "Capturing LogID",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -11617,7 +11619,7 @@
 									"type": "DateTime"
 								},
 								"CurrentStatus": {
-									"value": "Started",
+									"value": null,
 									"type": "String"
 								},
 								"IsFirstTimeLoad": {
@@ -11644,7 +11646,7 @@
 									"type": "DateTime"
 								},
 								"Status": {
-									"value": null,
+									"value": "Started",
 									"type": "String"
 								},
 								"TentantId": {
@@ -11727,6 +11729,12 @@
 								"dependencyConditions": [
 									"Succeeded"
 								]
+							},
+							{
+								"activity": "WorkspaceUsers__Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
 							}
 						],
 						"policy": {
@@ -11769,7 +11777,7 @@
 						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Workspaces_Master",
+								"activity": "Capturing LogID",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -11808,8 +11816,6 @@
 					{
 						"name": "WorkspaceUsers__Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Workspaces_Master",
@@ -11824,28 +11830,11 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "WorkSpacesUsers",
+								"referenceName": "WorkSpacesUsers_Batch",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": false,
-							"parameters": {
-								"AppTenantId": {
-									"value": "@pipeline().parameters.AppTenantId",
-									"type": "Expression"
-								},
-								"AppClientId": {
-									"value": "@pipeline().parameters.AppClientId",
-									"type": "Expression"
-								},
-								"AppClientCode": {
-									"value": "@pipeline().parameters.AppClientCode",
-									"type": "Expression"
-								},
-								"TenantId": {
-									"value": "@pipeline().parameters.TenantId",
-									"type": "Expression"
-								}
-							}
+							"parameters": {}
 						}
 					},
 					{
@@ -11874,6 +11863,42 @@
 							},
 							{
 								"activity": "Datasetrefresh_Master",
+								"dependencyConditions": [
+									"Failed"
+								]
+							},
+							{
+								"activity": "WorkspaceUsers__Master",
+								"dependencyConditions": [
+									"Failed"
+								]
+							},
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Failed"
+								]
+							},
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Failed"
+								]
+							},
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Failed"
+								]
+							},
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Failed"
+								]
+							},
+							{
+								"activity": "ViewReports_Master",
 								"dependencyConditions": [
 									"Failed"
 								]
@@ -11911,6 +11936,25 @@
 							"referenceName": "LS_Dataloadtracker_SQL",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "Capturing Success and Failures",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Counter",
+							"value": {
+								"value": "@add(variables('Counter'), 1)",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -11937,6 +11981,10 @@
 					},
 					"LogID": {
 						"type": "Integer"
+					},
+					"Counter": {
+						"type": "Integer",
+						"defaultValue": 0
 					}
 				},
 				"folder": {
@@ -11956,7 +12004,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/LS_Dataloadtracker_SQL')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSqlTable1')]",
 				"[concat(variables('factoryId'), '/pipelines/ViewReports')]",
-				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers')]"
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch')]"
 			]
 		},
 		{
