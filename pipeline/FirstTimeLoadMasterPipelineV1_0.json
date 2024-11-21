@@ -251,6 +251,8 @@
 			{
 				"name": "Datasetrefresh_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -292,6 +294,8 @@
 			{
 				"name": "DataflowRefreshes_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -454,10 +458,8 @@
 				}
 			},
 			{
-				"name": "Stored procedure_UpdatePIpelineExecution",
+				"name": "Sp_DataloadtrackerforSuccess",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "ReportPages_Master",
@@ -493,25 +495,18 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[usp_UpdatePipelineExecutionStatus]",
+					"storedProcedureName": "[dbo].[DataLoadTrack_Update]",
 					"storedProcedureParameters": {
-						"EndTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						},
-						"LogID": {
+						"DataLoadTrackerId": {
 							"value": {
 								"value": "@activity('Capturing LogID').output.count",
 								"type": "Expression"
 							},
 							"type": "Int32"
 						},
-						"RunningStatus": {
-							"value": "True",
-							"type": "Boolean"
+						"ProcessEndTime": {
+							"value": null,
+							"type": "DateTime"
 						},
 						"Status": {
 							"value": "Success",
@@ -520,13 +515,15 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "ADF_Pipeline_Status_Log",
+					"referenceName": "LS_Dataloadtracker_SQL",
 					"type": "LinkedServiceReference"
 				}
 			},
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Workspaces_Master",
@@ -604,6 +601,68 @@
 							"type": "Expression"
 						}
 					}
+				}
+			},
+			{
+				"name": "sp_dataloadtrackerforFailure",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "DataflowRefreshes_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					},
+					{
+						"activity": "ReportPages_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					},
+					{
+						"activity": "Datasetusers_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					},
+					{
+						"activity": "Datasetrefresh_Master",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[DataLoadTrack_Update]",
+					"storedProcedureParameters": {
+						"DataLoadTrackerId": {
+							"value": {
+								"value": "@activity('Capturing LogID').output.count",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"ProcessEndTime": {
+							"value": null,
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": "Failure",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_Dataloadtracker_SQL",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
