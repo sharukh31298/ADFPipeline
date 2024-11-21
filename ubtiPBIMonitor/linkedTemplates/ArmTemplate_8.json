@@ -13,115 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/get_refresh_schedules_dataflow')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "RefreshSchedules_API",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "RefreshSchedules_SQL",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "flatten1"
-						},
-						{
-							"name": "flatten2"
-						},
-						{
-							"name": "derivedColumn1"
-						}
-					],
-					"scriptLines": [
-						"parameters{",
-						"     groupid as string,",
-						"     datasetid as string",
-						"}",
-						"source(output(",
-						"          body as ({@odata.context} as string, days as string[], enabled as boolean, localTimeZoneId as string, notifyOption as string, times as string[]),",
-						"          headers as [string,string]",
-						"     ),",
-						"     allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     httpMethod: 'GET',",
-						"     timeout: 30,",
-						"     requestInterval: 0,",
-						"     paginationRules: ['supportRFC5988' -> 'true'],",
-						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments']) ~> source1",
-						"source1 foldDown(unroll(body.days),",
-						"     mapColumn(",
-						"          days = body.days,",
-						"          enabled = body.enabled,",
-						"          localTimeZoneId = body.localTimeZoneId,",
-						"          notifyOption = body.notifyOption,",
-						"          times = body.times",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flatten1",
-						"flatten1 foldDown(unroll(times),",
-						"     mapColumn(",
-						"          days,",
-						"          enabled,",
-						"          localTimeZoneId,",
-						"          notifyOption,",
-						"          times",
-						"     ),",
-						"     skipDuplicateMapInputs: false,",
-						"     skipDuplicateMapOutputs: false) ~> flatten2",
-						"flatten2 derive(groupid = $groupid,",
-						"          datasetid = $datasetid) ~> derivedColumn1",
-						"derivedColumn1 sink(allowSchemaDrift: true,",
-						"     validateSchema: false,",
-						"     input(",
-						"          index_no as integer,",
-						"          dataset_id as string,",
-						"          workspace_id as string,",
-						"          days as string,",
-						"          times as string,",
-						"          enabled as string,",
-						"          localTimeZoneId as string,",
-						"          notifyOption as string,",
-						"          updated_time as timestamp",
-						"     ),",
-						"     deletable:false,",
-						"     insertable:true,",
-						"     updateable:false,",
-						"     upsertable:false,",
-						"     format: 'table',",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true,",
-						"     errorHandlingOption: 'stopOnFirstError',",
-						"     mapColumn(",
-						"          dataset_id = datasetid,",
-						"          workspace_id = groupid,",
-						"          days,",
-						"          times,",
-						"          enabled,",
-						"          localTimeZoneId,",
-						"          notifyOption",
-						"     )) ~> sink1"
-					]
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_Batch')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2880,9 +2771,7 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/get_refresh_schedules_dataflow')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ReportPages_Batch')]",
@@ -4327,6 +4216,20 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					}
 				},
 				"variables": {
 					"CountWorkspace": {
@@ -7529,6 +7432,71 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PipelineBatch')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Test for batch pipeline",
+						"description": "",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpacesUsers_Batch_Tenant2",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch_Tenant2')]"
 			]
 		}
 	]

@@ -13,471 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get Datasets",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Datasets]')",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "Dataset_SQL",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "DatasetID in Loop",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get Datasets",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get Datasets').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "Get DatasetRefreshes Details",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"additionalColumns": [
-												{
-													"name": "WorkspaceID",
-													"value": {
-														"value": "@item().WorkspaceId",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "DatasetID",
-													"value": {
-														"value": "@item().DatasetSourceKey",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "TenantId",
-													"value": {
-														"value": "@pipeline().parameters.TenantID",
-														"type": "Expression"
-													}
-												}
-											],
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"mappings": [
-												{
-													"source": {
-														"path": "$['value'][0]['requestId']"
-													},
-													"sink": {
-														"name": "RequestId",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['value'][0]['id']"
-													},
-													"sink": {
-														"name": "DatasetRefreshesSourceKey",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['value'][0]['refreshType']"
-													},
-													"sink": {
-														"name": "RefreshType",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['value'][0]['startTime']"
-													},
-													"sink": {
-														"name": "StartTime",
-														"type": "DateTime"
-													}
-												},
-												{
-													"source": {
-														"path": "$['value'][0]['endTime']"
-													},
-													"sink": {
-														"name": "EndTime",
-														"type": "DateTime"
-													}
-												},
-												{
-													"source": {
-														"path": "$['value'][0]['status']"
-													},
-													"sink": {
-														"name": "Status",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['WorkspaceID']"
-													},
-													"sink": {
-														"name": "WorkSpaceID",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['DatasetID']"
-													},
-													"sink": {
-														"name": "DatasetID",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['TenantId']"
-													},
-													"sink": {
-														"name": "TenantId",
-														"type": "Int32"
-													}
-												}
-											],
-											"collectionReference": "",
-											"mapComplexValuesToString": true
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "DatasetRefreshes_API",
-											"type": "DatasetReference",
-											"parameters": {
-												"WorkSpaceID": {
-													"value": "@item().WorkspaceId",
-													"type": "Expression"
-												},
-												"DatasetID": {
-													"value": "@item().DatasetSourceKey",
-													"type": "Expression"
-												},
-												"AppTenantId": {
-													"value": "@pipeline().parameters.AppTenantId",
-													"type": "Expression"
-												},
-												"AppClientId": {
-													"value": "@pipeline().parameters.AppClientId",
-													"type": "Expression"
-												},
-												"AppClientCode": {
-													"value": "@pipeline().parameters.AppClientCode",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "DatasetRefreshes_SQL",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "Sp_TrackProcessSuccess",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get Datasets",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
-							"storedProcedureParameters": {
-								"EndTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"ErrorMessage": {
-									"value": "NA",
-									"type": "String"
-								},
-								"PipelineName": {
-									"value": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"RunID": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"StartTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"Status": {
-									"value": {
-										"value": "@activity('Get Datasets').Status",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerName": {
-									"value": {
-										"value": "@pipeline().TriggerName",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerTime": {
-									"value": {
-										"value": "@pipeline().TriggerTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TriggerType": {
-									"value": {
-										"value": "@pipeline().TriggerType",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TenantID": {
-									"value": {
-										"value": "@pipeline().parameters.TenantID",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "ADF_Pipeline_Status_Log",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Sp_TrackProcessFailure",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get Datasets",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
-							"storedProcedureParameters": {
-								"EndTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"ErrorMessage": {
-									"value": {
-										"value": "@activity('Get Datasets').error?.message",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"PipelineName": {
-									"value": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"RunID": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"StartTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"Status": {
-									"value": {
-										"value": "@activity('Get Datasets').Status",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerName": {
-									"value": {
-										"value": "@pipeline().TriggerName",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerTime": {
-									"value": {
-										"value": "@pipeline().TriggerTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TriggerType": {
-									"value": {
-										"value": "@pipeline().TriggerType",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "ADF_Pipeline_Status_Log",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					},
-					"TenantID": {
-						"type": "int"
-					}
-				},
-				"variables": {
-					"DatasetsRefreshes_status": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_StartTime": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_EndTime": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_IST": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_IST2": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "UBTI_Dev"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes_Tenant2')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -6389,7 +5924,6 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "TRUNCATE TABLE [dbo].[Reports]",
 								"writeBehavior": "upsert",
 								"upsertSettings": {
 									"useTempDB": true,
@@ -12436,6 +11970,18 @@
 												"WorkspaceID": {
 													"value": "@item().WorkSpaceSourceKey",
 													"type": "Expression"
+												},
+												"AppTenantId": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"AppClientId": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"AppClientCode": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
 												}
 											}
 										}
@@ -12657,11 +12203,20 @@
 				},
 				"parameters": {
 					"BatchNo": {
+						"type": "string",
+						"defaultValue": "1"
+					},
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
 						"type": "string"
 					},
 					"TenantId": {
-						"type": "int",
-						"defaultValue": 5
+						"type": "int"
 					}
 				},
 				"variables": {
@@ -14359,6 +13914,115 @@
 					"name": "UBTI_DEV RunStatus"
 				},
 				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/get_refresh_schedules_dataflow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "RefreshSchedules_API",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "RefreshSchedules_SQL",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "flatten1"
+						},
+						{
+							"name": "flatten2"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     groupid as string,",
+						"     datasetid as string",
+						"}",
+						"source(output(",
+						"          body as ({@odata.context} as string, days as string[], enabled as boolean, localTimeZoneId as string, notifyOption as string, times as string[]),",
+						"          headers as [string,string]",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     httpMethod: 'GET',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     paginationRules: ['supportRFC5988' -> 'true'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments']) ~> source1",
+						"source1 foldDown(unroll(body.days),",
+						"     mapColumn(",
+						"          days = body.days,",
+						"          enabled = body.enabled,",
+						"          localTimeZoneId = body.localTimeZoneId,",
+						"          notifyOption = body.notifyOption,",
+						"          times = body.times",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten1",
+						"flatten1 foldDown(unroll(times),",
+						"     mapColumn(",
+						"          days,",
+						"          enabled,",
+						"          localTimeZoneId,",
+						"          notifyOption,",
+						"          times",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten2",
+						"flatten2 derive(groupid = $groupid,",
+						"          datasetid = $datasetid) ~> derivedColumn1",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          index_no as integer,",
+						"          dataset_id as string,",
+						"          workspace_id as string,",
+						"          days as string,",
+						"          times as string,",
+						"          enabled as string,",
+						"          localTimeZoneId as string,",
+						"          notifyOption as string,",
+						"          updated_time as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          dataset_id = datasetid,",
+						"          workspace_id = groupid,",
+						"          days,",
+						"          times,",
+						"          enabled,",
+						"          localTimeZoneId,",
+						"          notifyOption",
+						"     )) ~> sink1"
+					]
+				}
 			},
 			"dependsOn": []
 		}

@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Dataloadtracker_SQL'"
 		},
+		"Ls_API_WorkSpaceUsers_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Ls_API_WorkSpaceUsers'"
+		},
 		"Ls_Sql_Workspacelive_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Ls_Sql_Workspacelive'"
@@ -331,7 +335,7 @@
 		},
 		"Ls_API_WorkSpaceUsers_properties_typeProperties_clientId": {
 			"type": "string",
-			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+			"defaultValue": "@{linkedService().AppClientId}"
 		},
 		"Ls_Api_Workspace_properties_typeProperties_url": {
 			"type": "string",
@@ -16755,7 +16759,6 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "TRUNCATE TABLE [dbo].[Reports]",
 								"writeBehavior": "upsert",
 								"upsertSettings": {
 									"useTempDB": true,
@@ -25655,6 +25658,20 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					}
+				},
 				"variables": {
 					"CountWorkspace": {
 						"type": "Integer"
@@ -26036,6 +26053,18 @@
 												"WorkspaceID": {
 													"value": "@item().WorkSpaceSourceKey",
 													"type": "Expression"
+												},
+												"AppTenantId": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"AppClientId": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"AppClientCode": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
 												}
 											}
 										}
@@ -26257,11 +26286,20 @@
 				},
 				"parameters": {
 					"BatchNo": {
+						"type": "string",
+						"defaultValue": "1"
+					},
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
 						"type": "string"
 					},
 					"TenantId": {
-						"type": "int",
-						"defaultValue": 5
+						"type": "int"
 					}
 				},
 				"variables": {
@@ -27989,32 +28027,43 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline2_copy1')]",
+			"name": "[concat(parameters('factoryName'), '/PipelineBatch')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Web_Activity",
-						"type": "WebActivity",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
+						"name": "Test for batch pipeline",
+						"description": "",
+						"type": "ExecutePipeline",
 						"dependsOn": [],
 						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"method": "POST",
-							"headers": {},
-							"url": "https://prod-28.westus.logic.azure.com:443/workflows/6c8e6d26bf514cbfbcdeb247122e1cb3/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=aNdRt-agqKZs9r9cefQXC03zBTgz5RX9fr4vsyl7Vfc",
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://management.azure.com/"
+							"pipeline": {
+								"referenceName": "WorkSpacesUsers_Batch_Tenant2",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
 							}
 						}
 					}
@@ -28023,14 +28072,24 @@
 					"elapsedTimeMetric": {}
 				},
 				"parameters": {
-					"ClientTestingID": {
-						"type": "String",
-						"defaultValue": "0"
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
 					}
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch_Tenant2')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_adf_orchestration')]",
@@ -31778,12 +31837,33 @@
 						"WorkspaceID": {
 							"value": "@dataset().WorkspaceID",
 							"type": "Expression"
+						},
+						"AppTenantId": {
+							"value": "@dataset().AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@dataset().AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@dataset().AppClientCode",
+							"type": "Expression"
 						}
 					}
 				},
 				"parameters": {
 					"WorkspaceID": {
 						"type": "String"
+					},
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -32867,6 +32947,15 @@
 				"parameters": {
 					"WorkspaceID": {
 						"type": "String"
+					},
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -32877,20 +32966,14 @@
 					"authenticationType": "OAuth2ClientCredential",
 					"clientId": "[parameters('Ls_API_WorkSpaceUsers_properties_typeProperties_clientId')]",
 					"clientSecret": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureKeyValut",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "UBTIClientSecretName"
+						"type": "SecureString",
+						"value": "[parameters('Ls_API_WorkSpaceUsers_clientSecret')]"
 					},
-					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"tokenEndpoint": "@{concat('https://login.microsoftonline.com',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureKeyValut')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Ls_Api_Workspace')]",
