@@ -5195,8 +5195,8 @@
 						}
 					},
 					{
-						"name": "If Condition1",
-						"type": "IfCondition",
+						"name": "SP_Call_UpdateStatus",
+						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
 								"activity": "WorkspaceUsers__Master",
@@ -5212,90 +5212,40 @@
 								]
 							}
 						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"expression": {
-								"value": "@equals(variables('Result'),'Success')",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "Failure Message",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
+							"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
+							"storedProcedureParameters": {
+								"DataLoadTrackerId": {
+									"value": {
+										"value": "@pipeline().parameters.TenantId",
+										"type": "Expression"
 									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
-										"storedProcedureParameters": {
-											"DataLoadTrackerId": {
-												"value": "",
-												"type": "Int32"
-											},
-											"ProcessEndTime": {
-												"value": "",
-												"type": "DateTime"
-											},
-											"Status": {
-												"value": {
-													"value": "@variables('Result')",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
+									"type": "Int32"
+								},
+								"ProcessEndTime": {
+									"value": "",
+									"type": "DateTime"
+								},
+								"Status": {
+									"value": {
+										"value": "@variables('Result')",
+										"type": "Expression"
 									},
-									"linkedServiceName": {
-										"referenceName": "LS_Dataloadtracker_SQL",
-										"type": "LinkedServiceReference"
-									}
+									"type": "String"
 								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "Success Message",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
-										"storedProcedureParameters": {
-											"DataLoadTrackerId": {
-												"value": "",
-												"type": "Int32"
-											},
-											"ProcessEndTime": {
-												"value": "",
-												"type": "DateTime"
-											},
-											"Status": {
-												"value": {
-													"value": "@variables('Result')",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "LS_Dataloadtracker_SQL",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_Dataloadtracker_SQL",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],
