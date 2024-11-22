@@ -3960,6 +3960,22 @@
 											"BatchNo": {
 												"value": "@item().BatchNo",
 												"type": "Expression"
+											},
+											"AppTenantId": {
+												"value": "@pipeline().parameters.AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@pipeline().parameters.AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@pipeline().parameters.AppClientCode",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@pipeline().parameters.TenantId",
+												"type": "Expression"
 											}
 										}
 									}
@@ -4644,14 +4660,7 @@
 						"type": "ExecutePipeline",
 						"state": "Inactive",
 						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [
-							{
-								"activity": "WorkspaceUsers__Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"secureInput": false
 						},
@@ -5190,7 +5199,13 @@
 						"type": "IfCondition",
 						"dependsOn": [
 							{
-								"activity": "DataflowRefreshes_Master",
+								"activity": "WorkspaceUsers__Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set variable1",
 								"dependencyConditions": [
 									"Succeeded",
 									"Failed"
@@ -6761,6 +6776,71 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/PipelineBatch')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Test for batch pipeline",
+						"description": "",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpacesUsers_Batch_Tenant2",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch_Tenant2')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Upset Master Pipelines Execution')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -7432,71 +7512,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/PipelineBatch')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Test for batch pipeline",
-						"description": "",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "WorkSpacesUsers_Batch_Tenant2",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": false,
-							"parameters": {
-								"AppTenantId": {
-									"value": "@pipeline().parameters.AppTenantId",
-									"type": "Expression"
-								},
-								"AppClientId": {
-									"value": "@pipeline().parameters.AppClientId",
-									"type": "Expression"
-								},
-								"AppClientCode": {
-									"value": "@pipeline().parameters.AppClientCode",
-									"type": "Expression"
-								},
-								"TenantId": {
-									"value": "@pipeline().parameters.TenantId",
-									"type": "Expression"
-								}
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					},
-					"TenantId": {
-						"type": "int"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch_Tenant2')]"
 			]
 		}
 	]
