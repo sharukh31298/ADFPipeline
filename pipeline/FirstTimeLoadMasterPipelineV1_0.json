@@ -89,14 +89,7 @@
 				"type": "ExecutePipeline",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "WorkspaceUsers__Master",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureInput": false
 				},
@@ -633,7 +626,13 @@
 				"type": "IfCondition",
 				"dependsOn": [
 					{
-						"activity": "DataflowRefreshes_Master",
+						"activity": "WorkspaceUsers__Master",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set variable1",
 						"dependencyConditions": [
 							"Succeeded",
 							"Failed"
