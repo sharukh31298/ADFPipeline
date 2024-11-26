@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'Ls_API_WorkSpaceUsers'"
 		},
+		"Ls_Ds_SQL_ViewReports_Staging_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Ls_Ds_SQL_ViewReports_Staging'"
+		},
 		"Ls_Sql_Workspacelive_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Ls_Sql_Workspacelive'"
@@ -66,10 +70,6 @@
 		"Test_Workspaces_clientSecret": {
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'Test_Workspaces'"
-		},
-		"Test_WorkspacesSQL_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'Test_WorkspacesSQL'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -126,6 +126,18 @@
 		"Ls_API_WorkSpaceUsers_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
+		},
+		"Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"Ls_Sql_Workspacelive_properties_typeProperties_server": {
 			"type": "string",
@@ -230,18 +242,6 @@
 		"Test_Workspaces_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
-		},
-		"Test_WorkspacesSQL_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"Test_WorkspacesSQL_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "pbimonitor"
-		},
-		"Test_WorkspacesSQL_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -411,6 +411,28 @@
 					},
 					"tokenEndpoint": "@{concat('https://login.microsoftonline.com',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ls_Ds_SQL_ViewReports_Staging')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_server')]",
+					"database": "[parameters('Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Ls_Ds_SQL_ViewReports_Staging_password')]"
+					}
 				}
 			},
 			"dependsOn": []
@@ -631,28 +653,6 @@
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Test_WorkspacesSQL')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('Test_WorkspacesSQL_properties_typeProperties_server')]",
-					"database": "[parameters('Test_WorkspacesSQL_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('Test_WorkspacesSQL_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('Test_WorkspacesSQL_password')]"
-					}
 				}
 			},
 			"dependsOn": []
