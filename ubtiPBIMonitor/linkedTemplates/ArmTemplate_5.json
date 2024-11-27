@@ -13,6 +13,179 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSqlTableDS')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureSqlDatabaseLS",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ClientId",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "varchar"
+					},
+					{
+						"name": "ClientSecret",
+						"type": "varchar"
+					},
+					{
+						"name": "OrganisationId",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WorkSpaceUser"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Azure_Sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Azure_SQL",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ClientInformation"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_SQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "workspace_id",
+						"type": "varchar"
+					},
+					{
+						"name": "dataflow_id",
+						"type": "varchar"
+					},
+					{
+						"name": "id",
+						"type": "varchar"
+					},
+					{
+						"name": "refreshType",
+						"type": "varchar"
+					},
+					{
+						"name": "startTime",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "endTime",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "status",
+						"type": "varchar"
+					},
+					{
+						"name": "updated_time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DataflowRefreshes"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_SQL_History')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "workspace_id",
+						"type": "varchar"
+					},
+					{
+						"name": "dataflow_id",
+						"type": "varchar"
+					},
+					{
+						"name": "id",
+						"type": "varchar"
+					},
+					{
+						"name": "refreshType",
+						"type": "varchar"
+					},
+					{
+						"name": "startTime",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "endTime",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "status",
+						"type": "varchar"
+					},
+					{
+						"name": "updated_time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DataflowRefreshesHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DataFlow_SQL')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -835,230 +1008,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "Datasources"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/GatewayHistory_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "datasetUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "emailAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "displayName",
-						"type": "varchar"
-					},
-					{
-						"name": "identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "graphId",
-						"type": "varchar"
-					},
-					{
-						"name": "principalType",
-						"type": "varchar"
-					},
-					{
-						"name": "userType",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "GatewayHistory"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Gateway_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "datasetUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "emailAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "displayName",
-						"type": "varchar"
-					},
-					{
-						"name": "identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "graphId",
-						"type": "varchar"
-					},
-					{
-						"name": "principalType",
-						"type": "varchar"
-					},
-					{
-						"name": "userType",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Gateways"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Gateways_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "objectId",
-						"type": "varchar"
-					},
-					{
-						"name": "name",
-						"type": "varchar"
-					},
-					{
-						"name": "description",
-						"type": "varchar"
-					},
-					{
-						"name": "workspaceId",
-						"type": "varchar"
-					},
-					{
-						"name": "configuredBy",
-						"type": "varchar"
-					},
-					{
-						"name": "updatedtime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Gateways"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/GetReportUsers_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "report_user_access_right",
-						"type": "varchar"
-					},
-					{
-						"name": "email_address",
-						"type": "varchar"
-					},
-					{
-						"name": "display_name",
-						"type": "varchar"
-					},
-					{
-						"name": "identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "graph_id",
-						"type": "varchar"
-					},
-					{
-						"name": "principal_type",
-						"type": "varchar"
-					},
-					{
-						"name": "user_type",
-						"type": "varchar"
-					},
-					{
-						"name": "report_id",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ReportUsers"
 				}
 			},
 			"dependsOn": []
