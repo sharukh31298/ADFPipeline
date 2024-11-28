@@ -658,13 +658,6 @@
 				"typeProperties": {
 					"storedProcedureName": "[dbo].[DataLoadTrack_Update]",
 					"storedProcedureParameters": {
-						"DataLoadTrackerId": {
-							"value": {
-								"value": "@activity('sp_Dataloadtracker').output.count",
-								"type": "Expression"
-							},
-							"type": "Int32"
-						},
 						"ProcessEndTime": {
 							"value": {
 								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
@@ -673,8 +666,18 @@
 							"type": "DateTime"
 						},
 						"Status": {
-							"value": "Success",
+							"value": {
+								"value": "@activity('Workspaces_Master').Status",
+								"type": "Expression"
+							},
 							"type": "String"
+						},
+						"TentantId": {
+							"value": {
+								"value": "@activity('sp_Dataloadtracker').output",
+								"type": "Expression"
+							},
+							"type": "Int32"
 						}
 					}
 				},
