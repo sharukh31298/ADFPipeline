@@ -52,7 +52,7 @@
 					"batchCount": 50,
 					"activities": [
 						{
-							"name": "Get WorkSpace Users",
+							"name": "Get WorkSpace Users_Staging",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -187,7 +187,7 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "WorkSpaceUsers_API",
+									"referenceName": "WorkSpaceUsers_Staging_API",
 									"type": "DatasetReference",
 									"parameters": {
 										"WorkspaceID": {
@@ -212,6 +212,175 @@
 							"outputs": [
 								{
 									"referenceName": "WorkSpaceUsers_SQL",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "Get WorkSpaceUsers_Live",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Get WorkSpace Users_Staging",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"additionalColumns": [
+										{
+											"name": "WorkSpaceID",
+											"value": {
+												"value": "@item().WorkSpaceSourceKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "TenantId",
+											"value": {
+												"value": "@pipeline().parameters.TenantId",
+												"type": "Expression"
+											}
+										}
+									],
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"WorkSpaceUserSourceKey"
+										]
+									},
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "EmailAddress",
+												"type": "varchar"
+											},
+											"sink": {
+												"name": "EmailAddress",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "GroupUserAccessRight",
+												"type": "varchar"
+											},
+											"sink": {
+												"name": "GroupUserAccessRight",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "UserName",
+												"type": "varchar"
+											},
+											"sink": {
+												"name": "UserName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "Identifier",
+												"type": "varchar"
+											},
+											"sink": {
+												"name": "Identifier",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "PrincipalType",
+												"type": "varchar"
+											},
+											"sink": {
+												"name": "PrincipalType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "WorkSpaceUserSourceKey",
+												"type": "varchar"
+											},
+											"sink": {
+												"name": "WorkSpaceUserSourceKey",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "UserType",
+												"type": "varchar"
+											},
+											"sink": {
+												"name": "UserType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "WorkSpaceID",
+												"type": "varchar"
+											},
+											"sink": {
+												"name": "WorkSpaceID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"name": "TenantId",
+												"type": "int",
+												"precision": 10
+											},
+											"sink": {
+												"name": "TenantId",
+												"type": "Int32"
+											}
+										}
+									],
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "LS_SQL_WorkspacesUsers_Live",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "WorkSpacesUsers_Live_SQL",
 									"type": "DatasetReference"
 								}
 							]
