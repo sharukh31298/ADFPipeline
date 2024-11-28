@@ -52,7 +52,7 @@
 					"batchCount": 50,
 					"activities": [
 						{
-							"name": "Get Report Page Details",
+							"name": "Get ReportPage_Staging",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -194,6 +194,188 @@
 							"outputs": [
 								{
 									"referenceName": "ReportPages_SQL",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "Get ReportPages_Live",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Get ReportPage_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"ReportID"
+										]
+									},
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "ReportID",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "ReportID",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "WorkSpaceID",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "WorkSpaceID",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "ReportPageName",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "ReportPageName",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "ReportPageDisplayName",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "ReportPageDisplayName",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "report_order",
+												"type": "Int32",
+												"physicalType": "int"
+											},
+											"sink": {
+												"name": "report_order",
+												"type": "Int32",
+												"physicalType": "int"
+											}
+										},
+										{
+											"source": {
+												"name": "CreatedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"name": "CreatedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											}
+										},
+										{
+											"source": {
+												"name": "ModifiedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"name": "ModifiedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											}
+										},
+										{
+											"source": {
+												"name": "CreatedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "CreatedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "ModifiedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "ModifiedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "TenantId",
+												"type": "Int32",
+												"physicalType": "int"
+											},
+											"sink": {
+												"name": "TenantId",
+												"type": "Int32",
+												"physicalType": "int"
+											}
+										}
+									],
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ReportPagesLive_SQL",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "SQL_ReportPagesLive",
 									"type": "DatasetReference"
 								}
 							]
