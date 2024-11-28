@@ -6758,7 +6758,7 @@
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "Capturing DataLoadTrackerId",
+								"activity": "sp_Dataloadtracker",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -6797,14 +6797,9 @@
 					{
 						"name": "Reports_Master",
 						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"secureInput": false
 						},
@@ -6874,6 +6869,8 @@
 					{
 						"name": "Datasets_Master",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Reports_Master",
@@ -6958,6 +6955,8 @@
 					{
 						"name": "Dataflows_Master",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
@@ -7177,14 +7176,9 @@
 					{
 						"name": "Capturing DataLoadTrackerId",
 						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "sp_Dataloadtracker",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -7255,14 +7249,7 @@
 						"type": "ExecutePipeline",
 						"state": "Inactive",
 						"onInactiveMarkAs": "Failed",
-						"dependsOn": [
-							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"secureInput": false
 						},
@@ -7296,6 +7283,8 @@
 					{
 						"name": "Set variable1",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkspaceUsers__Master",
@@ -7333,6 +7322,8 @@
 					{
 						"name": "Set variable3",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Dataflows_Master",
@@ -7354,6 +7345,8 @@
 					{
 						"name": "Set variable4",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
@@ -7375,6 +7368,8 @@
 					{
 						"name": "Set variable5",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Reports_Master",
@@ -7398,13 +7393,7 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "ViewReports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Dataflows_Master",
+								"activity": "Workspaces_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -7423,7 +7412,7 @@
 							"storedProcedureParameters": {
 								"DataLoadTrackerId": {
 									"value": {
-										"value": "@activity('Capturing DataLoadTrackerId').output.count",
+										"value": "@activity('sp_Dataloadtracker').output",
 										"type": "Expression"
 									},
 									"type": "Int32"

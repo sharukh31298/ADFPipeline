@@ -13,171 +13,63 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/Demo_Workspaces')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/getusersql_ds_1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
 					{
-						"name": "Demo_Workspaces",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "GET",
-								"paginationRules": {
-									"supportRFC5988": "true"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"path": "[['id']"
-										},
-										"sink": {
-											"name": "WorkSpaceSourceKey",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['isReadOnly']"
-										},
-										"sink": {
-											"name": "IsReadOnly",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['isOnDedicatedCapacity']"
-										},
-										"sink": {
-											"name": "IsonDedicatedCapacity",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['capacityMigrationStatus']"
-										},
-										"sink": {
-											"name": "CapacityMigrationStatus",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['description']"
-										},
-										"sink": {
-											"name": "WorkSpaceDescription",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['type']"
-										},
-										"sink": {
-											"name": "WorkSpaceType",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['state']"
-										},
-										"sink": {
-											"name": "Status",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['hasWorkspaceLevelSettings ']"
-										},
-										"sink": {
-											"name": "HasWorkspaceLevelSetting",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['name']"
-										},
-										"sink": {
-											"name": "WorkSpaceName",
-											"type": "String"
-										}
-									}
-								],
-								"collectionReference": "$['value']"
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "Ls_API_Workspaces",
-								"type": "DatasetReference",
-								"parameters": {
-									"AppTenantId": {
-										"value": "@pipeline().parameters.AppTenantId",
-										"type": "Expression"
-									},
-									"AppClientId": {
-										"value": "@pipeline().parameters.AppClientId",
-										"type": "Expression"
-									},
-									"AppClientCode": {
-										"value": "@pipeline().parameters.AppClientCode",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "LS_SQL_Workspaces",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
+						"name": "report_user_access_right",
+						"type": "varchar"
+					},
+					{
+						"name": "email_address",
+						"type": "varchar"
+					},
+					{
+						"name": "display_name",
+						"type": "varchar"
+					},
+					{
+						"name": "identifier",
+						"type": "varchar"
+					},
+					{
+						"name": "graph_id",
+						"type": "varchar"
+					},
+					{
+						"name": "principal_type",
+						"type": "varchar"
+					},
+					{
+						"name": "user_type",
+						"type": "varchar"
+					},
+					{
+						"name": "report_id",
+						"type": "varchar"
+					},
+					{
+						"name": "updated_time",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
 					}
 				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
-				},
-				"annotations": []
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "users1"
+				}
 			},
 			"dependsOn": []
 		},

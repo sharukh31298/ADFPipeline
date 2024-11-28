@@ -19,9 +19,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Capacities_History'"
 		},
+		"LS_API_Workspaces_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'LS_API_Workspaces'"
+		},
 		"LS_Dataloadtracker_SQL_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Dataloadtracker_SQL'"
+		},
+		"LS_SQL_DemoWorkspaces_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SQL_DemoWorkspaces'"
 		},
 		"Ls_API_WorkSpaceUsers_clientSecret": {
 			"type": "secureString",
@@ -173,14 +181,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
-		"LS_API_Workspaces_clientSecret": {
-			"type": "secureString",
-			"metadata": "Secure string for 'clientSecret' of 'LS_API_Workspaces'"
-		},
-		"LS_SQL_DemoWorkspaces_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SQL_DemoWorkspaces'"
-		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -313,6 +313,14 @@
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		},
+		"LS_API_Workspaces_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": " https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5000"
+		},
+		"LS_API_Workspaces_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().AppClientId}"
+		},
 		"LS_Api_ReportPages_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkSpaceID,'/reports/',linkedService().ReportID,'/pages')}"
@@ -338,6 +346,18 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"LS_Dataloadtracker_SQL_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"LS_SQL_DemoWorkspaces_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"LS_SQL_DemoWorkspaces_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"LS_SQL_DemoWorkspaces_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -660,26 +680,6 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
-		},
-		"LS_API_Workspaces_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": " https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5000"
-		},
-		"LS_API_Workspaces_properties_typeProperties_clientId": {
-			"type": "string",
-			"defaultValue": "@{linkedService().AppClientId}"
-		},
-		"LS_SQL_DemoWorkspaces_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_SQL_DemoWorkspaces_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "pbimonitor"
-		},
-		"LS_SQL_DemoWorkspaces_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -11277,6 +11277,178 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Demo_Workspaces')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Demo_Workspaces",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['id']"
+										},
+										"sink": {
+											"name": "WorkSpaceSourceKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isReadOnly']"
+										},
+										"sink": {
+											"name": "IsReadOnly",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isOnDedicatedCapacity']"
+										},
+										"sink": {
+											"name": "IsonDedicatedCapacity",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['capacityMigrationStatus']"
+										},
+										"sink": {
+											"name": "CapacityMigrationStatus",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['description']"
+										},
+										"sink": {
+											"name": "WorkSpaceDescription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['type']"
+										},
+										"sink": {
+											"name": "WorkSpaceType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['state']"
+										},
+										"sink": {
+											"name": "Status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['hasWorkspaceLevelSettings ']"
+										},
+										"sink": {
+											"name": "HasWorkspaceLevelSetting",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['name']"
+										},
+										"sink": {
+											"name": "WorkSpaceName",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "$['value']"
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Ls_API_Workspaces",
+								"type": "DatasetReference",
+								"parameters": {
+									"AppTenantId": {
+										"value": "@pipeline().parameters.AppTenantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@pipeline().parameters.AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@pipeline().parameters.AppClientCode",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "LS_SQL_Workspaces",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Ls_API_Workspaces')]",
+				"[concat(variables('factoryId'), '/datasets/LS_SQL_Workspaces')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/FirstTimeLoadMasterPipelineV1_0')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -11287,7 +11459,7 @@
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "Capturing DataLoadTrackerId",
+								"activity": "sp_Dataloadtracker",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -11326,14 +11498,9 @@
 					{
 						"name": "Reports_Master",
 						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"secureInput": false
 						},
@@ -11403,6 +11570,8 @@
 					{
 						"name": "Datasets_Master",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Reports_Master",
@@ -11487,6 +11656,8 @@
 					{
 						"name": "Dataflows_Master",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
@@ -11706,14 +11877,9 @@
 					{
 						"name": "Capturing DataLoadTrackerId",
 						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "sp_Dataloadtracker",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -11784,14 +11950,7 @@
 						"type": "ExecutePipeline",
 						"state": "Inactive",
 						"onInactiveMarkAs": "Failed",
-						"dependsOn": [
-							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"secureInput": false
 						},
@@ -11825,6 +11984,8 @@
 					{
 						"name": "Set variable1",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkspaceUsers__Master",
@@ -11862,6 +12023,8 @@
 					{
 						"name": "Set variable3",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Dataflows_Master",
@@ -11883,6 +12046,8 @@
 					{
 						"name": "Set variable4",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
@@ -11904,6 +12069,8 @@
 					{
 						"name": "Set variable5",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Reports_Master",
@@ -11927,13 +12094,7 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "ViewReports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Dataflows_Master",
+								"activity": "Workspaces_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -11952,7 +12113,7 @@
 							"storedProcedureParameters": {
 								"DataLoadTrackerId": {
 									"value": {
-										"value": "@activity('Capturing DataLoadTrackerId').output.count",
+										"value": "@activity('sp_Dataloadtracker').output",
 										"type": "Expression"
 									},
 									"type": "Int32"
@@ -30416,6 +30577,137 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_SQL_Workspaces')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SQL_DemoWorkspaces",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "WorkSpaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "WorkSpaceSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceName",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceType",
+						"type": "varchar"
+					},
+					{
+						"name": "IsonDedicatedCapacity",
+						"type": "bit"
+					},
+					{
+						"name": "CapacityMigrationStatus",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "IsReadOnly",
+						"type": "bit"
+					},
+					{
+						"name": "HasWorkspaceLevelSetting",
+						"type": "bit"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DemoWorkSpaces"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_SQL_DemoWorkspaces')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ls_API_Workspaces')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_API_Workspaces",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"AppTenantId": {
+							"value": "@dataset().AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@dataset().AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@dataset().AppClientCode",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_API_Workspaces')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Ls_ds_ViewRports_staging')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -33144,6 +33436,39 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_API_Workspaces')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('LS_API_Workspaces_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('LS_API_Workspaces_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('LS_API_Workspaces_clientSecret')]"
+					},
+					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_Api_ReportPages')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -33224,6 +33549,28 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS_Dataloadtracker_SQL_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_SQL_DemoWorkspaces')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_server')]",
+					"database": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_SQL_DemoWorkspaces_password')]"
 					}
 				}
 			},
@@ -34400,364 +34747,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Demo_Workspaces')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Demo_Workspaces",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "GET",
-								"paginationRules": {
-									"supportRFC5988": "true"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"path": "[['id']"
-										},
-										"sink": {
-											"name": "WorkSpaceSourceKey",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['isReadOnly']"
-										},
-										"sink": {
-											"name": "IsReadOnly",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['isOnDedicatedCapacity']"
-										},
-										"sink": {
-											"name": "IsonDedicatedCapacity",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['capacityMigrationStatus']"
-										},
-										"sink": {
-											"name": "CapacityMigrationStatus",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['description']"
-										},
-										"sink": {
-											"name": "WorkSpaceDescription",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['type']"
-										},
-										"sink": {
-											"name": "WorkSpaceType",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['state']"
-										},
-										"sink": {
-											"name": "Status",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['hasWorkspaceLevelSettings ']"
-										},
-										"sink": {
-											"name": "HasWorkspaceLevelSetting",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['name']"
-										},
-										"sink": {
-											"name": "WorkSpaceName",
-											"type": "String"
-										}
-									}
-								],
-								"collectionReference": "$['value']"
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "Ls_API_Workspaces",
-								"type": "DatasetReference",
-								"parameters": {
-									"AppTenantId": {
-										"value": "@pipeline().parameters.AppTenantId",
-										"type": "Expression"
-									},
-									"AppClientId": {
-										"value": "@pipeline().parameters.AppClientId",
-										"type": "Expression"
-									},
-									"AppClientCode": {
-										"value": "@pipeline().parameters.AppClientCode",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "LS_SQL_Workspaces",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Ls_API_Workspaces')]",
-				"[concat(variables('factoryId'), '/datasets/LS_SQL_Workspaces')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_API_Workspaces')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('LS_API_Workspaces_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "OAuth2ClientCredential",
-					"clientId": "[parameters('LS_API_Workspaces_properties_typeProperties_clientId')]",
-					"clientSecret": {
-						"type": "SecureString",
-						"value": "[parameters('LS_API_Workspaces_clientSecret')]"
-					},
-					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/linkedService().AppTenantId/oauth2/v2.0/token')}",
-					"scope": "https://analysis.windows.net/powerbi/api/.default"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_API_Workspaces')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_API_Workspaces",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"AppTenantId": {
-							"value": "@dataset().AppTenantId",
-							"type": "Expression"
-						},
-						"AppClientId": {
-							"value": "@dataset().AppClientId",
-							"type": "Expression"
-						},
-						"AppClientCode": {
-							"value": "@dataset().AppClientCode",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_API_Workspaces')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SQL_DemoWorkspaces')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SQL_DemoWorkspaces_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SQL_Workspaces')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_SQL_DemoWorkspaces",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "WorkSpaceId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "WorkSpaceSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceDescription",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceType",
-						"type": "varchar"
-					},
-					{
-						"name": "IsonDedicatedCapacity",
-						"type": "bit"
-					},
-					{
-						"name": "CapacityMigrationStatus",
-						"type": "varchar"
-					},
-					{
-						"name": "Status",
-						"type": "varchar"
-					},
-					{
-						"name": "IsReadOnly",
-						"type": "bit"
-					},
-					{
-						"name": "HasWorkspaceLevelSetting",
-						"type": "bit"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DemoWorkSpaces"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/LS_SQL_DemoWorkspaces')]"
 			]
 		}
 	]
