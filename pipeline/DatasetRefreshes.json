@@ -52,7 +52,7 @@
 					"batchCount": 50,
 					"activities": [
 						{
-							"name": "Get DatasetRefreshes Details",
+							"name": "Get DatasetRefreshes_Staging",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -222,6 +222,224 @@
 							"outputs": [
 								{
 									"referenceName": "DatasetRefreshes_SQL",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "Get DatasetRefreshes_Live",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Get DatasetRefreshes_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"DatasetRefreshesSourceKey"
+										]
+									},
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"name": "DatasetRefreshesSourceKey",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "DatasetRefreshesSourceKey",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "WorkSpaceID",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "WorkSpaceID",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "DatasetID",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "DatasetID",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "RefreshType",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "RefreshType",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "StartTime",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"name": "StartTime",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											}
+										},
+										{
+											"source": {
+												"name": "EndTime",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"name": "EndTime",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											}
+										},
+										{
+											"source": {
+												"name": "RequestId",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "RequestId",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Status",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "Status",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "CreatedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"name": "CreatedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											}
+										},
+										{
+											"source": {
+												"name": "ModifiedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"name": "ModifiedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											}
+										},
+										{
+											"source": {
+												"name": "CreatedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "CreatedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "ModifiedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "ModifiedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "TenantId",
+												"type": "Int32",
+												"physicalType": "int"
+											},
+											"sink": {
+												"name": "TenantId",
+												"type": "Int32",
+												"physicalType": "int"
+											}
+										}
+									],
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "SQL_DatasetRefreshesLive_Staging",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "SQl_DatasetRefreshesLive",
 									"type": "DatasetReference"
 								}
 							]
