@@ -238,22 +238,6 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"additionalColumns": [
-										{
-											"name": "WorkSpaceID",
-											"value": {
-												"value": "@item().WorkSpaceSourceKey",
-												"type": "Expression"
-											}
-										},
-										{
-											"name": "TenantId",
-											"value": {
-												"value": "@pipeline().parameters.TenantId",
-												"type": "Expression"
-											}
-										}
-									],
 									"queryTimeout": "02:00:00",
 									"partitionOption": "None"
 								},
@@ -275,93 +259,158 @@
 									"mappings": [
 										{
 											"source": {
-												"name": "EmailAddress",
-												"type": "varchar"
-											},
-											"sink": {
-												"name": "EmailAddress",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"name": "GroupUserAccessRight",
-												"type": "varchar"
-											},
-											"sink": {
-												"name": "GroupUserAccessRight",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"name": "UserName",
-												"type": "varchar"
-											},
-											"sink": {
-												"name": "UserName",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"name": "Identifier",
-												"type": "varchar"
-											},
-											"sink": {
-												"name": "Identifier",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"name": "PrincipalType",
-												"type": "varchar"
-											},
-											"sink": {
-												"name": "PrincipalType",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
 												"name": "WorkSpaceUserSourceKey",
-												"type": "varchar"
+												"type": "String",
+												"physicalType": "varchar"
 											},
 											"sink": {
 												"name": "WorkSpaceUserSourceKey",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"name": "UserType",
-												"type": "varchar"
-											},
-											"sink": {
-												"name": "UserType",
-												"type": "String"
+												"type": "String",
+												"physicalType": "varchar"
 											}
 										},
 										{
 											"source": {
 												"name": "WorkSpaceID",
-												"type": "varchar"
+												"type": "String",
+												"physicalType": "varchar"
 											},
 											"sink": {
 												"name": "WorkSpaceID",
-												"type": "String"
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "EmailAddress",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "EmailAddress",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "UserName",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "UserName",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "Identifier",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "Identifier",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "UserType",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "UserType",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "GroupUserAccessRight",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "GroupUserAccessRight",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "PrincipalType",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "PrincipalType",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "CreatedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"name": "CreatedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											}
+										},
+										{
+											"source": {
+												"name": "ModifiedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											},
+											"sink": {
+												"name": "ModifiedDate",
+												"type": "DateTime",
+												"physicalType": "datetime"
+											}
+										},
+										{
+											"source": {
+												"name": "CreatedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "CreatedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											}
+										},
+										{
+											"source": {
+												"name": "ModifiedBy",
+												"type": "String",
+												"physicalType": "varchar"
+											},
+											"sink": {
+												"name": "ModifiedBy",
+												"type": "String",
+												"physicalType": "varchar"
 											}
 										},
 										{
 											"source": {
 												"name": "TenantId",
-												"type": "int",
-												"precision": 10
+												"type": "Int32",
+												"physicalType": "int"
 											},
 											"sink": {
 												"name": "TenantId",
-												"type": "Int32"
+												"type": "Int32",
+												"physicalType": "int"
 											}
 										}
 									],
@@ -591,19 +640,23 @@
 		],
 		"parameters": {
 			"AppTenantId": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
 			},
 			"AppClientId": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 			},
 			"AppClientCode": {
 				"type": "string"
 			},
 			"TenantId": {
-				"type": "int"
+				"type": "int",
+				"defaultValue": 23
 			},
 			"BatchNo": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "1"
 			}
 		},
 		"variables": {
