@@ -42,7 +42,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Capturing WorkSpacesSourcesKey').output",
+						"value": "@activity('Capturing WorkSpacesSourcesKey').output.value",
 						"type": "Expression"
 					},
 					"activities": [
@@ -73,7 +73,49 @@
 									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false
 								},
-								"enableStaging": false
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['groupUserAccessRight']"
+											},
+											"sink": {
+												"name": "GroupUserAccessRight",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['displayName']"
+											},
+											"sink": {
+												"name": "UserName",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['identifier']"
+											},
+											"sink": {
+												"name": "Identifier",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['principalType']"
+											},
+											"sink": {
+												"name": "PrincipalType",
+												"type": "String"
+											}
+										}
+									],
+									"collectionReference": "$['value']"
+								}
 							},
 							"inputs": [
 								{
