@@ -24,6 +24,13 @@
 									"value": "@pipeline().parameters.TenantId",
 									"type": "Expression"
 								}
+							},
+							{
+								"name": "DataLoadTrackerID",
+								"value": {
+									"value": "@pipeline().parameters.DataLoadTrackerID",
+									"type": "Expression"
+								}
 							}
 						],
 						"httpRequestTimeout": "00:01:40",
@@ -137,7 +144,11 @@
 							},
 							{
 								"source": {
-									"path": "$['Datalo']"
+									"path": "$['DataLoadTrackerID']"
+								},
+								"sink": {
+									"name": "DataLoadTrackerID",
+									"type": "String"
 								}
 							}
 						],
@@ -615,6 +626,18 @@
 									"type": "Int32",
 									"physicalType": "int"
 								}
+							},
+							{
+								"source": {
+									"name": "DataLoadTrackerID",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "DataLoadTrackerID",
+									"type": "String",
+									"physicalType": "nvarchar"
+								}
 							}
 						],
 						"typeConversion": true,
@@ -737,6 +760,13 @@
 								"type": "Expression"
 							},
 							"type": "String"
+						},
+						"DataLoadTrackerID": {
+							"value": {
+								"value": "@pipeline().parameters.DataLoadTrackerID",
+								"type": "Expression"
+							},
+							"type": "String"
 						}
 					}
 				},
@@ -848,6 +878,13 @@
 								"type": "Expression"
 							},
 							"type": "String"
+						},
+						"DataLaodTrackerID": {
+							"value": {
+								"value": "@pipeline().parameters.DataLoadTrackerID",
+								"type": "Expression"
+							},
+							"type": "String"
 						}
 					}
 				},
@@ -860,16 +897,23 @@
 		"concurrency": 2,
 		"parameters": {
 			"AppTenantId": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "9049e040-2bf1-47a2-ad39-e23869af08ff"
 			},
 			"AppClientId": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "3a8df53a-9873-4e70-9d69-4725460c62b8"
 			},
 			"AppClientCode": {
 				"type": "string"
 			},
 			"TenantId": {
-				"type": "int"
+				"type": "string",
+				"defaultValue": "24356"
+			},
+			"DataLoadTrackerID": {
+				"type": "string",
+				"defaultValue": "6543"
 			}
 		},
 		"variables": {
