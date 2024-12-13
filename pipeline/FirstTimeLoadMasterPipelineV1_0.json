@@ -7,7 +7,7 @@
 				"type": "ExecutePipeline",
 				"dependsOn": [
 					{
-						"activity": "sp_Dataloadtracker",
+						"activity": "TrackerID_ GET",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -39,6 +39,10 @@
 						"TenantId": {
 							"value": "@pipeline().parameters.TenantId",
 							"type": "Expression"
+						},
+						"DataLoadTrackerID": {
+							"value": "@activity('Get_Dataloadtrackerid').output",
+							"type": "Expression"
 						}
 					}
 				}
@@ -46,6 +50,8 @@
 			{
 				"name": "Reports_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "sp_Dataloadtracker",
@@ -87,6 +93,8 @@
 			{
 				"name": "ReportPages_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Reports_Master",
@@ -128,6 +136,8 @@
 			{
 				"name": "Datasets_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "sp_Dataloadtracker",
@@ -169,6 +179,8 @@
 			{
 				"name": "Datasetusers_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -210,6 +222,8 @@
 			{
 				"name": "Dataflows_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "sp_Dataloadtracker",
@@ -251,6 +265,8 @@
 			{
 				"name": "Datasetrefresh_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -292,6 +308,8 @@
 			{
 				"name": "DataflowRefreshes_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -333,6 +351,8 @@
 			{
 				"name": "sp_Dataloadtracker",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -425,6 +445,8 @@
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "sp_Dataloadtracker",
@@ -500,6 +522,10 @@
 						"TenantId": {
 							"value": "@pipeline().parameters.TenantId",
 							"type": "Expression"
+						},
+						"DataLoadTrackerID": {
+							"value": "@variables('DataloadTrackerID')",
+							"type": "Expression"
 						}
 					}
 				}
@@ -528,6 +554,8 @@
 			{
 				"name": "Set variable2",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
@@ -542,6 +570,8 @@
 			{
 				"name": "Set variable3",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -563,6 +593,8 @@
 			{
 				"name": "Set variable4",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -584,6 +616,8 @@
 			{
 				"name": "Set variable5",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Reports_Master",
@@ -680,6 +714,7 @@
 							"type": "DateTime"
 						},
 						"Status": {
+							"value": "Success",
 							"type": "String"
 						},
 						"TentantId": {
@@ -688,12 +723,165 @@
 								"type": "Expression"
 							},
 							"type": "Int32"
+						},
+						"DataLoadTrackerID": {
+							"value": {
+								"value": "@variables('DataloadTrackerID')",
+								"type": "Expression"
+							},
+							"type": "String"
 						}
 					}
 				},
 				"linkedServiceName": {
 					"referenceName": "LS_Dataloadtracker_SQL",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "TrackerID_ GET",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get_Dataloadtrackerid",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataloadTrackerID",
+					"value": {
+						"value": "@int(activity('Get_Dataloadtrackerid').output.value[0].DataLoadTrackerID)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Get_Dataloadtrackerid",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Progress_Status",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[dbo].[DataLoadTrack_Insert]",
+						"storedProcedureParameters": {
+							"AppClientId": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.APPClientID",
+									"type": "Expression"
+								}
+							},
+							"AppClientSecret": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.APPClientCode",
+									"type": "Expression"
+								}
+							},
+							"AppTentantId": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.APPTenantID",
+									"type": "Expression"
+								}
+							},
+							"CreatedDate": {
+								"type": "DateTime",
+								"value": null
+							},
+							"CurrentStatus": {
+								"type": "String",
+								"value": "Started"
+							},
+							"IsFirstTimeLoad": {
+								"type": "Boolean",
+								"value": "True"
+							},
+							"ModifiedDate": {
+								"type": "DateTime",
+								"value": null
+							},
+							"PipelineRunId": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"ProcessEndTime": {
+								"type": "DateTime",
+								"value": null
+							},
+							"ProcessStartTime": {
+								"type": "DateTime",
+								"value": {
+									"value": "@utcNow()",
+									"type": "Expression"
+								}
+							},
+							"Status": {
+								"type": "String",
+								"value": {
+									"value": "@variables('Progress Status')",
+									"type": "Expression"
+								}
+							},
+							"TentantId": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.TenantID",
+									"type": "Expression"
+								}
+							},
+							"TriggerType": {
+								"type": "String",
+								"value": "Application"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Azure_Sql",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Progress_Status",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Progress Status",
+					"value": "Started"
 				}
 			}
 		],
@@ -722,6 +910,12 @@
 			"Result": {
 				"type": "String",
 				"defaultValue": "Success"
+			},
+			"DataloadTrackerID": {
+				"type": "Integer"
+			},
+			"Progress Status": {
+				"type": "String"
 			}
 		},
 		"folder": {
