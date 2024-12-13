@@ -80,6 +80,13 @@
 												"value": "@pipeline().parameters.TenantId",
 												"type": "Expression"
 											}
+										},
+										{
+											"name": "DataLoadTrackerID",
+											"value": {
+												"value": "@pipeline().parameters.DataLoadTrackerID",
+												"type": "Expression"
+											}
 										}
 									],
 									"httpRequestTimeout": "00:01:40",
@@ -178,6 +185,14 @@
 											"sink": {
 												"name": "TenantId",
 												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"path": "$['DataLoadTrackerID']"
+											},
+											"sink": {
+												"name": "DataLoadTrackerID"
 											}
 										}
 									],
@@ -531,6 +546,13 @@
 								"type": "Expression"
 							},
 							"type": "String"
+						},
+						"DataLoadTrackerID": {
+							"value": {
+								"value": "@pipeline().parameters.DataLoadTrackerID",
+								"type": "Expression"
+							},
+							"type": "String"
 						}
 					}
 				},
@@ -629,6 +651,13 @@
 								"type": "Expression"
 							},
 							"type": "String"
+						},
+						"DataLoadTrackerID": {
+							"value": {
+								"value": "@pipeline().parameters.DataLoadTrackerID",
+								"type": "Expression"
+							},
+							"type": "String"
 						}
 					}
 				},
@@ -640,23 +669,22 @@
 		],
 		"parameters": {
 			"AppTenantId": {
-				"type": "string",
-				"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+				"type": "string"
 			},
 			"AppClientId": {
-				"type": "string",
-				"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+				"type": "string"
 			},
 			"AppClientCode": {
 				"type": "string"
 			},
 			"TenantId": {
-				"type": "int",
-				"defaultValue": 23
+				"type": "string"
 			},
 			"BatchNo": {
-				"type": "string",
-				"defaultValue": "1"
+				"type": "string"
+			},
+			"DataLoadTrackerID": {
+				"type": "string"
 			}
 		},
 		"variables": {
