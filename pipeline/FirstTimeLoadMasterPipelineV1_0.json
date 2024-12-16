@@ -95,8 +95,6 @@
 			{
 				"name": "ReportPages_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Reports_Master",
@@ -130,6 +128,10 @@
 						},
 						"TenantId": {
 							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						},
+						"DataLoadTrackerID": {
+							"value": "@activity('Get_Dataloadtrackerid').output",
 							"type": "Expression"
 						}
 					}
@@ -526,7 +528,7 @@
 							"type": "Expression"
 						},
 						"DataLoadTrackerID": {
-							"value": "@variables('DataloadTrackerID')",
+							"value": "@activity('Get_Dataloadtrackerid').output",
 							"type": "Expression"
 						}
 					}
