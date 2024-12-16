@@ -140,11 +140,9 @@
 			{
 				"name": "Datasets_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "sp_Dataloadtracker",
+						"activity": "TrackerID_ GET",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -176,6 +174,10 @@
 						"TenantId": {
 							"value": "@pipeline().parameters.TenantId",
 							"type": "Expression"
+						},
+						"DataLoadTrackerID": {
+							"value": "@activity('Get_Dataloadtrackerid').output",
+							"type": "Expression"
 						}
 					}
 				}
@@ -183,8 +185,6 @@
 			{
 				"name": "Datasetusers_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -226,11 +226,9 @@
 			{
 				"name": "Dataflows_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "sp_Dataloadtracker",
+						"activity": "TrackerID_ GET",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -269,8 +267,6 @@
 			{
 				"name": "Datasetrefresh_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Datasets_Master",
@@ -312,8 +308,6 @@
 			{
 				"name": "DataflowRefreshes_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Dataflows_Master",
@@ -449,11 +443,9 @@
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "sp_Dataloadtracker",
+						"activity": "TrackerID_ GET",
 						"dependencyConditions": [
 							"Succeeded"
 						]
