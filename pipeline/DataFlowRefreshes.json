@@ -86,6 +86,13 @@
 												"value": "@pipeline().parameters.TenantID",
 												"type": "Expression"
 											}
+										},
+										{
+											"name": "DataLoadTrackerID",
+											"value": {
+												"value": "@pipeline().parameters.DataLoadTackerID",
+												"type": "Expression"
+											}
 										}
 									],
 									"httpRequestTimeout": "00:01:40",
@@ -174,6 +181,14 @@
 											"sink": {
 												"name": "TenantId",
 												"type": "Int32"
+											}
+										},
+										{
+											"source": {
+												"path": "$['DataLoadTrackingID']"
+											},
+											"sink": {
+												"name": "DataLoadTrackingID"
 											}
 										}
 									],
@@ -512,6 +527,13 @@
 								"type": "Expression"
 							},
 							"type": "String"
+						},
+						"DataLoadTrackerID": {
+							"value": {
+								"value": "@pipeline().parameters.DataLoadTackerID",
+								"type": "Expression"
+							},
+							"type": "String"
 						}
 					}
 				},
@@ -604,6 +626,13 @@
 								"type": "Expression"
 							},
 							"type": "String"
+						},
+						"DataLoadTrackerID": {
+							"value": {
+								"value": "@pipeline().parameters.DataLoadTackerID",
+								"type": "Expression"
+							},
+							"type": "String"
 						}
 					}
 				},
@@ -624,7 +653,10 @@
 				"type": "string"
 			},
 			"TenantID": {
-				"type": "int"
+				"type": "string"
+			},
+			"DataLoadTackerID": {
+				"type": "string"
 			}
 		},
 		"variables": {
