@@ -375,11 +375,11 @@
 		},
 		"LS_API_Workspaces_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": " https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5000"
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$expand=users&$top=2"
 		},
 		"LS_API_Workspaces_properties_typeProperties_clientId": {
 			"type": "string",
-			"defaultValue": "@{linkedService().AppClientId}"
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		},
 		"LS_Api_ReportPages_properties_typeProperties_url": {
 			"type": "string",
@@ -12445,20 +12445,7 @@
 							{
 								"referenceName": "Ls_API_Workspaces",
 								"type": "DatasetReference",
-								"parameters": {
-									"AppTenantId": {
-										"value": "@pipeline().parameters.AppTenantId",
-										"type": "Expression"
-									},
-									"AppClientId": {
-										"value": "@pipeline().parameters.AppClientId",
-										"type": "Expression"
-									},
-									"AppClientCode": {
-										"value": "@pipeline().parameters.AppClientCode",
-										"type": "Expression"
-									}
-								}
+								"parameters": {}
 							}
 						],
 						"outputs": [
@@ -13209,7 +13196,7 @@
 										"value": "@pipeline().parameters.AppTenantId",
 										"type": "Expression"
 									},
-									"type": "Int32"
+									"type": "String"
 								}
 							}
 						},
@@ -32506,32 +32493,7 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "LS_API_Workspaces",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"AppTenantId": {
-							"value": "@dataset().AppTenantId",
-							"type": "Expression"
-						},
-						"AppClientId": {
-							"value": "@dataset().AppClientId",
-							"type": "Expression"
-						},
-						"AppClientCode": {
-							"value": "@dataset().AppClientCode",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
+					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
 				"type": "RestResource",
@@ -35926,17 +35888,6 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
-				},
 				"annotations": [],
 				"type": "RestService",
 				"typeProperties": {
@@ -35948,7 +35899,7 @@
 						"type": "SecureString",
 						"value": "[parameters('LS_API_Workspaces_clientSecret')]"
 					},
-					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
+					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
 				}
 			},
