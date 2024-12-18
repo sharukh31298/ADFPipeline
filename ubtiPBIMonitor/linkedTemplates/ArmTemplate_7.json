@@ -13,6 +13,28 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes_SQL_History')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DatasetRefreshesHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DatasetUserHistory_sql')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1038,82 +1060,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "ReportsHistory"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Reports_SQL_Staging')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getreports_sql_ds",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ReportID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ReportSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetID",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportType",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportName",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportWebUrl",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ReportEmbedUrl",
-						"type": "nvarchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Reports_Staging"
 				}
 			},
 			"dependsOn": []

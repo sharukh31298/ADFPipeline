@@ -65,6 +65,22 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureSQL_SP')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ls_Sql_Workspaces",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DONT TOUCH References')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -3630,30 +3646,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "DatasetRefreshes_Staging"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes_SQL_History')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DatasetRefreshesHistory"
 				}
 			},
 			"dependsOn": [
