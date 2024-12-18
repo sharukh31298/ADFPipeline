@@ -685,7 +685,10 @@
 					"storedProcedureName": "[dbo].[DataLoadTrack_Update]",
 					"storedProcedureParameters": {
 						"DataLoadTrackerID": {
-							"value": "",
+							"value": {
+								"value": "@activity('Execute_SP').output.firstRow.DataLoadTrackerId",
+								"type": "Expression"
+							},
 							"type": "Int32"
 						},
 						"ProcessEndTime": {
@@ -729,7 +732,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientCode,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''','' '',','''',pipeline().parameters.TenantId,''','' ''')",
+							"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientCode,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(pipeline().parameters.TenantId),''','' ''')",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -767,6 +770,9 @@
 			"Result": {
 				"type": "String",
 				"defaultValue": "Success"
+			},
+			"a": {
+				"type": "String"
 			}
 		},
 		"folder": {
