@@ -1,0 +1,33 @@
+{
+	"name": "pipeline2",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup1",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "exec [dbo].[DataLoadTrack_Insert] \"9049e040-2bf1-47a2-ad39-e23869af08ff\",\"3a8df53a-9873-4e70-9d69-4725460c62b8\"\n,\"N9e8Q~NRLsIYTg2832J3f38T~qAwIhy3a.QTya_~\",\"53aad6f3-7954-47a2-8474-8d2f1c9ddcdc\", \"2024-12-18 11:59:48.313\",null,\n\"Started\",\"Started\",\"True\",\"Application\",null,null,'22',''",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "AzureSQL_SP",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
