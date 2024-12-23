@@ -15358,7 +15358,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "WorkSpacesUsers_Batch_Tenant2",
+								"referenceName": "WorkSpacesUsers_Batch",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": false,
@@ -15403,7 +15403,7 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch_Tenant2')]"
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch')]"
 			]
 		},
 		{
@@ -26426,22 +26426,22 @@
 				"parameters": {
 					"AppTenantId": {
 						"type": "string",
-						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+						"defaultValue": "@pipeline().parameters.AppTenantId"
 					},
 					"AppClientId": {
 						"type": "string",
-						"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+						"defaultValue": "@pipeline().parameters.AppClientId"
 					},
 					"AppClientCode": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "@pipeline().parameters.AppClientCode"
 					},
 					"TenantId": {
-						"type": "int",
-						"defaultValue": 23
+						"type": "int"
 					},
 					"BatchNo": {
 						"type": "string",
-						"defaultValue": "1"
+						"defaultValue": "@item().BatchNo"
 					}
 				},
 				"variables": {
@@ -26986,13 +26986,16 @@
 				},
 				"parameters": {
 					"AppTenantId": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "@pipeline().parameters.AppTenantId"
 					},
 					"AppClientId": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "@pipeline().parameters.AppClientId"
 					},
 					"AppClientCode": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "@pipeline().parameters.AppClientCode"
 					},
 					"TenantId": {
 						"type": "int"
