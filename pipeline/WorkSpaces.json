@@ -706,7 +706,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('WorkSpace Staging').Status",
+								"value": "variables('Workspaces_Status')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -860,6 +860,78 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Status of WorkSpaceStaging",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkspacesStaging Status",
+					"value": {
+						"value": "@activity('WorkSpace Staging').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing Status of WorkSpaceLive",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace Live Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaceLive Status",
+					"value": {
+						"value": "@activity('WorkSpace Live Data').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing Status of WorkSpaceHistory",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaceHistory Status",
+					"value": {
+						"value": "@activity('WorkSpace History').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"concurrency": 2,
@@ -878,7 +950,7 @@
 			}
 		},
 		"variables": {
-			"Workspaces_Status": {
+			"WorkspacesStaging Status": {
 				"type": "String"
 			},
 			"Workspaces_StartTime": {
@@ -1091,6 +1163,12 @@
 			},
 			"LogID": {
 				"type": "Integer"
+			},
+			"WorkSpaceLive Status": {
+				"type": "String"
+			},
+			"WorkSpaceHistory Status": {
+				"type": "String"
 			}
 		},
 		"folder": {
