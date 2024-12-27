@@ -426,7 +426,8 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
 					"dataIntegrationUnits": 4,
@@ -608,9 +609,9 @@
 									"physicalType": "int"
 								},
 								"sink": {
-									"name": "TenantId",
-									"type": "Int32",
-									"physicalType": "int"
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							}
 						],
@@ -637,11 +638,13 @@
 			{
 				"name": "sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -656,10 +659,6 @@
 				"typeProperties": {
 					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
 					"storedProcedureParameters": {
-						"DataLoadTrackerID": {
-							"value": null,
-							"type": "String"
-						},
 						"EndTime": {
 							"value": {
 								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
@@ -694,14 +693,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "variables('Workspaces_Status')\n\nvariables('WorkSpaceLive Status')\n\nvariables('WorkSpaceHistory Status')",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"TenantID": {
-							"value": {
-								"value": "@pipeline().parameters.AppTenantId",
+								"value": "@concat(variables('WorkspacesStaging Status'),variables('WorkSpaceHistory Status'),variables('WorkSpaceLive Status'))",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -741,7 +733,7 @@
 					{
 						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
-							"Failed"
+							"Completed"
 						]
 					}
 				],
@@ -793,7 +785,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@variables('WorkspacesStaging Status')",
+								"value": "@concat(variables('WorkspacesStaging Status'),variables('WorkSpaceHistory Status'),variables('WorkSpaceLive Status'))",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -855,7 +847,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "WorkSpace Staging",
+						"activity": "WorkSpace Live Data",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -869,7 +861,7 @@
 				"typeProperties": {
 					"variableName": "WorkSpaceLive Status",
 					"value": {
-						"value": "@activity('WorkSpace Staging').Status",
+						"value": "@activity('WorkSpace Live Data').Status",
 						"type": "Expression"
 					}
 				}
@@ -879,7 +871,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "WorkSpace Staging",
+						"activity": "WorkSpace History",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -893,7 +885,7 @@
 				"typeProperties": {
 					"variableName": "WorkSpaceHistory Status",
 					"value": {
-						"value": "@activity('WorkSpace Staging').Status",
+						"value": "@activity('WorkSpace History').Status",
 						"type": "Expression"
 					}
 				}
@@ -902,16 +894,19 @@
 		"concurrency": 2,
 		"parameters": {
 			"AppTenantId": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "9049e040-2bf1-47a2-ad39-e23869af08ff"
 			},
 			"AppClientId": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "3a8df53a-9873-4e70-9d69-4725460c62b8"
 			},
 			"AppClientCode": {
 				"type": "string"
 			},
 			"TenantId": {
-				"type": "int"
+				"type": "int",
+				"defaultValue": 2
 			}
 		},
 		"variables": {
