@@ -425,7 +425,13 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"WorkSpaceSourceKey"
+							]
+						},
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -609,9 +615,9 @@
 									"physicalType": "int"
 								},
 								"sink": {
-									"name": "ModifiedBy",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "TenantId",
+									"type": "Int32",
+									"physicalType": "int"
 								}
 							}
 						],
@@ -638,9 +644,19 @@
 			{
 				"name": "sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
+					{
+						"activity": "WorkSpace History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "WorkSpace Live Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
 					{
 						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
@@ -667,7 +683,10 @@
 							"type": "DateTime"
 						},
 						"ErrorMessage": {
-							"value": "NA",
+							"value": {
+								"value": "@(activity('WorkSpace Staging').error?.message,\r\nactivity('WorkSpace Live Data').error?.message,\r\nactivity('WorkSpace History').error?.message)",
+								"type": "Expression"
+							},
 							"type": "String"
 						},
 						"PipelineName": {
@@ -693,7 +712,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@concat(variables('WorkspacesStaging Status'),variables('WorkSpaceHistory Status'),variables('WorkSpaceLive Status'))",
+								"value": "@if(and(and(\nequals(variables('WorkspacesStaging Status'),'Succeeded'),\nequals(variables('WorkSpaceHistory Status'),'Succeeded')),\nequals(variables('WorkSpaceLive Status'),'Succeeded')),\n    'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -729,6 +748,8 @@
 			{
 				"name": "sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
