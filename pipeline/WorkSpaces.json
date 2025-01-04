@@ -170,11 +170,13 @@
 			{
 				"name": "WorkSpace Live Data",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -401,11 +403,13 @@
 			{
 				"name": "WorkSpace History",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -440,18 +444,6 @@
 					"translator": {
 						"type": "TabularTranslator",
 						"mappings": [
-							{
-								"source": {
-									"name": "WorkSpaceId",
-									"type": "Int32",
-									"physicalType": "int"
-								},
-								"sink": {
-									"name": "WorkSpaceId",
-									"type": "Int32",
-									"physicalType": "int"
-								}
-							},
 							{
 								"source": {
 									"name": "WorkSpaceSourceKey",
@@ -646,6 +638,12 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
+						"activity": "WorkSpace Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
 						"activity": "WorkSpace History",
 						"dependencyConditions": [
 							"Completed"
@@ -658,7 +656,7 @@
 						]
 					},
 					{
-						"activity": "WorkSpace Staging",
+						"activity": "Capture the StartTime",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -683,10 +681,90 @@
 							"type": "DateTime"
 						},
 						"ErrorMessage": {
+							"value": "NA",
+							"type": "String"
+						},
+						"PipelineName": {
 							"value": {
-								"value": "@(activity('WorkSpace Staging').error?.message,\r\nactivity('WorkSpace Live Data').error?.message,\r\nactivity('WorkSpace History').error?.message)",
+								"value": "@pipeline().Pipeline",
 								"type": "Expression"
 							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@activity('WorkSpace Staging').ExecutionStartTime\n\n\n",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@if(and(and(\nequals(variables('WorkspacesStaging Status'),'Succeeded'),\nequals(variables('WorkSpaceHistory Status'),'Succeeded')),\nequals(variables('WorkSpaceLive Status'),'Succeeded')),\n    'Succeeded','Failed')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "sp_TrackProcessFailure",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"ErrorMessage": {
 							"type": "String"
 						},
 						"PipelineName": {
@@ -746,102 +824,10 @@
 				}
 			},
 			{
-				"name": "sp_TrackProcessFailure",
-				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "WorkSpace Staging",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
-					"storedProcedureParameters": {
-						"EndTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						},
-						"ErrorMessage": {
-							"value": {
-								"value": "\n\n@activity('Workspace Staging').error?.message",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"PipelineName": {
-							"value": {
-								"value": "@pipeline().Pipeline",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"RunID": {
-							"value": {
-								"value": "@pipeline().RunId",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"StartTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						},
-						"Status": {
-							"value": {
-								"value": "@concat(variables('WorkspacesStaging Status'),variables('WorkSpaceHistory Status'),variables('WorkSpaceLive Status'))",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"TriggerName": {
-							"value": {
-								"value": "@pipeline().TriggerName",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"TriggerTime": {
-							"value": {
-								"value": "@pipeline().TriggerTime",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						},
-						"TriggerType": {
-							"value": {
-								"value": "@pipeline().TriggerType",
-								"type": "Expression"
-							},
-							"type": "String"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ADF_Pipeline_Status_Log",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
 				"name": "Capturing Status of WorkSpaceStaging",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Staging",
@@ -866,6 +852,8 @@
 			{
 				"name": "Capturing Status of WorkSpaceLive",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace Live Data",
@@ -890,6 +878,8 @@
 			{
 				"name": "Capturing Status of WorkSpaceHistory",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpace History",
@@ -907,6 +897,49 @@
 					"variableName": "WorkSpaceHistory Status",
 					"value": {
 						"value": "@activity('WorkSpace History').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capture the StartTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaceStartTime",
+					"value": {
+						"value": "@activity('WorkSpace Staging').ExecutionStartTime",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capture the WorkSpaceEndTime",
+				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpacesEndTime",
+					"value": {
+						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 						"type": "Expression"
 					}
 				}
@@ -1149,6 +1182,12 @@
 				"type": "String"
 			},
 			"WorkSpaceHistory Status": {
+				"type": "String"
+			},
+			"WorkSpaceStartTime": {
+				"type": "String"
+			},
+			"WorkSpacesEndTime": {
 				"type": "String"
 			}
 		},
