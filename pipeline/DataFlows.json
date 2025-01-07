@@ -496,7 +496,37 @@
 					{
 						"activity": "DataFlow Staging",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Dataflows Staging Status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "DataFlow Live Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Dataflows Live Status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "DataFlow History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Dataflows History Status",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -592,14 +622,7 @@
 			{
 				"name": "Sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "DataFlow Staging",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -684,6 +707,78 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Dataflows Staging Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataFlow Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Dataflows Staging Status",
+					"value": {
+						"value": "@activity('DataFlow Staging').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing Dataflows Live Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataFlow Live Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Dataflows Live Status",
+					"value": {
+						"value": "@activity('DataFlow Live Data').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing Dataflows History Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataFlow History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Dataflows History Status",
+					"value": {
+						"value": "@activity('DataFlow History').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -714,6 +809,15 @@
 				"type": "String"
 			},
 			"DataFlows_IST2": {
+				"type": "String"
+			},
+			"Dataflows Staging Status": {
+				"type": "String"
+			},
+			"Dataflows Live Status": {
+				"type": "String"
+			},
+			"Dataflows History Status": {
 				"type": "String"
 			}
 		},
