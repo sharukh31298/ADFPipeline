@@ -381,6 +381,54 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "Capturing GetreportPage Staging status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get ReportPage_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "ReportPages Staging Status",
+								"value": {
+									"value": "@activity('Get Reports').Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Capturing Get Reportpages Live Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get ReportPages_Live",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "ReportPages Live Status",
+								"value": {
+									"value": "@activity('Get ReportPages_Live').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -572,6 +620,30 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Get Reportspages Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Reports",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Get ReportPages Status",
+					"value": {
+						"value": "@activity('Get Reports').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -740,6 +812,15 @@
 				"type": "String"
 			},
 			"ViewReports_IST2": {
+				"type": "String"
+			},
+			"ReportPages Staging Status": {
+				"type": "String"
+			},
+			"ReportPages Live Status": {
+				"type": "String"
+			},
+			"Get ReportPages Status": {
 				"type": "String"
 			}
 		},
