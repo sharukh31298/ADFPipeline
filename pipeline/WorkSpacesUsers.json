@@ -477,7 +477,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "WorkSpaceUserLive",
+								"variableName": "WorkSpaceUserLive Status",
 								"value": {
 									"value": "@activity('Get WorkSpaceUsers_Live').Status",
 									"type": "Expression"
@@ -492,15 +492,15 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Get WorkSpaces",
+						"activity": "WorkSpace ID in Loop",
 						"dependencyConditions": [
 							"Succeeded"
 						]
 					},
 					{
-						"activity": "WorkSpace ID in Loop",
+						"activity": "Get WorkSpaces",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -549,7 +549,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('Get WorkSpaces').Status",
+								"value": "@if(and(and(and(\nequals(variables('Get Workspaces Status'),'Succeeded'),\nequals(variables('WorkspaceUsers Staging Staus'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -914,7 +914,7 @@
 			"WorkspaceUsers Staging Staus": {
 				"type": "String"
 			},
-			"WorkSpaceUserLive": {
+			"WorkSpaceUserLive Status": {
 				"type": "String"
 			},
 			"Get Workspaces Status": {
