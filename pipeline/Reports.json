@@ -563,7 +563,37 @@
 					{
 						"activity": "Reports Staging",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
+						]
+					},
+					{
+						"activity": "Report History Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Report Live Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Reports Live Status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Report History Status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Status for Reports Staging",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -612,7 +642,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('Reports Staging').Status",
+								"value": "@if(and(and(\nequals(variables('Reports Staging Status'),'Succeeded'),\nequals(variables('Report Live Status'),'Succeeded')),\nequals(variables('Report History Status'),'Succeeded')),\n    'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -659,14 +689,7 @@
 			{
 				"name": "sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Reports Staging",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -750,6 +773,69 @@
 				"linkedServiceName": {
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Capturing Status for Reports Staging",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Reports Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Reports Staging Status",
+					"value": ""
+				}
+			},
+			{
+				"name": "Capturing Report History Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Report History Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Report History Status",
+					"value": ""
+				}
+			},
+			{
+				"name": "Capturing Reports Live Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Report Live Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Report Live Status",
+					"value": ""
 				}
 			}
 		],
@@ -938,6 +1024,24 @@
 			},
 			"LogID": {
 				"type": "Integer"
+			},
+			"ViewReportStaging Status": {
+				"type": "String"
+			},
+			"ViewReport Live Status": {
+				"type": "String"
+			},
+			"ViewReport History Status": {
+				"type": "String"
+			},
+			"Reports Staging Status": {
+				"type": "String"
+			},
+			"Report History Status": {
+				"type": "String"
+			},
+			"Report Live Status": {
+				"type": "String"
 			}
 		},
 		"folder": {
