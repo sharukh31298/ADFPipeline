@@ -328,11 +328,65 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "CapturingUsers Dataset Batches Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Dataset Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Datasets Batches Status",
+					"value": {
+						"value": "@activity('Get Dataset Batches').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing DatasetsUsers Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DatasetUsers History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DatasetUsers History Status",
+					"value": {
+						"value": "@activity('DatasetUsers History').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"variables": {
 			"CountWorkspace": {
 				"type": "Integer"
+			},
+			"Datasets Batches Status": {
+				"type": "String"
+			},
+			"DatasetUsers History Status": {
+				"type": "String"
 			}
 		},
 		"folder": {

@@ -429,6 +429,54 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "Capturing DatasetUsers Staging Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get DatasetUsers_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "DatasetUsers Staging Status",
+								"value": {
+									"value": "@activity('Get DatasetUsers_Staging').Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Capturing DatasetUsers Live",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get DatasetUsers_Live",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "DatasetUsers Live Status",
+								"value": {
+									"value": "@activity('Get DatasetUsers_Live').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -657,6 +705,18 @@
 			},
 			"LogID": {
 				"type": "Integer"
+			},
+			"DatasetUsers Staging Status": {
+				"type": "String"
+			},
+			"DatasetUsers Live Status": {
+				"type": "String"
+			},
+			"Datasets Batches Status": {
+				"type": "String"
+			},
+			"DatasetUsers History Status": {
+				"type": "String"
 			}
 		},
 		"folder": {
