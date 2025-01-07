@@ -1156,26 +1156,7 @@
 			{
 				"name": "sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "View Activity Live Data",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "View Activity History",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "Capturing status ViewActivity Statging",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1294,6 +1275,12 @@
 						"dependencyConditions": [
 							"Completed"
 						]
+					},
+					{
+						"activity": "View Activity Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
 					}
 				],
 				"policy": {
@@ -1344,7 +1331,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('View Activity Live Data').Status",
+								"value": "@if(and(and(\nequals(variables('ViewReportStaging Status'),'Succeeded'),\nequals(variables('ViewReport Live Status'),'Succeeded')),\nequals(variables('ViewReport Live Status'),'Succeeded')),\n    'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
