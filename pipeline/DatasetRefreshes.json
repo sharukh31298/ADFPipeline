@@ -445,6 +445,54 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "Capturing DatasetRefreshes Staging Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get DatasetRefreshes_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Dataset Refreshes Staging Status",
+								"value": {
+									"value": "@activity('Get DatasetRefreshes_Staging').Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Capturing DatasetRefreshes Live Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get DatasetRefreshes_Live",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "DatasetRefreshes Live Status",
+								"value": {
+									"value": "@activity('Get DatasetRefreshes_Live').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -456,7 +504,7 @@
 					{
 						"activity": "Get Datasets",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -505,7 +553,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('Get Datasets').Status",
+								"value": "@if(and(and(and(and(\nequals(variables('Get DatasetRefreshes Status'),'Succeeded'),\nequals(variables('Dataset Refreshes Staging Status'),'Succeeded')),\nequals(variables('DatasetRefreshes Live Status'),'Succeeded')),\nequals(variables('Get DatasetRefreshes Status'),'Succeeded')),\nequals(variables('DatasetRefreshes History Status'),'Succeeded')),\n'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -548,14 +596,7 @@
 			{
 				"name": "Sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Get Datasets",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -636,6 +677,30 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Get Datasetsrefreshes Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Get DatasetRefreshes Status",
+					"value": {
+						"value": "@activity('Get Datasets').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -666,6 +731,30 @@
 				"type": "String"
 			},
 			"DatasetsRefreshes_IST2": {
+				"type": "String"
+			},
+			"Dataset staging Status": {
+				"type": "String"
+			},
+			"Dataset Live Status": {
+				"type": "String"
+			},
+			"Dataset History Status": {
+				"type": "String"
+			},
+			"Dataset Refreshes Staging Status": {
+				"type": "String"
+			},
+			"DatasetRefreshes Live Status": {
+				"type": "String"
+			},
+			"Get DatasetRefreshes Status": {
+				"type": "String"
+			},
+			"Get DatasetsRefreshes Batch Status": {
+				"type": "String"
+			},
+			"DatasetRefreshes History Status": {
 				"type": "String"
 			}
 		},
