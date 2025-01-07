@@ -1158,15 +1158,27 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
+						"activity": "View Activity Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
 						"activity": "View Activity Live Data",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					},
 					{
 						"activity": "View Activity History",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing status ViewActivity Statging",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -1260,9 +1272,33 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
+						"activity": "View Activity History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
 						"activity": "View Activity Live Data",
 						"dependencyConditions": [
-							"Failed"
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing status ViewActivity Statging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Status ViewReports History ",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Status ViewReport Live Status",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -1766,6 +1802,78 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "Capturing status ViewActivity Statging",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "View Activity Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ViewReportStaging Status",
+					"value": {
+						"value": "@activity('View Activity Staging').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing Status ViewReport Live Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "View Activity Live Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ViewReport Live Status",
+					"value": {
+						"value": "@activity('View Activity Live Data').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing Status ViewReports History ",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "View Activity History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ViewReport History Status",
+					"value": {
+						"value": "@activity('View Activity History').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -1799,6 +1907,33 @@
 				"type": "String"
 			},
 			"ViewReports_IST2": {
+				"type": "String"
+			},
+			"WorkspaceUsers Staging Staus": {
+				"type": "String"
+			},
+			"WorkSpaceUserLive Status": {
+				"type": "String"
+			},
+			"Get Workspaces Status": {
+				"type": "String"
+			},
+			"WorkSpaces Batch": {
+				"type": "String"
+			},
+			"WorkSpacesUsers History Status": {
+				"type": "String"
+			},
+			"Get WorkSpaces Batch Status": {
+				"type": "String"
+			},
+			"ViewReportStaging Status": {
+				"type": "String"
+			},
+			"ViewReport Live Status": {
+				"type": "String"
+			},
+			"ViewReport History Status": {
 				"type": "String"
 			}
 		},
