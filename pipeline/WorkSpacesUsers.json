@@ -435,6 +435,54 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "Capturing Status in WorkSpace Users Staging",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get WorkSpace Users_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "WorkspaceUsers Staging Staus",
+								"value": {
+									"value": "@activity('Get WorkSpace Users_Staging').Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Capturing Status in WorkSpaceUsers Live",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get WorkSpaceUsers_Live",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "WorkSpaceUserLive",
+								"value": {
+									"value": "@activity('Get WorkSpaceUsers_Live').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -638,6 +686,30 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Status for Get WorkSpaces",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get WorkSpaces",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Get Workspaces Status",
+					"value": {
+						"value": "@activity('Get WorkSpaces').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -837,6 +909,21 @@
 				"type": "String"
 			},
 			"ViewReports_IST2": {
+				"type": "String"
+			},
+			"WorkspaceUsers Staging Staus": {
+				"type": "String"
+			},
+			"WorkSpaceUserLive": {
+				"type": "String"
+			},
+			"Get Workspaces Status": {
+				"type": "String"
+			},
+			"WorkSpaces Batch": {
+				"type": "String"
+			},
+			"WorkSpacesUsers History Status": {
 				"type": "String"
 			}
 		},

@@ -332,6 +332,48 @@
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
 				}
+			},
+			{
+				"name": "Capturing Workspaces Batches",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get WorkSpace Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpaces Batch",
+					"value": ""
+				}
+			},
+			{
+				"name": "Capturing Status in WorkSpaces Users History",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkSpaceUsers History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "WorkSpacesUsers History Status",
+					"value": ""
+				}
 			}
 		],
 		"parameters": {
@@ -515,6 +557,21 @@
 				"type": "String"
 			},
 			"DataFlowRefreshes_IST2": {
+				"type": "String"
+			},
+			"WorkspaceUsers Staging Staus": {
+				"type": "String"
+			},
+			"WorkSpaceUserLive": {
+				"type": "String"
+			},
+			"Get Workspaces Status": {
+				"type": "String"
+			},
+			"WorkSpaces Batch": {
+				"type": "String"
+			},
+			"WorkSpacesUsers History Status": {
 				"type": "String"
 			}
 		},
