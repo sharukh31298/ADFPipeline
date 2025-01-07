@@ -336,11 +336,68 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Capturing DataflowRefreshes Batches Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get DataFlow Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Get Dataflowsrefreshes Batch",
+					"value": {
+						"value": "@activity('Get DataFlow Batches').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing DataflowRefreshes History Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataFlow Refreshes History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataflowRefreshes History Status",
+					"value": {
+						"value": "@activity('DataFlow Refreshes History').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"variables": {
 			"CountWorkspace": {
 				"type": "Integer"
+			},
+			"Get Dataflowsrefreshes Status": {
+				"type": "String"
+			},
+			"Get Dataflowsrefreshes Batch": {
+				"type": "String"
+			},
+			"DataflowRefreshes History Status": {
+				"type": "String"
 			}
 		},
 		"folder": {

@@ -422,6 +422,54 @@
 									"type": "DatasetReference"
 								}
 							]
+						},
+						{
+							"name": "Capturing DataflowRefreshes Staging",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get DataflowRefresh_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "DataflowRefreshes Staging Status",
+								"value": {
+									"value": "@activity('Get DataflowRefresh_Staging').Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Capturing DataflowRefreshes Live Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get DataflowRefresh_Live",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "DataflowRefreshes Status",
+								"value": {
+									"value": "@activity('Get DataflowRefresh_Live').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
@@ -431,9 +479,21 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
+						"activity": "Capturing Get Dataflows Status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
 						"activity": "Get Dataflows",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
+						]
+					},
+					{
+						"activity": "Dataflow ID in Loop",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -525,14 +585,7 @@
 			{
 				"name": "Sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Get Dataflows",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -552,10 +605,6 @@
 							"type": "DateTime"
 						},
 						"ErrorMessage": {
-							"value": {
-								"value": "@activity('Get Dataflows').error?.message",
-								"type": "Expression"
-							},
 							"type": "String"
 						},
 						"PipelineName": {
@@ -613,6 +662,30 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Get Dataflows Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Dataflows",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Get Dataflowsrefreshes Status",
+					"value": {
+						"value": "@activity('Get Dataflows').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -643,6 +716,21 @@
 				"type": "String"
 			},
 			"DataFlowRefreshes_IST2": {
+				"type": "String"
+			},
+			"DataflowRefreshes Staging Status": {
+				"type": "String"
+			},
+			"DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"Get Dataflowsrefreshes Status": {
+				"type": "String"
+			},
+			"Get Dataflowsrefreshes Batch": {
+				"type": "String"
+			},
+			"DataflowRefreshes History Status": {
 				"type": "String"
 			}
 		},
