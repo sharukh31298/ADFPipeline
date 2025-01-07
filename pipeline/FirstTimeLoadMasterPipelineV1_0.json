@@ -432,7 +432,14 @@
 				"type": "ExecutePipeline",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute_SP",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -507,15 +514,15 @@
 				}
 			},
 			{
-				"name": "Set variable1",
+				"name": "Capturing Workspaces_Master status",
 				"type": "SetVariable",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "WorkspaceUsers__Master",
+						"activity": "Workspaces_Master",
 						"dependencyConditions": [
-							"Failed"
+							"Completed"
 						]
 					}
 				],
@@ -525,28 +532,41 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Result",
-					"value": "Failure"
+					"variableName": "Master Workspaces Status",
+					"value": {
+						"value": "@activity('Workspaces_Master').Status",
+						"type": "Expression"
+					}
 				}
 			},
 			{
-				"name": "Set variable2",
+				"name": "Capturing Datasetsrefresh Master Status",
 				"type": "SetVariable",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Datasetrefresh_Master",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"secureOutput": false,
 					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Result",
-					"value": "Failure"
+					"variableName": "Master Datasetfreshes status",
+					"value": {
+						"value": "@activity('Datasetrefresh_Master').Status",
+						"type": "Expression"
+					}
 				}
 			},
 			{
-				"name": "Set variable3",
+				"name": "Capturing Dataflows Master Status",
 				"type": "SetVariable",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -554,7 +574,7 @@
 					{
 						"activity": "Dataflows_Master",
 						"dependencyConditions": [
-							"Failed"
+							"Completed"
 						]
 					}
 				],
@@ -564,12 +584,15 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Result",
-					"value": "Failure"
+					"variableName": "Master Dataflows Status",
+					"value": {
+						"value": "@activity('Dataflows_Master').Status",
+						"type": "Expression"
+					}
 				}
 			},
 			{
-				"name": "Set variable4",
+				"name": "Capturing Datasets Master Status",
 				"type": "SetVariable",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -577,7 +600,7 @@
 					{
 						"activity": "Datasets_Master",
 						"dependencyConditions": [
-							"Failed"
+							"Completed"
 						]
 					}
 				],
@@ -587,12 +610,12 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Result",
-					"value": "Failure"
+					"variableName": "Master Datasets Status",
+					"value": ""
 				}
 			},
 			{
-				"name": "Set variable5",
+				"name": "Capturing ReportsMaster status",
 				"type": "SetVariable",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -600,7 +623,7 @@
 					{
 						"activity": "Reports_Master",
 						"dependencyConditions": [
-							"Failed"
+							"Completed"
 						]
 					}
 				],
@@ -610,8 +633,11 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Result",
-					"value": "Failure"
+					"variableName": "Master Report status",
+					"value": {
+						"value": "@activity('Reports_Master').Status",
+						"type": "Expression"
+					}
 				}
 			},
 			{
@@ -670,6 +696,18 @@
 						"activity": "Datasetrefresh_Master",
 						"dependencyConditions": [
 							"Succeeded"
+						]
+					},
+					{
+						"activity": "Capturing Workspaces_Master status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing WorkSpaceUsers Master Status",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -736,6 +774,126 @@
 						"type": "DatasetReference"
 					}
 				}
+			},
+			{
+				"name": "Capturing WorkSpaceUsers Master Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "WorkspaceUsers__Master",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Master WorkSpaceUsers Status",
+					"value": {
+						"value": "@activity('WorkspaceUsers__Master').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing ReportPagesMaster Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ReportPages_Master",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Master ReportPages Status",
+					"value": {
+						"value": "@activity('ReportPages_Master').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing DatasetUsersMaster Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Datasetusers_Master",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Master Datasetusers Status",
+					"value": {
+						"value": "@activity('Datasetusers_Master').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing Viewreports Master Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ViewReports_Master",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Master Viewreports Status",
+					"value": {
+						"value": "@activity('ViewReports_Master').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing DataflowsRefreshes Master Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataflowRefreshes_Master",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Master DataflowRefreshes Status",
+					"value": {
+						"value": "@activity('DataflowRefreshes_Master').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -765,6 +923,36 @@
 				"defaultValue": "Success"
 			},
 			"a": {
+				"type": "String"
+			},
+			"Master Workspaces Status": {
+				"type": "String"
+			},
+			"Master WorkSpaceUsers Status": {
+				"type": "String"
+			},
+			"Master Report status": {
+				"type": "String"
+			},
+			"Master ReportPages Status": {
+				"type": "String"
+			},
+			"Master Datasets Status": {
+				"type": "String"
+			},
+			"Master Datasetfreshes status": {
+				"type": "String"
+			},
+			"Master Datasetusers Status": {
+				"type": "String"
+			},
+			"Master Viewreports Status": {
+				"type": "String"
+			},
+			"Master Dataflows Status": {
+				"type": "String"
+			},
+			"Master DataflowRefreshes Status": {
 				"type": "String"
 			}
 		},
