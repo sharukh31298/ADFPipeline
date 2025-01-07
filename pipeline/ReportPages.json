@@ -438,9 +438,21 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
+						"activity": "ReportID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
 						"activity": "Get Reports",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Get Reportspages Status",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -489,7 +501,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('Get Reports').Status",
+								"value": "@if(and(and(and(and(\nequals(variables('Get ReportPages Status'),'Succeeded'),\nequals(variables('ReportPages Staging Status'),'Succeeded')),\nequals(variables('ReportPages Live Status'),'Succeeded')),\nequals(variables('ReportPages Batch Status'),'Succeeded')),\nequals(variables('ReportPages History'),'Succeeded')),\n'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -532,14 +544,7 @@
 			{
 				"name": "sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Get Reports",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -821,6 +826,12 @@
 				"type": "String"
 			},
 			"Get ReportPages Status": {
+				"type": "String"
+			},
+			"ReportPages Batch Status": {
+				"type": "String"
+			},
+			"ReportPages History Status": {
 				"type": "String"
 			}
 		},
