@@ -488,7 +488,13 @@
 					{
 						"activity": "Get Datasets",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
+						]
+					},
+					{
+						"activity": "DatasetID in Loop",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -537,7 +543,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('Get Datasets').Status",
+								"value": "@if(and(and(and(and(\nequals(variables('Get Datasets Status'),'Succeeded'),\nequals(variables('DatasetUsers Staging Status'),'Succeeded')),\nequals(variables('DatasetUsers Live Status'),'Succeeded')),\nequals(variables('Datasets Batches Status'),'Succeeded')),\nequals(variables('DatasetUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -580,14 +586,7 @@
 			{
 				"name": "Sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Get Datasets",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -668,6 +667,30 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Get Datasets Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Datasets",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Get Datasets Status",
+					"value": {
+						"value": "@activity('Get Datasets').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
@@ -716,6 +739,9 @@
 				"type": "String"
 			},
 			"DatasetUsers History Status": {
+				"type": "String"
+			},
+			"Get Datasets Status": {
 				"type": "String"
 			}
 		},
