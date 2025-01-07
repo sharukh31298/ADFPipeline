@@ -280,11 +280,65 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Capturing ReportPages History Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "ReportPages History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportPages History",
+					"value": {
+						"value": "@activity('ReportPages History').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing ReportPages Batches Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get ReportPages in Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ReportPages Batch Status",
+					"value": {
+						"value": "@activity('Get ReportPages in Batches').Status",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"variables": {
 			"CountWorkspace": {
 				"type": "Integer"
+			},
+			"ReportPages Batch Status": {
+				"type": "String"
+			},
+			"ReportPages History": {
+				"type": "String"
 			}
 		},
 		"folder": {
