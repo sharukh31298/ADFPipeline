@@ -866,9 +866,27 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Dataset Staging",
+						"activity": "Capturing Dataset Staging Status",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
+						]
+					},
+					{
+						"activity": "Dataset History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing DatasetLive status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Dataset History Status",
+						"dependencyConditions": [
+							"Completed"
 						]
 					}
 				],
@@ -917,7 +935,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('Dataset Staging').Status",
+								"value": "@if(and(and(\nequals(variables('Dataset staging Status'),'Succeeded'),\nequals(variables('Dataset Live Status'),'Succeeded')),\nequals(variables('Dataset History Status'),'Succeeded')),\n    'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -964,14 +982,7 @@
 			{
 				"name": "Sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Dataset Staging",
-						"dependencyConditions": [
-							"Failed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -1056,6 +1067,69 @@
 					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Capturing Dataset Staging Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Dataset Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Dataset staging Status",
+					"value": ""
+				}
+			},
+			{
+				"name": "Capturing DatasetLive status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Dataset Live Data",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Dataset Live Status",
+					"value": ""
+				}
+			},
+			{
+				"name": "Capturing Dataset History Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Dataset History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Dataset History Status",
+					"value": ""
+				}
 			}
 		],
 		"parameters": {
@@ -1086,6 +1160,15 @@
 				"type": "String"
 			},
 			"Datasets_IST2": {
+				"type": "String"
+			},
+			"Dataset staging Status": {
+				"type": "String"
+			},
+			"Dataset Live Status": {
+				"type": "String"
+			},
+			"Dataset History Status": {
 				"type": "String"
 			}
 		},
