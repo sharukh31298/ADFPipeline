@@ -1774,6 +1774,54 @@
 											"parameters": {}
 										}
 									]
+								},
+								{
+									"name": "Capturing DataflowRefreshes Staging",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get DataflowRefresh_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "DataflowRefreshes Staging Status",
+										"value": {
+											"value": "@activity('Get DataflowRefresh_Staging').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Capturing DataflowRefreshes Live Status",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get DataflowRefresh_Live",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "DataflowRefreshes Status",
+										"value": {
+											"value": "@activity('Get DataflowRefresh_Live').Status",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -1783,9 +1831,21 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
+								"activity": "Capturing Get Dataflows Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
 								"activity": "Get Dataflows",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
+								]
+							},
+							{
+								"activity": "Dataflow ID in Loop",
+								"dependencyConditions": [
+									"Completed"
 								]
 							}
 						],
@@ -1877,14 +1937,9 @@
 					{
 						"name": "Sp_TrackProcessFailure",
 						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get Dataflows",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -1904,10 +1959,6 @@
 									"type": "DateTime"
 								},
 								"ErrorMessage": {
-									"value": {
-										"value": "@activity('Get Dataflows').error?.message",
-										"type": "Expression"
-									},
 									"type": "String"
 								},
 								"PipelineName": {
@@ -1932,10 +1983,7 @@
 									"type": "DateTime"
 								},
 								"Status": {
-									"value": {
-										"value": "@activity('Get Dataflows').Status",
-										"type": "Expression"
-									},
+									"value": null,
 									"type": "String"
 								},
 								"TriggerName": {
@@ -1965,6 +2013,30 @@
 							"referenceName": "ADF_Pipeline_Status_Log",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "Capturing Get Dataflows Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get Dataflows",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Get Dataflowsrefreshes Status",
+							"value": {
+								"value": "@activity('Get Dataflows').Status",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -1982,6 +2054,10 @@
 					},
 					"TenantID": {
 						"type": "int"
+					},
+					"BatchNo": {
+						"type": "string",
+						"defaultValue": "@item().BatchNo"
 					}
 				},
 				"variables": {
@@ -1998,6 +2074,51 @@
 						"type": "String"
 					},
 					"DataFlowRefreshes_IST2": {
+						"type": "String"
+					},
+					"DataflowRefreshes Staging Status": {
+						"type": "String"
+					},
+					"DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Batch": {
+						"type": "String"
+					},
+					"DataflowRefreshes History Status": {
+						"type": "String"
+					},
+					"Master Workspaces Status": {
+						"type": "String"
+					},
+					"Master WorkSpaceUsers Status": {
+						"type": "String"
+					},
+					"Master Report status": {
+						"type": "String"
+					},
+					"Master ReportPages Status": {
+						"type": "String"
+					},
+					"Master Datasets Status": {
+						"type": "String"
+					},
+					"Master Datasetfreshes status": {
+						"type": "String"
+					},
+					"Master Datasetusers Status": {
+						"type": "String"
+					},
+					"Master Viewreports Status": {
+						"type": "String"
+					},
+					"Master Dataflows Status": {
+						"type": "String"
+					},
+					"Master DataflowRefreshes Status": {
 						"type": "String"
 					}
 				},
@@ -2950,7 +3071,37 @@
 							{
 								"activity": "DataFlow Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Dataflows Staging Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "DataFlow Live Data",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Dataflows Live Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "DataFlow History",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Dataflows History Status",
+								"dependencyConditions": [
+									"Completed"
 								]
 							}
 						],
@@ -3046,14 +3197,9 @@
 					{
 						"name": "Sp_TrackProcessFailure",
 						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "DataFlow Staging",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -3073,10 +3219,7 @@
 									"type": "DateTime"
 								},
 								"ErrorMessage": {
-									"value": {
-										"value": "@activity('DataFlow Staging').error?.message",
-										"type": "Expression"
-									},
+									"value": null,
 									"type": "String"
 								},
 								"PipelineName": {
@@ -3101,10 +3244,7 @@
 									"type": "DateTime"
 								},
 								"Status": {
-									"value": {
-										"value": "@activity('DataFlow Staging').Status",
-										"type": "Expression"
-									},
+									"value": null,
 									"type": "String"
 								},
 								"TriggerName": {
@@ -3137,6 +3277,78 @@
 						"linkedServiceName": {
 							"referenceName": "ADF_Pipeline_Status_Log",
 							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Capturing Dataflows Staging Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "DataFlow Staging",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Dataflows Staging Status",
+							"value": {
+								"value": "@activity('DataFlow Staging').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing Dataflows Live Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "DataFlow Live Data",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Dataflows Live Status",
+							"value": {
+								"value": "@activity('DataFlow Live Data').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing Dataflows History Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "DataFlow History",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Dataflows History Status",
+							"value": {
+								"value": "@activity('DataFlow History').Status",
+								"type": "Expression"
+							}
 						}
 					}
 				],
@@ -3171,6 +3383,60 @@
 						"type": "String"
 					},
 					"DataFlows_IST2": {
+						"type": "String"
+					},
+					"Dataflows Staging Status": {
+						"type": "String"
+					},
+					"Dataflows Live Status": {
+						"type": "String"
+					},
+					"Dataflows History Status": {
+						"type": "String"
+					},
+					"DataflowRefreshes Staging Status": {
+						"type": "String"
+					},
+					"DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Batch": {
+						"type": "String"
+					},
+					"DataflowRefreshes History Status": {
+						"type": "String"
+					},
+					"Master Workspaces Status": {
+						"type": "String"
+					},
+					"Master WorkSpaceUsers Status": {
+						"type": "String"
+					},
+					"Master Report status": {
+						"type": "String"
+					},
+					"Master ReportPages Status": {
+						"type": "String"
+					},
+					"Master Datasets Status": {
+						"type": "String"
+					},
+					"Master Datasetfreshes status": {
+						"type": "String"
+					},
+					"Master Datasetusers Status": {
+						"type": "String"
+					},
+					"Master Viewreports Status": {
+						"type": "String"
+					},
+					"Master Dataflows Status": {
+						"type": "String"
+					},
+					"Master DataflowRefreshes Status": {
 						"type": "String"
 					}
 				},
@@ -4341,6 +4607,54 @@
 											"parameters": {}
 										}
 									]
+								},
+								{
+									"name": "Capturing DatasetRefreshes Staging Status",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get DatasetRefreshes_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Dataset Refreshes Staging Status",
+										"value": {
+											"value": "@activity('Get DatasetRefreshes_Staging').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Capturing DatasetRefreshes Live Status",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get DatasetRefreshes_Live",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "DatasetRefreshes Live Status",
+										"value": {
+											"value": "@activity('Get DatasetRefreshes_Live').Status",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -4352,7 +4666,7 @@
 							{
 								"activity": "Get Datasets",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -4401,7 +4715,7 @@
 								},
 								"Status": {
 									"value": {
-										"value": "@activity('Get Datasets').Status",
+										"value": "@if(and(and(and(and(\nequals(variables('Get DatasetRefreshes Status'),'Succeeded'),\nequals(variables('Dataset Refreshes Staging Status'),'Succeeded')),\nequals(variables('DatasetRefreshes Live Status'),'Succeeded')),\nequals(variables('Get DatasetRefreshes Status'),'Succeeded')),\nequals(variables('DatasetRefreshes History Status'),'Succeeded')),\n'Succeeded','Failed')",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -4444,14 +4758,9 @@
 					{
 						"name": "Sp_TrackProcessFailure",
 						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get Datasets",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -4471,10 +4780,7 @@
 									"type": "DateTime"
 								},
 								"ErrorMessage": {
-									"value": {
-										"value": "@activity('Get Datasets').error?.message",
-										"type": "Expression"
-									},
+									"value": null,
 									"type": "String"
 								},
 								"PipelineName": {
@@ -4499,10 +4805,7 @@
 									"type": "DateTime"
 								},
 								"Status": {
-									"value": {
-										"value": "@activity('Get Datasets').Status",
-										"type": "Expression"
-									},
+									"value": null,
 									"type": "String"
 								},
 								"TriggerName": {
@@ -4532,6 +4835,30 @@
 							"referenceName": "ADF_Pipeline_Status_Log",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "Capturing Get Datasetsrefreshes Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get Datasets",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Get DatasetRefreshes Status",
+							"value": {
+								"value": "@activity('Get Datasets').Status",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -4549,6 +4876,10 @@
 					},
 					"TenantID": {
 						"type": "int"
+					},
+					"BatchNo": {
+						"type": "string",
+						"defaultValue": "@item().BatchNo"
 					}
 				},
 				"variables": {
@@ -4565,6 +4896,84 @@
 						"type": "String"
 					},
 					"DatasetsRefreshes_IST2": {
+						"type": "String"
+					},
+					"Dataset staging Status": {
+						"type": "String"
+					},
+					"Dataset Live Status": {
+						"type": "String"
+					},
+					"Dataset History Status": {
+						"type": "String"
+					},
+					"Dataset Refreshes Staging Status": {
+						"type": "String"
+					},
+					"DatasetRefreshes Live Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Batch Status": {
+						"type": "String"
+					},
+					"DatasetRefreshes History Status": {
+						"type": "String"
+					},
+					"Dataflows Staging Status": {
+						"type": "String"
+					},
+					"Dataflows Live Status": {
+						"type": "String"
+					},
+					"Dataflows History Status": {
+						"type": "String"
+					},
+					"DataflowRefreshes Staging Status": {
+						"type": "String"
+					},
+					"DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Batch": {
+						"type": "String"
+					},
+					"DataflowRefreshes History Status": {
+						"type": "String"
+					},
+					"Master Workspaces Status": {
+						"type": "String"
+					},
+					"Master WorkSpaceUsers Status": {
+						"type": "String"
+					},
+					"Master Report status": {
+						"type": "String"
+					},
+					"Master ReportPages Status": {
+						"type": "String"
+					},
+					"Master Datasets Status": {
+						"type": "String"
+					},
+					"Master Datasetfreshes status": {
+						"type": "String"
+					},
+					"Master Datasetusers Status": {
+						"type": "String"
+					},
+					"Master Viewreports Status": {
+						"type": "String"
+					},
+					"Master Dataflows Status": {
+						"type": "String"
+					},
+					"Master DataflowRefreshes Status": {
 						"type": "String"
 					}
 				},
@@ -5469,6 +5878,54 @@
 											"parameters": {}
 										}
 									]
+								},
+								{
+									"name": "Capturing DatasetUsers Staging Status",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get DatasetUsers_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "DatasetUsers Staging Status",
+										"value": {
+											"value": "@activity('Get DatasetUsers_Staging').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Capturing DatasetUsers Live",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get DatasetUsers_Live",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "DatasetUsers Live Status",
+										"value": {
+											"value": "@activity('Get DatasetUsers_Live').Status",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -5480,7 +5937,13 @@
 							{
 								"activity": "Get Datasets",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
+								]
+							},
+							{
+								"activity": "DatasetID in Loop",
+								"dependencyConditions": [
+									"Completed"
 								]
 							}
 						],
@@ -5529,7 +5992,7 @@
 								},
 								"Status": {
 									"value": {
-										"value": "@activity('Get Datasets').Status",
+										"value": "@if(and(and(and(and(\nequals(variables('Get Datasets Status'),'Succeeded'),\nequals(variables('DatasetUsers Staging Status'),'Succeeded')),\nequals(variables('DatasetUsers Live Status'),'Succeeded')),\nequals(variables('Datasets Batches Status'),'Succeeded')),\nequals(variables('DatasetUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -5572,14 +6035,9 @@
 					{
 						"name": "Sp_TrackProcessFailure",
 						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get Datasets",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -5599,10 +6057,7 @@
 									"type": "DateTime"
 								},
 								"ErrorMessage": {
-									"value": {
-										"value": "@activity('Get Datasets').error?.message",
-										"type": "Expression"
-									},
+									"value": null,
 									"type": "String"
 								},
 								"PipelineName": {
@@ -5627,10 +6082,7 @@
 									"type": "DateTime"
 								},
 								"Status": {
-									"value": {
-										"value": "@activity('Get Datasets').Status",
-										"type": "Expression"
-									},
+									"value": null,
 									"type": "String"
 								},
 								"TriggerName": {
@@ -5660,6 +6112,30 @@
 							"referenceName": "ADF_Pipeline_Status_Log",
 							"type": "LinkedServiceReference"
 						}
+					},
+					{
+						"name": "Capturing Get Datasets Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get Datasets",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Get Datasets Status",
+							"value": {
+								"value": "@activity('Get Datasets').Status",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"policy": {
@@ -5677,6 +6153,10 @@
 					},
 					"TenantId": {
 						"type": "int"
+					},
+					"BatchNo": {
+						"type": "string",
+						"defaultValue": "@item().BatchNo"
 					}
 				},
 				"variables": {
@@ -5700,6 +6180,99 @@
 					},
 					"LogID": {
 						"type": "Integer"
+					},
+					"DatasetUsers Staging Status": {
+						"type": "String"
+					},
+					"DatasetUsers Live Status": {
+						"type": "String"
+					},
+					"Datasets Batches Status": {
+						"type": "String"
+					},
+					"DatasetUsers History Status": {
+						"type": "String"
+					},
+					"Get Datasets Status": {
+						"type": "String"
+					},
+					"Dataset staging Status": {
+						"type": "String"
+					},
+					"Dataset Live Status": {
+						"type": "String"
+					},
+					"Dataset History Status": {
+						"type": "String"
+					},
+					"Dataset Refreshes Staging Status": {
+						"type": "String"
+					},
+					"DatasetRefreshes Live Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Batch Status": {
+						"type": "String"
+					},
+					"DatasetRefreshes History Status": {
+						"type": "String"
+					},
+					"Dataflows Staging Status": {
+						"type": "String"
+					},
+					"Dataflows Live Status": {
+						"type": "String"
+					},
+					"Dataflows History Status": {
+						"type": "String"
+					},
+					"DataflowRefreshes Staging Status": {
+						"type": "String"
+					},
+					"DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Batch": {
+						"type": "String"
+					},
+					"DataflowRefreshes History Status": {
+						"type": "String"
+					},
+					"Master Workspaces Status": {
+						"type": "String"
+					},
+					"Master WorkSpaceUsers Status": {
+						"type": "String"
+					},
+					"Master Report status": {
+						"type": "String"
+					},
+					"Master ReportPages Status": {
+						"type": "String"
+					},
+					"Master Datasets Status": {
+						"type": "String"
+					},
+					"Master Datasetfreshes status": {
+						"type": "String"
+					},
+					"Master Datasetusers Status": {
+						"type": "String"
+					},
+					"Master Viewreports Status": {
+						"type": "String"
+					},
+					"Master Dataflows Status": {
+						"type": "String"
+					},
+					"Master DataflowRefreshes Status": {
+						"type": "String"
 					}
 				},
 				"folder": {
