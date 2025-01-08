@@ -501,7 +501,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@if(and(and(and(and(\nequals(variables('Get ReportPages Status'),'Succeeded'),\nequals(variables('ReportPages Staging Status'),'Succeeded')),\nequals(variables('ReportPages Live Status'),'Succeeded')),\nequals(variables('ReportPages Batch Status'),'Succeeded')),\nequals(variables('ReportPages History'),'Succeeded')),\n'Succeeded','Failed')",
+								"value": "@if(and(and(and(and(\nequals(variables('Get ReportPages Status'),'Succeeded'),\nequals(variables('ReportPages Staging Status'),'Succeeded')),\nequals(variables('ReportPages Live Status'),'Succeeded')),\nequals(variables('ReportPages Batch Status'),'Succeeded')),\nequals(variables('ReportPages History Status'),'Succeeded')),\n'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -544,6 +544,8 @@
 			{
 				"name": "sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -564,10 +566,7 @@
 							"type": "DateTime"
 						},
 						"ErrorMessage": {
-							"value": {
-								"value": "@activity('Get Reports').error?.message",
-								"type": "Expression"
-							},
+							"value": null,
 							"type": "String"
 						},
 						"PipelineName": {
@@ -592,10 +591,7 @@
 							"type": "DateTime"
 						},
 						"Status": {
-							"value": {
-								"value": "@activity('Get Reports').Status",
-								"type": "Expression"
-							},
+							"value": null,
 							"type": "String"
 						},
 						"TriggerName": {
