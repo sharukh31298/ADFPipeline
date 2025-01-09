@@ -28853,7 +28853,7 @@
 								},
 								"StartTime": {
 									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+										"value": "@activity('Get WorkSpaces').ExecutionStartTime",
 										"type": "Expression"
 									},
 									"type": "DateTime"
@@ -28882,13 +28882,6 @@
 								"TriggerType": {
 									"value": {
 										"value": "@pipeline().TriggerType",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TenantID": {
-									"value": {
-										"value": "@pipeline().parameters.TenantId",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -29711,6 +29704,8 @@
 					{
 						"name": "Capturing Workspaces Batches",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Get WorkSpace Batches",
@@ -29735,6 +29730,8 @@
 					{
 						"name": "Capturing Status in WorkSpaces Users History",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkSpaceUsers History",
