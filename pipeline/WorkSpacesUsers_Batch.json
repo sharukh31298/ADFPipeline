@@ -366,8 +366,6 @@
 			{
 				"name": "Capturing Status in WorkSpaces Users History",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpaceUsers History",
@@ -382,11 +380,17 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "WorkSpacesUsers History Status",
-					"value": {
-						"value": "@activity('Get WorkSpace Batches').Status",
-						"type": "Expression"
-					}
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "WorkSpacesUsers History Status",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('WorkSpaceUsers History').Status"
+							}
+						}
+					],
+					"setSystemVariable": true
 				}
 			}
 		],
