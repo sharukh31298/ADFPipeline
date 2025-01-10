@@ -2897,7 +2897,10 @@
 										},
 										"waitOnCompletion": true,
 										"parameters": {
-											"AppTenantId": "@pipeline().parameters.AppTenantId",
+											"AppTenantId": {
+												"value": "@pipeline().parameters.AppTenantId",
+												"type": "Expression"
+											},
 											"AppClientId": {
 												"value": "@pipeline().parameters.AppClientId",
 												"type": "Expression"
@@ -3958,8 +3961,6 @@
 					{
 						"name": "Capturing Workspaces Batches",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Get WorkSpace Batches",
@@ -3974,11 +3975,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "Get WorkSpaces Batch Status",
-							"value": {
-								"value": "@activity('Get WorkSpace Batches').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "Get WorkSpaces Batch Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get WorkSpace Batches').status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					},
 					{
