@@ -222,7 +222,7 @@
 							"type": "Copy",
 							"dependsOn": [
 								{
-									"activity": "Get WorkSpace Users_Staging",
+									"activity": "Wait to WorkspaceUsers Staging complete",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -244,13 +244,7 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"writeBehavior": "upsert",
-									"upsertSettings": {
-										"useTempDB": true,
-										"keys": [
-											"WorkSpaceUserSourceKey"
-										]
-									},
+									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false,
 									"disableMetricsCollection": false
 								},
@@ -480,6 +474,25 @@
 								"variableName": "WorkSpaceUserLive Status",
 								"value": {
 									"value": "@activity('Get WorkSpaceUsers_Live').Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Wait to WorkspaceUsers Staging complete",
+							"type": "Wait",
+							"dependsOn": [
+								{
+									"activity": "Get WorkSpace Users_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": {
+									"value": "@activity('Get WorkSpace Users_Staging').output",
 									"type": "Expression"
 								}
 							}
