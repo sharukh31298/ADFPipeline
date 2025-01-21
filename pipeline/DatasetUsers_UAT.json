@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Datasets]')",
+							"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Datasets] where BatchNo =',pipeline().parameters.BatchNo)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -194,7 +194,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "DatasetUsers_sql",
+									"referenceName": "DatasetUsersStaging_sql_UAT",
 									"type": "DatasetReference"
 								}
 							]
@@ -579,7 +579,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "ADF_Pipeline_Status_Log",
+					"referenceName": "LS_ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
 			},
