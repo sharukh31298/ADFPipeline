@@ -18,14 +18,14 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select ReportSourceKey,WorkspaceId from [dbo].[Reports]')\n",
+							"value": "@concat('select ReportSourceKey,WorkspaceId from [dbo].[Reports]where BatchNo =',pipeline().parameters.BatchNo)\n",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "Reports_SQL",
+						"referenceName": "ReportsLive_sql_UAT",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -194,7 +194,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ReportPages_SQL",
+									"referenceName": "ReportPagesStaging_sql_UAT",
 									"type": "DatasetReference"
 								}
 							]
@@ -371,13 +371,13 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "ReportPagesLive_SQL",
+									"referenceName": "ReportsStaging_sql_UAT",
 									"type": "DatasetReference"
 								}
 							],
 							"outputs": [
 								{
-									"referenceName": "SQL_ReportPagesLive",
+									"referenceName": "ReportPagesLive_sql_UAT",
 									"type": "DatasetReference"
 								}
 							]
@@ -537,7 +537,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "ADF_Pipeline_Status_Log",
+					"referenceName": "LS_ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
 			},
