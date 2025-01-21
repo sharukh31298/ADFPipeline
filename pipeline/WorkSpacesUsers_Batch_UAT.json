@@ -108,6 +108,11 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
 					"sink": {
 						"type": "AzureSqlSink",
 						"writeBehavior": "insert",
@@ -121,139 +126,176 @@
 							{
 								"source": {
 									"name": "WorkSpaceUserSourceKey",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "WorkSpaceUserSourceKey",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "WorkSpaceID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "WorkSpaceID",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "EmailAddress",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "EmailAddress",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "UserName",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "UserName",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "Identifier",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "Identifier",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "UserType",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "UserType",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "GroupUserAccessRight",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "GroupUserAccessRight",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "PrincipalType",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "PrincipalType",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "CreatedDate",
-									"type": "DateTime"
+									"type": "DateTime",
+									"physicalType": "datetime"
 								},
 								"sink": {
 									"name": "CreatedDate",
-									"type": "DateTime"
+									"type": "DateTime",
+									"physicalType": "datetime"
 								}
 							},
 							{
 								"source": {
 									"name": "ModifiedDate",
-									"type": "DateTime"
+									"type": "DateTime",
+									"physicalType": "datetime"
 								},
 								"sink": {
 									"name": "ModifiedDate",
-									"type": "DateTime"
+									"type": "DateTime",
+									"physicalType": "datetime"
 								}
 							},
 							{
 								"source": {
 									"name": "CreatedBy",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "CreatedBy",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "ModifiedBy",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								},
 								"sink": {
 									"name": "ModifiedBy",
-									"type": "String"
+									"type": "String",
+									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
 									"name": "TenantId",
-									"type": "Int32"
+									"type": "Int32",
+									"physicalType": "int"
 								},
 								"sink": {
 									"name": "TenantId",
-									"type": "Int32"
+									"type": "Int32",
+									"physicalType": "int"
 								}
 							}
-						]
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
 					}
 				},
+				"inputs": [
+					{
+						"referenceName": "WorkSpaceUsersStaging_sql_UAT",
+						"type": "DatasetReference"
+					}
+				],
 				"outputs": [
 					{
-						"referenceName": "WorkSpaceUsers_SQL_History",
+						"referenceName": "WorkSpaceUsersHistory_sql_UAT",
 						"type": "DatasetReference"
 					}
 				]
