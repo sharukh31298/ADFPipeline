@@ -26485,7 +26485,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "ReportPages",
+											"referenceName": "ReportPages_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -26744,11 +26744,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "ReportPages History Status",
-							"value": {
-								"value": "@activity('ReportPages History').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "ReportPages History Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('ReportPages History').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					},
 					{
@@ -26768,11 +26774,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "ReportPages Batch Status",
-							"value": {
-								"value": "@activity('Get ReportPages in Batches').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "ReportPages Batch Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get ReportPages in Batches').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					}
 				],
@@ -26908,7 +26920,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPagesStaging_sql_UAT')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPagesHistory_sql_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/ReportPages')]"
+				"[concat(variables('factoryId'), '/pipelines/ReportPages_UAT')]"
 			]
 		},
 		{
@@ -44714,7 +44726,7 @@
 									],
 									"userProperties": [],
 									"typeProperties": {
-										"waitTimeInSeconds": 60
+										"waitTimeInSeconds": 2
 									}
 								}
 							]
