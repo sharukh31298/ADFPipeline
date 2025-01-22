@@ -5677,7 +5677,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows]where BatchNo =',pipeline().parameters.BatchNo)",
+									"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows_batch]where BatchNo =',pipeline().parameters.BatchNo)",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -10957,11 +10957,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "Get DatasetsRefreshes Batch Status",
-							"value": {
-								"value": "@activity('Get Dataset Batches').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "Get DatasetsRefreshes Batch Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get Dataset Batches').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					},
 					{
@@ -10981,11 +10987,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "DatasetRefreshes History Status",
-							"value": {
-								"value": "@activity('DatasetRefreshes History').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "DatasetRefreshes History Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('DatasetRefreshes History').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					}
 				],
@@ -11569,7 +11581,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Datasets] where BatchNo =',pipeline().parameters.BatchNo)",
+									"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Dataset_batch] where BatchNo =',pipeline().parameters.BatchNo)",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -12058,6 +12070,12 @@
 						"dependsOn": [
 							{
 								"activity": "Get Datasets",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "DatasetID in Loop",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -14486,11 +14504,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "Datasets Batches Status",
-							"value": {
-								"value": "@activity('Get Dataset Batches').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "Datasets Batches Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get Dataset Batches').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					},
 					{
@@ -14510,11 +14534,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "DatasetUsers History Status",
-							"value": {
-								"value": "@activity('DatasetUsers History').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "DatasetUsers History Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('DatasetUsers History').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					}
 				],
@@ -15095,7 +15125,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Datasets] where BatchNo =',pipeline().parameters.BatchNo)",
+									"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Dataset_Batch] where BatchNo =',pipeline().parameters.BatchNo)",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -27500,7 +27530,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select ReportSourceKey,WorkspaceId from [dbo].[Reports]where BatchNo =',pipeline().parameters.BatchNo)\n",
+									"value": "@concat('select ReportSourceKey,WorkspaceId from [dbo].[Reports_batch]where BatchNo =',pipeline().parameters.BatchNo)\n",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
