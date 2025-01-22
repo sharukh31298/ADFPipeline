@@ -18,14 +18,14 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows]')",
+							"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows]where BatchNo =',pipeline().parameters.BatchNo)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "DataFlow_SQL",
+						"referenceName": "DataflowLive_sql_UAT",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -211,7 +211,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "DataFlowRefreshes_SQL",
+									"referenceName": "DataflowRefreshesStaging_sql_UAT",
 									"type": "DatasetReference"
 								}
 							]
@@ -412,13 +412,13 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "SQL_DataFlowRefreshLive_Staging",
+									"referenceName": "DataflowRefreshesStaging_sql_UAT",
 									"type": "DatasetReference"
 								}
 							],
 							"outputs": [
 								{
-									"referenceName": "SQL_DataFlowRefeshLive",
+									"referenceName": "DataflowRefreshesLive_sql_UAT",
 									"type": "DatasetReference"
 								}
 							]
@@ -578,7 +578,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "ADF_Pipeline_Status_Log",
+					"referenceName": "LS_ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
 			},
