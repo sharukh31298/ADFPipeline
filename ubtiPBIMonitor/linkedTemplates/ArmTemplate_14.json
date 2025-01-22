@@ -4796,14 +4796,9 @@
 					{
 						"name": "ReportPages_Master",
 						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Reports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"secureInput": false
 						},
@@ -4878,11 +4873,13 @@
 					{
 						"name": "Datasetusers_Master",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -4960,6 +4957,8 @@
 					{
 						"name": "Datasetrefresh_Master",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
@@ -4997,11 +4996,13 @@
 					{
 						"name": "DataflowRefreshes_Master",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Dataflows_Master",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -5034,6 +5035,8 @@
 					{
 						"name": "sp_Dataloadtracker",
 						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -5227,6 +5230,8 @@
 					{
 						"name": "Capturing Datasetsrefresh Master Status",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasetrefresh_Master",
@@ -5325,60 +5330,6 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "ViewReports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Dataflows_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Datasets_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Reports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "WorkspaceUsers__Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "ReportPages_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Datasetusers_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Datasetrefresh_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
 								"activity": "Capturing Workspaces_Master status",
 								"dependencyConditions": [
 									"Completed"
@@ -5386,6 +5337,72 @@
 							},
 							{
 								"activity": "Capturing WorkSpaceUsers Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "ViewReports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing ReportsMaster status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Datasets Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "WorkspaceUsers__Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Dataflows Master Status",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -5486,6 +5503,8 @@
 					{
 						"name": "Capturing ReportPagesMaster Status",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "ReportPages_Master",
@@ -5510,6 +5529,8 @@
 					{
 						"name": "Capturing DatasetUsersMaster Status",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasetusers_Master",
@@ -5558,6 +5579,8 @@
 					{
 						"name": "Capturing DataflowsRefreshes Master Status",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "DataflowRefreshes_Master",
