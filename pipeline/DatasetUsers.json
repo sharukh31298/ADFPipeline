@@ -447,7 +447,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "DatasetUsers Staging Status",
+								"variableName": "DatasetUser Staging Status",
 								"value": {
 									"value": "@activity('Get DatasetUsers_Staging').Status",
 									"type": "Expression"
@@ -471,7 +471,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "DatasetUsers Live Status",
+								"variableName": "DatasetUser Live Status",
 								"value": {
 									"value": "@activity('Get DatasetUsers_Live').Status",
 									"type": "Expression"
@@ -484,20 +484,9 @@
 			{
 				"name": "Sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Get Datasets",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "DatasetID in Loop",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -820,6 +809,12 @@
 				"type": "String"
 			},
 			"Master DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"DatasetUser Staging Status": {
+				"type": "String"
+			},
+			"DatasetUser Live Status": {
 				"type": "String"
 			}
 		},
