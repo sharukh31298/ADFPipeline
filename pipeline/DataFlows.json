@@ -5,7 +5,14 @@
 			{
 				"name": "DataFlow Staging",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute ChilsPipelineLog",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -539,7 +546,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureName": "[dbo].[sp_ChildPipelineLog_Update]",
 					"storedProcedureParameters": {
 						"EndTime": {
 							"value": {
@@ -548,62 +555,16 @@
 							},
 							"type": "DateTime"
 						},
-						"ErrorMessage": {
-							"value": "NA",
-							"type": "String"
-						},
-						"PipelineName": {
+						"LogTrackerID": {
 							"value": {
-								"value": "@pipeline().Pipeline",
+								"value": "@activity('Execute ChilsPipelineLog').output.firstRow.LogTrackerID",
 								"type": "Expression"
 							},
 							"type": "String"
-						},
-						"RunID": {
-							"value": {
-								"value": "@pipeline().RunId",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"StartTime": {
-							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-								"type": "Expression"
-							},
-							"type": "DateTime"
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('DataFlow Staging').Status",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"TriggerName": {
-							"value": {
-								"value": "@pipeline().TriggerName",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"TriggerTime": {
-							"value": {
-								"value": "@pipeline().TriggerTime",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						},
-						"TriggerType": {
-							"value": {
-								"value": "@pipeline().TriggerType",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"TenantID": {
-							"value": {
-								"value": "@pipeline().parameters.TenantId",
+								"value": "@if(and(and(\nequals(variables('Dataflows staging Status'),'Succeeded'),\nequals(variables('Dataflows Live Status'),'Succeeded')),\nequals(variables('Dataflows History Status'),'Succeeded')),\n    'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -769,6 +730,34 @@
 					"value": {
 						"value": "@activity('DataFlow History').Status",
 						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Execute ChilsPipelineLog",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Execute_ChildPipelineLogs",
+						"type": "DatasetReference"
 					}
 				}
 			}

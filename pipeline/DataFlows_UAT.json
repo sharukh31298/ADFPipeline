@@ -575,7 +575,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@activity('DataFlow Staging').Status",
+								"value": "@if(and(and(\nequals(variables('Dataflows staging Status'),'Succeeded'),\nequals(variables('Dataflows Live Status'),'Succeeded')),\nequals(variables('Dataflows History Status'),'Succeeded')),\n    'Succeeded','Failed')",
 								"type": "Expression"
 							},
 							"type": "String"
