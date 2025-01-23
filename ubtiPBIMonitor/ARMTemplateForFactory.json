@@ -21705,8 +21705,6 @@
 					{
 						"name": "ViewReports_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -22142,8 +22140,6 @@
 					{
 						"name": "Capturing Viewreports Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "ViewReports_Master",
@@ -39318,7 +39314,14 @@
 					{
 						"name": "WorkSpace Staging",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "sp_Childpipeline Tracker Insert",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -39484,8 +39487,6 @@
 					{
 						"name": "WorkSpace Live Data",
 						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkSpace Staging",
@@ -39719,8 +39720,6 @@
 					{
 						"name": "WorkSpace History",
 						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkSpace Staging",
@@ -39989,7 +39988,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
+							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
 							"storedProcedureParameters": {
 								"EndTime": {
 									"value": {
@@ -39998,55 +39997,16 @@
 									},
 									"type": "DateTime"
 								},
-								"ErrorMessage": {
-									"value": "NA",
-									"type": "String"
-								},
-								"PipelineName": {
+								"LogTrackerID": {
 									"value": {
-										"value": "@pipeline().Pipeline",
+										"value": "@activity('sp_Childpipeline Tracker Insert').outputfirstRow.LogTrackerID",
 										"type": "Expression"
 									},
 									"type": "String"
-								},
-								"RunID": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"StartTime": {
-									"value": {
-										"value": "@activity('WorkSpace Staging').ExecutionStartTime\n\n\n",
-										"type": "Expression"
-									},
-									"type": "DateTime"
 								},
 								"Status": {
 									"value": {
 										"value": "@if(and(and(\nequals(variables('WorkspacesStaging Status'),'Succeeded'),\nequals(variables('WorkSpaceHistory Status'),'Succeeded')),\nequals(variables('WorkSpaceLive Status'),'Succeeded')),\n    'Succeeded','Failed')",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerName": {
-									"value": {
-										"value": "@pipeline().TriggerName",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerTime": {
-									"value": {
-										"value": "@pipeline().TriggerTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TriggerType": {
-									"value": {
-										"value": "@pipeline().TriggerType",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -40059,10 +40019,8 @@
 						}
 					},
 					{
-						"name": "sp_TrackProcessFailure",
+						"name": "sp_Childpipeline Tracker Insert",
 						"type": "SqlServerStoredProcedure",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -40073,8 +40031,12 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
+							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Insert]",
 							"storedProcedureParameters": {
+								"DataLoadTrackerId": {
+									"value": "",
+									"type": "String"
+								},
 								"EndTime": {
 									"value": {
 										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
@@ -40083,6 +40045,11 @@
 									"type": "DateTime"
 								},
 								"ErrorMessage": {
+									"value": "NA",
+									"type": "String"
+								},
+								"LogTrackerId": {
+									"value": "",
 									"type": "String"
 								},
 								"PipelineName": {
@@ -40107,11 +40074,15 @@
 									"type": "DateTime"
 								},
 								"Status": {
+									"value": "Started",
+									"type": "String"
+								},
+								"TenantId": {
 									"value": {
-										"value": "@if(and(and(\nequals(variables('WorkspacesStaging Status'),'Succeeded'),\nequals(variables('WorkSpaceHistory Status'),'Succeeded')),\nequals(variables('WorkSpaceLive Status'),'Succeeded')),\n    'Succeeded','Failed')",
+										"value": "@pipeline().parameters.TenantId",
 										"type": "Expression"
 									},
-									"type": "String"
+									"type": "Int32"
 								},
 								"TriggerName": {
 									"value": {
@@ -40144,8 +40115,6 @@
 					{
 						"name": "Capturing Status of WorkSpaceStaging",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkSpace Staging",
@@ -40170,8 +40139,6 @@
 					{
 						"name": "Capturing Status of WorkSpaceLive",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkSpace Live Data",
@@ -40196,8 +40163,6 @@
 					{
 						"name": "Capturing Status of WorkSpaceHistory",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkSpace History",
