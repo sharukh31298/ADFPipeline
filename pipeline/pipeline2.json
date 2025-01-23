@@ -45,7 +45,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat(\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', 'Started', '''', ',',\n    '''', formatDateTime(utcNow(), 'yyyy-MM-dd HH:mm:ss'), '''', ',',\n    '''', formatDateTime(utcNow(), 'yyyy-MM-dd HH:mm:ss'), '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', formatDateTime(pipeline().TriggerTime, 'yyyy-MM-dd HH:mm:ss'), '''', ',',\n    '''', ' ', '''', ',',\n    '''', string(pipeline().parameters.TenantId), '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+							"value": "@concat(\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', 'Started', '''', ',',\n    '''', utcNow(), '''', ',',\n    '''', utcNow(), '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
