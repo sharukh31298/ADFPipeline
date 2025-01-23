@@ -45,7 +45,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientCode,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''','' '',','''',pipeline().parameters.TenantId,''','' ''')",
+							"value": "@concat(\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', 'Started', '''', ',',\n    '''', utcNow(), '''', ',',\n    '''', utcNow(), '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -60,6 +60,8 @@
 			{
 				"name": "Set variable1",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Execute_SP",
@@ -83,21 +85,9 @@
 			}
 		],
 		"parameters": {
-			"AppClientId": {
-				"type": "string",
-				"defaultValue": "dsfsdf"
-			},
 			"TenantId": {
 				"type": "string",
 				"defaultValue": "22"
-			},
-			"AppClientCode": {
-				"type": "string",
-				"defaultValue": "sdfsggds"
-			},
-			"AppTenantId": {
-				"type": "string",
-				"defaultValue": "dfgdfvgdfgvge"
 			}
 		},
 		"variables": {
