@@ -2007,7 +2007,7 @@
 								},
 								"Status": {
 									"value": {
-										"value": "@activity('Get Dataflows').Status",
+										"value": "@if(and(and(and(and(\nequals(variables('Get Dataflowsrefreshes Status'),'Succeeded'),\nequals(variables('DataflowRefreshes Staging Status'),'Succeeded')),\nequals(variables('DataflowRefreshes Status'),'Succeeded')),\nequals(variables('Get Dataflowsrefreshes Batch'),'Succeeded')),\nequals(variables('DataflowRefreshes History Status'),'Succeeded')),\n'Succeeded','Failed')",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -2826,7 +2826,7 @@
 								},
 								"Status": {
 									"value": {
-										"value": "@activity('DataFlow Staging').Status",
+										"value": "@if(and(and(\nequals(variables('Dataflows staging Status'),'Succeeded'),\nequals(variables('Dataflows Live Status'),'Succeeded')),\nequals(variables('Dataflows History Status'),'Succeeded')),\n    'Succeeded','Failed')",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -3066,9 +3066,6 @@
 					"Dataflows History Status": {
 						"type": "String"
 					},
-					"DataflowRefreshes Staging Status": {
-						"type": "String"
-					},
 					"DataflowRefreshes Status": {
 						"type": "String"
 					},
@@ -3109,6 +3106,9 @@
 						"type": "String"
 					},
 					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
 						"type": "String"
 					}
 				},

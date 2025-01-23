@@ -1654,11 +1654,17 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "DataflowRefreshes Staging Status",
-										"value": {
-											"value": "@activity('Get DataflowRefresh_Staging').Status",
-											"type": "Expression"
-										}
+										"variableName": "pipelineReturnValue",
+										"value": [
+											{
+												"key": "DataflowRefreshes Staging Status",
+												"value": {
+													"type": "Expression",
+													"content": "@activity('Get DataflowRefresh_Staging').Status"
+												}
+											}
+										],
+										"setSystemVariable": true
 									}
 								},
 								{
@@ -1678,11 +1684,17 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "DataflowRefreshes Status",
-										"value": {
-											"value": "@activity('Get DataflowRefresh_Live').Status",
-											"type": "Expression"
-										}
+										"variableName": "pipelineReturnValue",
+										"value": [
+											{
+												"key": "DataflowRefreshesLive Status",
+												"value": {
+													"type": "Expression",
+													"content": "@activity('Get DataflowRefresh_Live').Status"
+												}
+											}
+										],
+										"setSystemVariable": true
 									}
 								}
 							]
@@ -1691,26 +1703,9 @@
 					{
 						"name": "Sp_TrackProcessSuccess",
 						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Capturing Get Dataflows Status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Get Dataflows",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Dataflow ID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -1893,11 +1888,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "Get Dataflowsrefreshes Status",
-							"value": {
-								"value": "@activity('Get Dataflows').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "Get Dataflowsrefreshes Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get Dataflows').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					}
 				],
@@ -1936,9 +1937,6 @@
 						"type": "String"
 					},
 					"DataFlowRefreshes_IST2": {
-						"type": "String"
-					},
-					"DataflowRefreshes Staging Status": {
 						"type": "String"
 					},
 					"DataflowRefreshes Status": {
@@ -1981,6 +1979,9 @@
 						"type": "String"
 					},
 					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
 						"type": "String"
 					}
 				},
@@ -2437,7 +2438,14 @@
 					{
 						"name": "DataFlow Staging",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Execute ChilsPipelineLog",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -2976,7 +2984,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
+							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
 							"storedProcedureParameters": {
 								"EndTime": {
 									"value": {
@@ -2985,62 +2993,16 @@
 									},
 									"type": "DateTime"
 								},
-								"ErrorMessage": {
-									"value": "NA",
-									"type": "String"
-								},
-								"PipelineName": {
+								"LogTrackerID": {
 									"value": {
-										"value": "@pipeline().Pipeline",
+										"value": "@activity('Execute ChilsPipelineLog').output.firstRow.LogTrackerID",
 										"type": "Expression"
 									},
 									"type": "String"
-								},
-								"RunID": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"StartTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
 								},
 								"Status": {
 									"value": {
-										"value": "@activity('DataFlow Staging').Status",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerName": {
-									"value": {
-										"value": "@pipeline().TriggerName",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerTime": {
-									"value": {
-										"value": "@pipeline().TriggerTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TriggerType": {
-									"value": {
-										"value": "@pipeline().TriggerType",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TenantID": {
-									"value": {
-										"value": "@pipeline().parameters.TenantId",
+										"value": "@if(and(and(\nequals(variables('Dataflows staging Status'),'Succeeded'),\nequals(variables('Dataflows Live Status'),'Succeeded')),\nequals(variables('Dataflows History Status'),'Succeeded')),\n    'Succeeded','Failed')",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -3208,6 +3170,35 @@
 								"type": "Expression"
 							}
 						}
+					},
+					{
+						"name": "Execute ChilsPipelineLog",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Execute_ChildPipelineLogs",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
 					}
 				],
 				"policy": {
@@ -3252,9 +3243,6 @@
 					"Dataflows History Status": {
 						"type": "String"
 					},
-					"DataflowRefreshes Staging Status": {
-						"type": "String"
-					},
 					"DataflowRefreshes Status": {
 						"type": "String"
 					},
@@ -3295,6 +3283,9 @@
 						"type": "String"
 					},
 					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
 						"type": "String"
 					}
 				},
@@ -4483,11 +4474,17 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "Dataset Refreshes Staging Status",
-										"value": {
-											"value": "@activity('Get DatasetRefreshes_Staging').Status",
-											"type": "Expression"
-										}
+										"variableName": "pipelineReturnValue",
+										"value": [
+											{
+												"key": "Dataset Refreshes Staging Status",
+												"value": {
+													"type": "Expression",
+													"content": "@activity('Get DatasetRefreshes_Staging').Status"
+												}
+											}
+										],
+										"setSystemVariable": true
 									}
 								},
 								{
@@ -4507,11 +4504,17 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "DatasetRefreshes Live Status",
-										"value": {
-											"value": "@activity('Get DatasetRefreshes_Live').Status",
-											"type": "Expression"
-										}
+										"variableName": "pipelineReturnValue",
+										"value": [
+											{
+												"key": "DatasetRefreshes Live Status",
+												"value": {
+													"type": "Expression",
+													"content": "@activity('Get DatasetRefreshes_Live').Status"
+												}
+											}
+										],
+										"setSystemVariable": true
 									}
 								}
 							]
@@ -4520,14 +4523,9 @@
 					{
 						"name": "Sp_TrackProcessSuccess",
 						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get Datasets",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -4711,11 +4709,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "Get DatasetRefreshes Status",
-							"value": {
-								"value": "@activity('Get Datasets').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "Get DatasetRefreshe Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get Datasets').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					}
 				],
@@ -4765,12 +4769,6 @@
 					"Dataset History Status": {
 						"type": "String"
 					},
-					"Dataset Refreshes Staging Status": {
-						"type": "String"
-					},
-					"DatasetRefreshes Live Status": {
-						"type": "String"
-					},
 					"Get DatasetRefreshes Status": {
 						"type": "String"
 					},
@@ -4787,12 +4785,6 @@
 						"type": "String"
 					},
 					"Dataflows History Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Staging Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Status": {
 						"type": "String"
 					},
 					"Get Dataflowsrefreshes Status": {
@@ -4832,6 +4824,18 @@
 						"type": "String"
 					},
 					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes_ Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshe Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
 						"type": "String"
 					}
 				},
@@ -5754,11 +5758,17 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "DatasetUsers Staging Status",
-										"value": {
-											"value": "@activity('Get DatasetUsers_Staging').Status",
-											"type": "Expression"
-										}
+										"variableName": "pipelineReturnValue",
+										"value": [
+											{
+												"key": "DatasetUser Staging Status",
+												"value": {
+													"type": "Expression",
+													"content": "@activity('Get DatasetUsers_Staging').Status"
+												}
+											}
+										],
+										"setSystemVariable": true
 									}
 								},
 								{
@@ -5778,11 +5788,17 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "DatasetUsers Live Status",
-										"value": {
-											"value": "@activity('Get DatasetUsers_Live').Status",
-											"type": "Expression"
-										}
+										"variableName": "pipelineReturnValue",
+										"value": [
+											{
+												"key": "DatasetUser Live Status",
+												"value": {
+													"type": "Expression",
+													"content": "@activity('Get DatasetUsers_Live').Status"
+												}
+											}
+										],
+										"setSystemVariable": true
 									}
 								}
 							]
@@ -5791,20 +5807,9 @@
 					{
 						"name": "Sp_TrackProcessSuccess",
 						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get Datasets",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "DatasetID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -5988,11 +5993,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "Get Datasets Status",
-							"value": {
-								"value": "@activity('Get Datasets').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "Get Datasets Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get Datasets').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					}
 				],
@@ -6063,12 +6074,6 @@
 					"Dataset History Status": {
 						"type": "String"
 					},
-					"Dataset Refreshes Staging Status": {
-						"type": "String"
-					},
-					"DatasetRefreshes Live Status": {
-						"type": "String"
-					},
 					"Get DatasetRefreshes Status": {
 						"type": "String"
 					},
@@ -6085,12 +6090,6 @@
 						"type": "String"
 					},
 					"Dataflows History Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Staging Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Status": {
 						"type": "String"
 					},
 					"Get Dataflowsrefreshes Status": {
@@ -6130,6 +6129,24 @@
 						"type": "String"
 					},
 					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"DatasetUser Staging Status": {
+						"type": "String"
+					},
+					"DatasetUser Live Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes_ Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshe Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
 						"type": "String"
 					}
 				},
@@ -6577,7 +6594,14 @@
 					{
 						"name": "Dataset Staging",
 						"type": "Copy",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Execute ChildPipelineLog",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -7476,7 +7500,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
+							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
 							"storedProcedureParameters": {
 								"EndTime": {
 									"value": {
@@ -7485,62 +7509,16 @@
 									},
 									"type": "DateTime"
 								},
-								"ErrorMessage": {
-									"value": "NA",
-									"type": "String"
-								},
-								"PipelineName": {
+								"LogTrackerID": {
 									"value": {
-										"value": "@pipeline().Pipeline",
+										"value": "@activity('Execute ChildPipelineLog').output.firstRow.LogTrackerID",
 										"type": "Expression"
 									},
 									"type": "String"
-								},
-								"RunID": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"StartTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
 								},
 								"Status": {
 									"value": {
 										"value": "@if(and(and(\nequals(variables('Dataset staging Status'),'Succeeded'),\nequals(variables('Dataset Live Status'),'Succeeded')),\nequals(variables('Dataset History Status'),'Succeeded')),\n    'Succeeded','Failed')",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerName": {
-									"value": {
-										"value": "@pipeline().TriggerName",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerTime": {
-									"value": {
-										"value": "@pipeline().TriggerTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TriggerType": {
-									"value": {
-										"value": "@pipeline().TriggerType",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TenantID": {
-									"value": {
-										"value": "@pipeline().parameters.TenantId",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -7708,6 +7686,35 @@
 								"type": "Expression"
 							}
 						}
+					},
+					{
+						"name": "Execute ChildPipelineLog",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)\n",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Execute_ChildPipelineLogs",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
 					}
 				],
 				"policy": {
@@ -7752,12 +7759,6 @@
 					"Dataset History Status": {
 						"type": "String"
 					},
-					"Dataset Refreshes Staging Status": {
-						"type": "String"
-					},
-					"DatasetRefreshes Live Status": {
-						"type": "String"
-					},
 					"Get DatasetRefreshes Status": {
 						"type": "String"
 					},
@@ -7774,12 +7775,6 @@
 						"type": "String"
 					},
 					"Dataflows History Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Staging Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Status": {
 						"type": "String"
 					},
 					"Get Dataflowsrefreshes Status": {
@@ -7819,6 +7814,18 @@
 						"type": "String"
 					},
 					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes_ Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshe Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
 						"type": "String"
 					}
 				},
