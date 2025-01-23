@@ -7,7 +7,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "sp_Childpipeline Tracker Insert",
+						"activity": "Execute_ChildLogs",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -685,7 +685,7 @@
 						},
 						"LogTrackerID": {
 							"value": {
-								"value": "@activity('sp_Childpipeline Tracker Insert').output",
+								"value": "@activity('Execute_ChildLogs').output.firstRow.LogTrackerID",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -707,6 +707,8 @@
 			{
 				"name": "sp_Childpipeline Tracker Insert",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -735,7 +737,6 @@
 							"type": "String"
 						},
 						"LogTrackerId": {
-							"value": "",
 							"type": "String"
 						},
 						"PipelineName": {
@@ -910,6 +911,34 @@
 					"value": {
 						"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Execute_ChildLogs",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "concat(\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Execute_ChildPipelineLogs",
+						"type": "DatasetReference"
 					}
 				}
 			}
