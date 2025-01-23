@@ -8850,26 +8850,7 @@
 					{
 						"name": "Sp_TrackProcessSuccess",
 						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Get WorkSpaces",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "WorkSpace ID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Capturing Status for Get WorkSpaces",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -8879,39 +8860,18 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
+							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
 							"storedProcedureParameters": {
 								"EndTime": {
 									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 										"type": "Expression"
 									},
 									"type": "DateTime"
 								},
-								"ErrorMessage": {
-									"value": "NA",
+								"LogTrackerID": {
+									"value": "",
 									"type": "String"
-								},
-								"PipelineName": {
-									"value": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"RunID": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"StartTime": {
-									"value": {
-										"value": "@activity('Get WorkSpaces').ExecutionStartTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
 								},
 								"Status": {
 									"value": {
@@ -8919,34 +8879,6 @@
 										"type": "Expression"
 									},
 									"type": "String"
-								},
-								"TriggerName": {
-									"value": {
-										"value": "@pipeline().TriggerName",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerTime": {
-									"value": {
-										"value": "@pipeline().TriggerTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TriggerType": {
-									"value": {
-										"value": "@pipeline().TriggerType",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TenantId": {
-									"value": {
-										"value": "@pipeline().parameters.TenantId",
-										"type": "Expression"
-									},
-									"type": "Int32"
 								}
 							}
 						},
