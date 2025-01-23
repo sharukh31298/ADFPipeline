@@ -464,7 +464,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "DataflowRefreshes Status",
+								"variableName": "DataflowRefreshesLive Status",
 								"value": {
 									"value": "@activity('Get DataflowRefresh_Live').Status",
 									"type": "Expression"
@@ -477,26 +477,7 @@
 			{
 				"name": "Sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Capturing Get Dataflows Status",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "Get Dataflows",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "Dataflow ID in Loop",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -764,6 +745,9 @@
 				"type": "String"
 			},
 			"Master DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"DataflowRefreshesLive Status": {
 				"type": "String"
 			}
 		},
