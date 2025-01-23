@@ -13,6 +13,124 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUsersAPI')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_API_DatasetUsers",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"WorkSpaceID": {
+							"value": "@dataset().WorkSpaceID",
+							"type": "Expression"
+						},
+						"DatasetID": {
+							"value": "@dataset().DatasetID",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"WorkSpaceID": {
+						"type": "String"
+					},
+					"DatasetID": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUsers_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DatasetUsers_sql",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DatasetUserID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DatasetUserSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceID",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetID",
+						"type": "varchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "varchar"
+					},
+					{
+						"name": "UserName",
+						"type": "varchar"
+					},
+					{
+						"name": "Identifier",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetUserAccessRight",
+						"type": "varchar"
+					},
+					{
+						"name": "PrincipalType",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DatasetUsers_Staging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Dataset_SQL')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -929,369 +1047,6 @@
 				"type": "RestResource",
 				"typeProperties": {},
 				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ViewReports_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ViewReportID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ViewReportSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "RecordType",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CreationTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Operation",
-						"type": "varchar"
-					},
-					{
-						"name": "OrganizationID",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "varchar"
-					},
-					{
-						"name": "UserKey",
-						"type": "varchar"
-					},
-					{
-						"name": "Workload",
-						"type": "varchar"
-					},
-					{
-						"name": "UserID",
-						"type": "varchar"
-					},
-					{
-						"name": "ClientIP",
-						"type": "varchar"
-					},
-					{
-						"name": "UserAgent",
-						"type": "varchar"
-					},
-					{
-						"name": "Activity",
-						"type": "varchar"
-					},
-					{
-						"name": "ItemName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceName",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetName",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportName",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityID",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkspaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "AppName",
-						"type": "varchar"
-					},
-					{
-						"name": "ObjectID",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetID",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportID",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactId",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactName",
-						"type": "varchar"
-					},
-					{
-						"name": "IsSucess",
-						"type": "bit"
-					},
-					{
-						"name": "ReportType",
-						"type": "varchar"
-					},
-					{
-						"name": "RequestID",
-						"type": "varchar"
-					},
-					{
-						"name": "ActivityID",
-						"type": "varchar"
-					},
-					{
-						"name": "AppReportID",
-						"type": "varchar"
-					},
-					{
-						"name": "DistributionMethod",
-						"type": "varchar"
-					},
-					{
-						"name": "ConsumptionMethod",
-						"type": "varchar"
-					},
-					{
-						"name": "AppID",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactKind",
-						"type": "varchar"
-					},
-					{
-						"name": "RefreshEnforcementPolicy",
-						"type": "bit"
-					},
-					{
-						"name": "ContinuationURL",
-						"type": "varchar"
-					},
-					{
-						"name": "ContinuationToken",
-						"type": "varchar"
-					},
-					{
-						"name": "lastResultSet",
-						"type": "bit"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ViewReports_Staging"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ViewReports_SQL_History')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "Id",
-						"type": "varchar"
-					},
-					{
-						"name": "RecordType",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CreationTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Operation",
-						"type": "varchar"
-					},
-					{
-						"name": "OrganizationId",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "UserKey",
-						"type": "varchar"
-					},
-					{
-						"name": "Workload",
-						"type": "varchar"
-					},
-					{
-						"name": "UserId",
-						"type": "varchar"
-					},
-					{
-						"name": "ClientIP",
-						"type": "varchar"
-					},
-					{
-						"name": "Activity",
-						"type": "varchar"
-					},
-					{
-						"name": "ItemName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceName",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetName",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportName",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityId",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkspaceId",
-						"type": "varchar"
-					},
-					{
-						"name": "ObjectId",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetId",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportId",
-						"type": "varchar"
-					},
-					{
-						"name": "EmbedTokenId",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactId",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactName",
-						"type": "varchar"
-					},
-					{
-						"name": "IsSuccess",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportType",
-						"type": "varchar"
-					},
-					{
-						"name": "RequestId",
-						"type": "varchar"
-					},
-					{
-						"name": "ActivityId",
-						"type": "varchar"
-					},
-					{
-						"name": "DistributionMethod",
-						"type": "varchar"
-					},
-					{
-						"name": "ConsumptionMethod",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactKind",
-						"type": "varchar"
-					},
-					{
-						"name": "RefreshEnforcementPolicy",
-						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ViewReportHistory"
-				}
 			},
 			"dependsOn": []
 		}
