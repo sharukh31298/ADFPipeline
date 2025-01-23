@@ -5,7 +5,14 @@
 			{
 				"name": "Get WorkSpace Batches",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute_ChildPipelinelogs",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -307,7 +314,7 @@
 					{
 						"activity": "Get WorkSpace Batches",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -391,6 +398,93 @@
 						}
 					],
 					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "Execute_ChildPipelinelogs",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Execute_ChildPipelineLogs",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Sp_TrackProcessSuccess",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "WorkSpaceUsers History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Status in WorkSpaces Users History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Workspaces Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_ChildPipelineLog_Update]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"LogTrackerID": {
+							"value": {
+								"value": "@activity('Execute_ChildPipelinelogs').output.firstRow.LogTrackerID",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"Status": {
+							"value": {
+								"value": "@if(and(and(and(and(\nequals(variables('Get Workspaces Status'),'Succeeded'),\nequals(variables('WorkspaceUsers Staging Staus'),'Succeeded')),\nequals(variables('WorkSpaceUserLive Status'),'Succeeded')),\nequals(variables('WorkSpaces Batch'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
