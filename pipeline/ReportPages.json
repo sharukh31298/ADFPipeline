@@ -399,9 +399,9 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "ReportPages Staging Status",
+								"variableName": "ReportPage Staging Status",
 								"value": {
-									"value": "@activity('Get Reports').Status",
+									"value": "@activity('Get ReportPage_Staging').Status",
 									"type": "Expression"
 								}
 							}
@@ -436,26 +436,9 @@
 			{
 				"name": "sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "ReportID in Loop",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "Get Reports",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "Capturing Get Reportspages Status",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -639,7 +622,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Get ReportPages Status",
+					"variableName": "Get ReportPage Status",
 					"value": {
 						"value": "@activity('Get Reports').Status",
 						"type": "Expression"
@@ -925,6 +908,12 @@
 				"type": "String"
 			},
 			"Master DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"Get ReportPage Status": {
+				"type": "String"
+			},
+			"ReportPage Staging Status": {
 				"type": "String"
 			}
 		},

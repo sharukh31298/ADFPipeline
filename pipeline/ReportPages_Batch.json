@@ -5,7 +5,14 @@
 			{
 				"name": "Get ReportPages in Batches",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute ChildPipelineLog",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -62,7 +69,10 @@
 								},
 								"waitOnCompletion": true,
 								"parameters": {
-									"AppTenantId": "@pipeline().parameters.AppTenantId",
+									"AppTenantId": {
+										"value": "@pipeline().parameters.AppTenantId",
+										"type": "Expression"
+									},
 									"AppClientId": {
 										"value": "@pipeline().parameters.AppClientId",
 										"type": "Expression"
@@ -92,7 +102,7 @@
 					{
 						"activity": "Get ReportPages in Batches",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -341,6 +351,96 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Execute ChildPipelineLog",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Execute_ChildPipelineLogs",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "sp_TrackProcessSuccess",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Capturing ReportPages History Status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "ReportPages History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing ReportPages Batches Status",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_ChildPipelineLog_Update]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"LogTrackerID": {
+							"value": {
+								"value": "@activity('Execute ChildPipelineLog').output.firstRow.LogTrackerID",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"Status": {
+							"value": {
+								"value": "@if(and(and(and(and(\nequals(variables('Get ReportPage Status'),'Succeeded'),\nequals(variables('ReportPage Staging Status'),'Succeeded')),\nequals(variables('ReportPages Live Status'),'Succeeded')),\nequals(variables('ReportPages Batch Status'),'Succeeded')),\nequals(variables('ReportPages History Status'),'Succeeded')),\n'Succeeded','Failed')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
@@ -458,6 +558,15 @@
 				"type": "String"
 			},
 			"Master DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"Get ReportPage Status": {
+				"type": "String"
+			},
+			"ReportPage Staging Status": {
+				"type": "String"
+			},
+			"ReportPages Live Status": {
 				"type": "String"
 			}
 		},
