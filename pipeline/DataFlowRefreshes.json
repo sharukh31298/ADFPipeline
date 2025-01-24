@@ -219,6 +219,8 @@
 						{
 							"name": "Get DataflowRefresh_Live",
 							"type": "Copy",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "Get DataflowRefresh_Staging",
@@ -456,11 +458,14 @@
 						{
 							"name": "Capturing DataflowRefreshes Live Status",
 							"type": "SetVariable",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "Get DataflowRefresh_Live",
 									"dependencyConditions": [
-										"Completed"
+										"Succeeded",
+										"Failed"
 									]
 								}
 							],
