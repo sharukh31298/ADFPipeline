@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"Test_Pipelines_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Test_Pipelines'"
+		},
 		"Test_Workspaces_clientSecret": {
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'Test_Workspaces'"
@@ -79,9 +83,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'getdataflow_api_ls'"
 		},
-		"getdataflow_refreshes_ls_clientSecret": {
-			"type": "secureString",
-			"metadata": "Secure string for 'clientSecret' of 'getdataflow_refreshes_ls'"
+		"Test_Pipelines_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Test_Pipelines_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"Test_Pipelines_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"Test_Workspaces_properties_typeProperties_url": {
 			"type": "string",
@@ -258,20 +270,34 @@
 		"getdataflow_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
-		},
-		"getdataflow_refreshes_ls_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkSpaceID,'/dataflows/',linkedService().DataFlowID,'/transactions')}"
-		},
-		"getdataflow_refreshes_ls_properties_typeProperties_clientId": {
-			"type": "string",
-			"defaultValue": "@{linkedService().AppClientId}"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Test_Pipelines')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Test_Pipelines_properties_typeProperties_server')]",
+					"database": "[parameters('Test_Pipelines_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Test_Pipelines_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Test_Pipelines_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Test_Workspaces')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -694,45 +720,6 @@
 						"value": "[parameters('getdataflow_api_ls_clientSecret')]"
 					},
 					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}\n",
-					"scope": "https://analysis.windows.net/powerbi/api/.default"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/getdataflow_refreshes_ls')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"parameters": {
-					"WorkSpaceID": {
-						"type": "string"
-					},
-					"DataFlowID": {
-						"type": "string"
-					},
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('getdataflow_refreshes_ls_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "OAuth2ClientCredential",
-					"clientId": "[parameters('getdataflow_refreshes_ls_properties_typeProperties_clientId')]",
-					"clientSecret": {
-						"type": "SecureString",
-						"value": "[parameters('getdataflow_refreshes_ls_clientSecret')]"
-					},
-					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
 				}
 			},

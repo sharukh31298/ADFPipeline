@@ -2061,8 +2061,6 @@
 					{
 						"name": "Reports_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -2147,8 +2145,6 @@
 					{
 						"name": "Datasets_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -2233,8 +2229,6 @@
 					{
 						"name": "Dataflows_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -2451,8 +2445,6 @@
 					{
 						"name": "ViewReports_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -2537,8 +2529,6 @@
 					{
 						"name": "Capturing Workspaces_Master status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Workspaces_Master",
@@ -2589,8 +2579,6 @@
 					{
 						"name": "Capturing Dataflows Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Dataflows_Master",
@@ -2615,8 +2603,6 @@
 					{
 						"name": "Capturing Datasets Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
@@ -2641,8 +2627,6 @@
 					{
 						"name": "Capturing ReportsMaster status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Reports_Master",
@@ -2669,33 +2653,17 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "ViewReports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
 								"activity": "Dataflows_Master",
 								"dependencyConditions": [
-									"Succeeded"
+									"Succeeded",
+									"Completed"
 								]
 							},
 							{
 								"activity": "Datasets_Master",
 								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Reports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Succeeded"
+									"Succeeded",
+									"Completed"
 								]
 							},
 							{
@@ -2730,6 +2698,42 @@
 							},
 							{
 								"activity": "Capturing WorkSpaceUsers Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Dataflows Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "ViewReports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing ReportsMaster status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Viewreports Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Reports_Master",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -2884,8 +2888,6 @@
 					{
 						"name": "Capturing Viewreports Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "ViewReports_Master",
@@ -4972,7 +4974,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+								"sqlReaderQuery": {
+									"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},

@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetUsersStaging_sql_UAT'"
 		},
+		"Execute_ChildPipelineLogs_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Execute_ChildPipelineLogs'"
+		},
 		"LS_ADF_Pipeline_Status_Log_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_ADF_Pipeline_Status_Log'"
@@ -83,10 +87,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SQL_ReportPagesLive'"
 		},
-		"LS_SQL_WorkSpaceUsers_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SQL_WorkSpaceUsers'"
-		},
 		"DatasetStaging_sql_UAT_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -132,6 +132,18 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"DatasetUsersStaging_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Execute_ChildPipelineLogs_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Execute_ChildPipelineLogs_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"Execute_ChildPipelineLogs_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -306,18 +318,6 @@
 		"LS_SQL_ReportPagesLive_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"LS_SQL_WorkSpaceUsers_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_SQL_WorkSpaceUsers_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "pbimonitor"
-		},
-		"LS_SQL_WorkSpaceUsers_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -410,6 +410,29 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DatasetUsersStaging_sql_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Execute_ChildPipelineLogs')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Execute_ChildPipelineLogs",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_server')]",
+					"database": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Execute_ChildPipelineLogs_password')]"
 					}
 				}
 			},
@@ -747,28 +770,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS_SQL_ReportPagesLive_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SQL_WorkSpaceUsers')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SQL_WorkSpaceUsers_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SQL_WorkSpaceUsers_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SQL_WorkSpaceUsers_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SQL_WorkSpaceUsers_password')]"
 					}
 				}
 			},

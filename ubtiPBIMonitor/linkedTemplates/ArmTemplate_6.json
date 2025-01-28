@@ -251,6 +251,22 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Execute_ChildPipelineLogs')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Execute_ChildPipelineLogs",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_ExecuteSP_UAT')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1270,91 +1286,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "Reports"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ReportsStaging_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ReportStaging_sql_UAT",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Datasets_UAT"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ReportID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ReportSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetID",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportType",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportName",
-						"type": "nvarchar"
-					},
-					{
-						"name": "ReportWebUrl",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportEmbedUrl",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataLoadTrackerID",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Reports_Staging"
 				}
 			},
 			"dependsOn": []

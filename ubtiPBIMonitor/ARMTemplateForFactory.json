@@ -83,6 +83,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetUsersStaging_sql_UAT'"
 		},
+		"Execute_ChildPipelineLogs_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Execute_ChildPipelineLogs'"
+		},
 		"LS_ADF_Pipeline_Status_Log_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_ADF_Pipeline_Status_Log'"
@@ -365,10 +369,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
-		"Execute_ChildPipelineLogs_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'Execute_ChildPipelineLogs'"
-		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -642,6 +642,18 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"DatasetuserHistory_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Execute_ChildPipelineLogs_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Execute_ChildPipelineLogs_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"Execute_ChildPipelineLogs_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -1416,18 +1428,6 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
-		},
-		"Execute_ChildPipelineLogs_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"Execute_ChildPipelineLogs_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"Execute_ChildPipelineLogs_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -3598,6 +3598,30 @@
 										],
 										"setSystemVariable": true
 									}
+								},
+								{
+									"name": "Capturing Error Message",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get DataflowRefresh_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Dataflowrefreshes Staging EM",
+										"value": {
+											"value": "@activity('Get DataflowRefresh_Staging').error?.message",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -3884,6 +3908,9 @@
 						"type": "String"
 					},
 					"DataflowRefreshesLive Status": {
+						"type": "String"
+					},
+					"Dataflowrefreshes Staging EM": {
 						"type": "String"
 					}
 				},
@@ -20733,8 +20760,6 @@
 					{
 						"name": "Reports_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -20819,8 +20844,6 @@
 					{
 						"name": "Datasets_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -20905,8 +20928,6 @@
 					{
 						"name": "Dataflows_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -21123,8 +21144,6 @@
 					{
 						"name": "ViewReports_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Execute_SP",
@@ -21209,8 +21228,6 @@
 					{
 						"name": "Capturing Workspaces_Master status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Workspaces_Master",
@@ -21261,8 +21278,6 @@
 					{
 						"name": "Capturing Dataflows Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Dataflows_Master",
@@ -21287,8 +21302,6 @@
 					{
 						"name": "Capturing Datasets Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
@@ -21313,8 +21326,6 @@
 					{
 						"name": "Capturing ReportsMaster status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Reports_Master",
@@ -21341,33 +21352,17 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "ViewReports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
 								"activity": "Dataflows_Master",
 								"dependencyConditions": [
-									"Succeeded"
+									"Succeeded",
+									"Completed"
 								]
 							},
 							{
 								"activity": "Datasets_Master",
 								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Reports_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Succeeded"
+									"Succeeded",
+									"Completed"
 								]
 							},
 							{
@@ -21402,6 +21397,42 @@
 							},
 							{
 								"activity": "Capturing WorkSpaceUsers Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Dataflows Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "ViewReports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing ReportsMaster status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Viewreports Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Reports_Master",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -21556,8 +21587,6 @@
 					{
 						"name": "Capturing Viewreports Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "ViewReports_Master",
@@ -41010,42 +41039,6 @@
 					},
 					"WorkSpacesEndTime": {
 						"type": "String"
-					},
-					"Get ReportPage Status": {
-						"type": "String"
-					},
-					"ReportPage Staging Status": {
-						"type": "String"
-					},
-					"ReportPages Live Status": {
-						"type": "String"
-					},
-					"DatasetUser Staging Status": {
-						"type": "String"
-					},
-					"DatasetUser Live Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshes_ Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshe Status": {
-						"type": "String"
-					},
-					"Dataset Refreshes Staging Status": {
-						"type": "String"
-					},
-					"DatasetRefreshes Live Status": {
-						"type": "String"
-					},
-					"Get DatasetsRefreshes Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Staging Status": {
-						"type": "String"
-					},
-					"DataflowRefreshesLive Status": {
-						"type": "String"
 					}
 				},
 				"folder": {
@@ -42515,7 +42508,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+								"sqlReaderQuery": {
+									"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -48240,9 +48236,6 @@
 					},
 					"WorkSpacesEndTime": {
 						"type": "String"
-					},
-					"DataflowRefreshes Status": {
-						"type": "String"
 					}
 				},
 				"folder": {
@@ -52549,6 +52542,24 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Execute_ChildPipelineLogs')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Execute_ChildPipelineLogs",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Execute_ChildPipelineLogs')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/GatewayHistory_SQL')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -54162,7 +54173,12 @@
 				},
 				"annotations": [],
 				"type": "RestResource",
-				"typeProperties": {},
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "/reports",
+						"type": "Expression"
+					}
+				},
 				"schema": []
 			},
 			"dependsOn": [
@@ -57868,6 +57884,29 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Execute_ChildPipelineLogs')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Execute_ChildPipelineLogs",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_server')]",
+					"database": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Execute_ChildPipelineLogs_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_ADF_Pipeline_Status_Log')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -60029,47 +60068,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Execute_ChildPipelineLogs')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Execute_ChildPipelineLogs",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_server')]",
-					"database": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('Execute_ChildPipelineLogs_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('Execute_ChildPipelineLogs_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Execute_ChildPipelineLogs')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Execute_ChildPipelineLogs",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Execute_ChildPipelineLogs')]"
 			]
 		}
 	]
