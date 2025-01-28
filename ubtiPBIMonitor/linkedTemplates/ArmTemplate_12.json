@@ -13,6 +13,22 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ViewReportsAPI')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_API_ViewReports",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ViewReports_SQL')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1724,6 +1740,96 @@
 											"value": "@activity('Get DataflowRefresh_Staging').error?.message",
 											"type": "Expression"
 										}
+									}
+								},
+								{
+									"name": "Capturing EM",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Capturing Error Message",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_Capturing Error Message]",
+										"storedProcedureParameters": {
+											"AppClientId": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppClientSecret": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppTentantId": {
+												"value": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "String"
+											},
+											"ErrorMessage": {
+												"value": {
+													"value": "@variables('Dataflowrefreshes Staging EM')",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineRunId": {
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ProcessEndTime": {
+												"value": null,
+												"type": "DateTime"
+											},
+											"ProcessStartTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": null,
+												"type": "String"
+											},
+											"TentantId": {
+												"value": {
+													"value": "@pipeline().parameters.TenantID",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Capturing Error Message",
+										"type": "LinkedServiceReference"
 									}
 								}
 							]
@@ -9368,239 +9474,6 @@
 				},
 				"folder": {
 					"name": "UBTI_DEV RunStatus"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Gateways')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get Data",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Gateway_batch] where BatchNo=',pipeline().parameters.BatchNo)",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "Dataset_SQL",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get Data",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get Data').output.value",
-								"type": "Expression"
-							},
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "Get Gateways",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"additionalColumns": [
-												{
-													"name": "DatasetID",
-													"value": {
-														"value": "@item().DatasetSourcekey",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "WorkspaceID",
-													"value": {
-														"value": "@item().WorkspaceID",
-														"type": "Expression"
-													}
-												}
-											],
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"mappings": [
-												{
-													"source": {
-														"path": "[['id']"
-													},
-													"sink": {
-														"name": "GatewaySourceKey",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['gatewayId']"
-													},
-													"sink": {
-														"name": "GatewayID",
-														"type": "Int32"
-													}
-												},
-												{
-													"source": {
-														"path": "[['name']"
-													},
-													"sink": {
-														"name": "GatewayName",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['type']"
-													},
-													"sink": {
-														"name": "Type",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['publicKey']['exponent']"
-													},
-													"sink": {
-														"name": "Exponent",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['publicKey']['modulus']"
-													},
-													"sink": {
-														"name": "Modulus",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['gatewayAnnotation']"
-													},
-													"sink": {
-														"name": "GatewayAnnotation",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['@odata.context']"
-													},
-													"sink": {}
-												},
-												{
-													"source": {
-														"path": "$['DatasetID']"
-													},
-													"sink": {
-														"name": "DatasetID",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['WorkspaceID']"
-													},
-													"sink": {
-														"name": "WorkSpaceID",
-														"type": "String"
-													}
-												}
-											],
-											"collectionReference": "$['value']",
-											"mapComplexValuesToString": true
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "APIs_Datasets",
-											"type": "DatasetReference",
-											"parameters": {
-												"RelativeURL": {
-													"value": "@{concat('/v1.0/myorg/groups/',item().WorkspaceID,'/datasets/',item().DatasetSourcekey,'/Default.DiscoverGateways')}\n",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Gateways_SQL",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"BatchNo": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "Sample Pipelines"
 				},
 				"annotations": []
 			},

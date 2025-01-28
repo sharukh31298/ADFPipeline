@@ -369,6 +369,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
+		"Capturing Error Message_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Capturing Error Message'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1428,6 +1432,18 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
+		},
+		"Capturing Error Message_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Capturing Error Message_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"Capturing Error Message_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -3622,6 +3638,96 @@
 											"type": "Expression"
 										}
 									}
+								},
+								{
+									"name": "Capturing EM",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Capturing Error Message",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_Capturing Error Message]",
+										"storedProcedureParameters": {
+											"AppClientId": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppClientSecret": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppTentantId": {
+												"value": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "String"
+											},
+											"ErrorMessage": {
+												"value": {
+													"value": "@variables('Dataflowrefreshes Staging EM')",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineRunId": {
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ProcessEndTime": {
+												"value": null,
+												"type": "DateTime"
+											},
+											"ProcessStartTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": null,
+												"type": "String"
+											},
+											"TentantId": {
+												"value": {
+													"value": "@pipeline().parameters.TenantID",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Capturing Error Message",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
 						}
@@ -3925,7 +4031,8 @@
 				"[concat(variables('factoryId'), '/datasets/DataFlowRefreshes_API')]",
 				"[concat(variables('factoryId'), '/datasets/DataFlowRefreshes_SQL')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DataFlowRefreshLive_Staging')]",
-				"[concat(variables('factoryId'), '/datasets/SQL_DataFlowRefeshLive')]"
+				"[concat(variables('factoryId'), '/datasets/SQL_DataFlowRefeshLive')]",
+				"[concat(variables('factoryId'), '/linkedServices/Capturing Error Message')]"
 			]
 		},
 		{
@@ -60073,6 +60180,29 @@
 				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers')]",
 				"[concat(variables('factoryId'), '/datasets/AzureSQL_SP')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Capturing Error Message')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Capturing Error Message",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Capturing Error Message_properties_typeProperties_server')]",
+					"database": "[parameters('Capturing Error Message_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Capturing Error Message_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Capturing Error Message_password')]"
+					}
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }
