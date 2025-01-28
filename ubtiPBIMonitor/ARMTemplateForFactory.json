@@ -21148,7 +21148,7 @@
 							{
 								"activity": "Execute_SP",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
@@ -48745,7 +48745,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat(\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+									"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientCode,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(pipeline().parameters.TenantId),''','' ''')",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -48780,6 +48780,8 @@
 					{
 						"name": "Stored procedure1",
 						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Wait1",
@@ -48851,6 +48853,15 @@
 					"TenantId": {
 						"type": "string",
 						"defaultValue": "22"
+					},
+					"AppTenantId": {
+						"type": "String"
+					},
+					"AppClientId": {
+						"type": "String"
+					},
+					"AppClientCode": {
+						"type": "String"
 					}
 				},
 				"variables": {
