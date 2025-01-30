@@ -14120,8 +14120,6 @@
 					{
 						"name": "Truncate Dataset Refreshes",
 						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Get Dataset Batches",
@@ -14146,7 +14144,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "TRUNCATE TABLE [dbo].[DatasetRefreshes];"
+									"text": "TRUNCATE TABLE [dbo].[DatasetRefreshes_Staging];"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -14155,6 +14153,8 @@
 					{
 						"name": "DatasetRefreshes History",
 						"type": "Copy",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "For Each Batch",
@@ -14393,6 +14393,8 @@
 					{
 						"name": "Capturing DatasetRefreshes History status",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "DatasetRefreshes History",
