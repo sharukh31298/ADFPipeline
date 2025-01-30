@@ -1721,14 +1721,9 @@
 								{
 									"name": "Capturing Error Message",
 									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Get DataflowRefresh_Staging",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [],
 									"policy": {
 										"secureOutput": false,
 										"secureInput": false
@@ -1747,9 +1742,9 @@
 									"type": "SqlServerStoredProcedure",
 									"dependsOn": [
 										{
-											"activity": "Capturing Error Message",
+											"activity": "Get DataflowRefresh_Staging",
 											"dependencyConditions": [
-												"Succeeded"
+												"Completed"
 											]
 										}
 									],
@@ -1791,7 +1786,7 @@
 											},
 											"ErrorMessage": {
 												"value": {
-													"value": "@variables('Dataflowrefreshes Staging EM')",
+													"value": "@activity('Get DataflowRefresh_Staging').error?.message",
 													"type": "Expression"
 												},
 												"type": "String"
