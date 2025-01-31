@@ -511,7 +511,7 @@
 							}
 						},
 						{
-							"name": "Capturin ED  ",
+							"name": "Capturing DatasetRefreshes ED",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
@@ -528,7 +528,104 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[Sp_DatasetRefrehesED]",
+								"storedProcedureParameters": {
+									"AppClientId": {
+										"value": {
+											"value": "@pipeline().parameters.AppClientId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"AppClientSecret": {
+										"value": {
+											"value": "@pipeline().parameters.AppClientCode",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"AppTentantId": {
+										"value": {
+											"value": "@pipeline().parameters.AppTenantId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"DataLoadTrackerId": {
+										"value": "",
+										"type": "String"
+									},
+									"DatasetID": {
+										"value": {
+											"value": "@item().DatasetID",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ErrorMessage": {
+										"value": {
+											"value": "@activity('Get DatasetRefreshes_Staging').error?.message",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineName": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineRunId": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ProcessEndTime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"ProcessStartTime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"Status": {
+										"value": {
+											"value": "@activity('Get DatasetRefreshes_Staging').Status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"TenantId": {
+										"value": {
+											"value": "@pipeline().parameters.TenantID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"WorkSpaceID": {
+										"value": {
+											"value": "@item().WorkSpaceID",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "DatasetRefreshes Log",
+								"type": "LinkedServiceReference"
+							}
 						}
 					]
 				}
