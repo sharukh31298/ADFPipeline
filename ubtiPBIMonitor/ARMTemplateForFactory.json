@@ -107,6 +107,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'LS_API_Workspaces'"
 		},
+		"LS_Capturing DatasetUsers ED_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Capturing DatasetUsers ED'"
+		},
+		"LS_Capturing ReportPages ED_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Capturing ReportPages ED'"
+		},
 		"LS_Dataloadtracker_SQL_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Dataloadtracker_SQL'"
@@ -377,13 +385,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
-		"LS_Capturing DatasetUsers ED_password": {
+		"LS_Capturing WorkSpaceUsers ED_password": {
 			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Capturing DatasetUsers ED'"
-		},
-		"LS_Capturing ReportPages ED_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Capturing ReportPages ED'"
+			"metadata": "Secure string for 'password' of 'LS_Capturing WorkSpaceUsers ED'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -788,6 +792,30 @@
 		"LS_Api_Reports_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"LS_Capturing ReportPages ED_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"LS_Capturing ReportPages ED_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"LS_Capturing ReportPages ED_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"LS_Dataloadtracker_SQL_properties_typeProperties_server": {
 			"type": "string",
@@ -1469,27 +1497,15 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
 		},
-		"LS_Capturing DatasetUsers ED_properties_typeProperties_server": {
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
 		},
-		"LS_Capturing DatasetUsers ED_properties_typeProperties_database": {
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "PowerPulseDB-Dev"
 		},
-		"LS_Capturing DatasetUsers ED_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_userName": {
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -41840,6 +41856,8 @@
 								{
 									"name": "Get WorkSpaceUsers_Live",
 									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Wait to WorkspaceUsers Staging complete",
@@ -42085,6 +42103,8 @@
 								{
 									"name": "Capturing Status in WorkSpaceUsers Live",
 									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Get WorkSpaceUsers_Live",
@@ -42115,6 +42135,8 @@
 								{
 									"name": "Wait to WorkspaceUsers Staging complete",
 									"type": "Wait",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Get WorkSpace Users_Staging",
@@ -42126,6 +42148,116 @@
 									"userProperties": [],
 									"typeProperties": {
 										"waitTimeInSeconds": 60
+									}
+								},
+								{
+									"name": "Capturing WorkspaceUsers ED",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Get WorkSpace Users_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_WorkSpaceUsersED]",
+										"storedProcedureParameters": {
+											"AppClientId": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppClientSecret": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppTentantId": {
+												"value": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "String"
+											},
+											"ErrorMessage": {
+												"value": {
+													"value": "@activity('Get WorkSpace Users_Staging').error?.message",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineName": {
+												"value": {
+													"value": "@pipeline().Pipeline",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineRunId": {
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ProcessEndTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"ProcessStartTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": {
+													"value": "@activity('Get WorkSpace Users_Staging').Status",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"TenantId": {
+												"value": {
+													"value": "@pipeline().parameters.TenantId",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"WorkSpaceID": {
+												"value": {
+													"value": "@item().WorkSpaceSourceKey",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_Capturing WorkSpaceUsers ED",
+										"type": "LinkedServiceReference"
 									}
 								}
 							]
@@ -42653,7 +42785,8 @@
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_SQL')]",
 				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]"
+				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Capturing WorkSpaceUsers ED')]"
 			]
 		},
 		{
@@ -42684,7 +42817,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select distinct BatchNo from [dbo].[Workspaces_batch] ORDER BY 1",
+								"sqlReaderQuery": "SELECT DISTINCT BatchNo \nFROM  [dbo].[Workspaces_batch] ORDER BY 1",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -42759,6 +42892,8 @@
 					{
 						"name": "WorkSpaceUsers History",
 						"type": "Copy",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "For Each Batch",
@@ -43030,6 +43165,8 @@
 					{
 						"name": "Capturing Status in WorkSpaces Users History",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkSpaceUsers History",
@@ -58843,6 +58980,52 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/LS_Capturing DatasetUsers ED')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "LS_Capturing DatasetUsers ED",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Capturing DatasetUsers ED_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Capturing ReportPages ED')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "LS_Capturing ReportPages ED",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Capturing ReportPages ED_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/LS_Dataloadtracker_SQL')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -60680,46 +60863,22 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/LS_Capturing DatasetUsers ED')]",
+			"name": "[concat(parameters('factoryName'), '/LS_Capturing WorkSpaceUsers ED')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "LS_Capturing DatasetUsers ED",
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"server": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_database')]",
+					"server": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database')]",
 					"encrypt": "mandatory",
 					"trustServerCertificate": false,
 					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_userName')]",
+					"userName": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName')]",
 					"password": {
 						"type": "SecureString",
-						"value": "[parameters('LS_Capturing DatasetUsers ED_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Capturing ReportPages ED')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "LS_Capturing ReportPages ED",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Capturing ReportPages ED_password')]"
+						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_password')]"
 					}
 				}
 			},

@@ -13,6 +13,127 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DatasetStaging_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DatasetStaging_sql_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Datasets_UAT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DatasetId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DatasetSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkspaceId",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetName",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetWebUrl",
+						"type": "varchar"
+					},
+					{
+						"name": "AddRowsAPIEnabled",
+						"type": "bit"
+					},
+					{
+						"name": "ConfiguredBy",
+						"type": "varchar"
+					},
+					{
+						"name": "IsRefreshable",
+						"type": "bit"
+					},
+					{
+						"name": "IsEffectiveIdentityRequired",
+						"type": "bit"
+					},
+					{
+						"name": "IsEffectiveIdentityRolesRequired",
+						"type": "bit"
+					},
+					{
+						"name": "TargetStorageMode",
+						"type": "varchar"
+					},
+					{
+						"name": "ContentProviderType",
+						"type": "varchar"
+					},
+					{
+						"name": "CreateReportEmbedURL",
+						"type": "varchar"
+					},
+					{
+						"name": "QNAEmbedURL",
+						"type": "varchar"
+					},
+					{
+						"name": "IsInPlaceSharingEnabled",
+						"type": "bit"
+					},
+					{
+						"name": "AutoSyncReadOnlyReplicas",
+						"type": "varchar"
+					},
+					{
+						"name": "MaxReadOnlyReplicas",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Datasets_Staging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DatasetUsersHistory_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1287,84 +1408,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "ReportPages"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ReportPagesStaging_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ReportPagesStaging_sql_UAT",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Datasets_UAT"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ReportPageID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ReportID",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportPageName",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportPageDisplayName",
-						"type": "varchar"
-					},
-					{
-						"name": "report_order",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataLoadTrackerID",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ReportPages_Staging"
 				}
 			},
 			"dependsOn": []
