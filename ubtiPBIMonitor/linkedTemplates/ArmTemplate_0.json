@@ -59,13 +59,13 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetLive_sql_UAT'"
 		},
+		"DatasetRefreshes Log_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DatasetRefreshes Log'"
+		},
 		"DatasetRefreshesHistory_sql_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetRefreshesHistory_sql_UAT'"
-		},
-		"DatasetRefreshesLive_sql_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DatasetRefreshesLive_sql_UAT'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -223,6 +223,18 @@
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
+		"DatasetRefreshes Log_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DatasetRefreshes Log_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"DatasetRefreshes Log_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
 		"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -232,18 +244,6 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"DatasetRefreshesLive_sql_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DatasetRefreshesLive_sql_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DatasetRefreshesLive_sql_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -720,6 +720,28 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes Log')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DatasetRefreshes Log_properties_typeProperties_server')]",
+					"database": "[parameters('DatasetRefreshes Log_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DatasetRefreshes Log_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DatasetRefreshes Log_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DatasetRefreshesHistory_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -737,29 +759,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetRefreshesLive_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DatasetRefreshesLive_sql_UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DatasetRefreshesLive_sql_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('DatasetRefreshesLive_sql_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DatasetRefreshesLive_sql_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DatasetRefreshesLive_sql_UAT_password')]"
 					}
 				}
 			},

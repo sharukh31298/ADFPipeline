@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"LS_SQL_DemoWorkspaces_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SQL_DemoWorkspaces'"
+		},
 		"LS_SQL_ReportPagesLive_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SQL_ReportPagesLive'"
@@ -83,9 +87,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'Test'"
 		},
-		"TestActivityevents_clientSecret": {
-			"type": "secureString",
-			"metadata": "Secure string for 'clientSecret' of 'TestActivityevents'"
+		"LS_SQL_DemoWorkspaces_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"LS_SQL_DemoWorkspaces_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "pbimonitor"
+		},
+		"LS_SQL_DemoWorkspaces_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"LS_SQL_ReportPagesLive_properties_typeProperties_server": {
 			"type": "string",
@@ -302,20 +314,34 @@
 		"Test_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
-		},
-		"TestActivityevents_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://wabi-west-us-c-primary-redirect.analysis.windows.net/v1.0/myorg/admin/activityevents?continuationToken='eyJTdGFydERhdGVUaW1lIjoiMjAyNC0wMy0xMlQwMDowMDowMC4wMDAwMDAwXHUwMDJCMDA6MDAiLCJFbmREYXRlVGltZSI6IjIwMjQtMDMtMTJUMjM6NTk6NTkuMDAwMDAwMFx1MDAyQjAwOjAwIiwiRmlsZU5hbWUiOiIyMDI0LTAzLTEyVDAyX3YxXzAwMS5jc3YiLCJGaWxlT2Zmc2V0IjowLCJBY3Rpdml0eSI6InZpZXdyZXBvcnQiLCJVc2VySWQiOm51bGx9LDIwMjQtMDMtMTJUMDA6MDA6MDAuMDAwMDAwMCswMDowMCwyMDI0LTAzLTEyVDIzOjU5OjU5LjAwMDAwMDArMDA6MDAsMCx2aWV3cmVwb3J0LA%3D%3D'"
-		},
-		"TestActivityevents_properties_typeProperties_clientId": {
-			"type": "string",
-			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_SQL_DemoWorkspaces')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_server')]",
+					"database": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_SQL_DemoWorkspaces_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_SQL_DemoWorkspaces_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/LS_SQL_ReportPagesLive')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -743,28 +769,6 @@
 					"clientSecret": {
 						"type": "SecureString",
 						"value": "[parameters('Test_clientSecret')]"
-					},
-					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
-					"scope": "https://analysis.windows.net/powerbi/api/.default"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/TestActivityevents')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('TestActivityevents_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "OAuth2ClientCredential",
-					"clientId": "[parameters('TestActivityevents_properties_typeProperties_clientId')]",
-					"clientSecret": {
-						"type": "SecureString",
-						"value": "[parameters('TestActivityevents_clientSecret')]"
 					},
 					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"

@@ -59,6 +59,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetLive_sql_UAT'"
 		},
+		"DatasetRefreshes Log_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DatasetRefreshes Log'"
+		},
 		"DatasetRefreshesHistory_sql_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetRefreshesHistory_sql_UAT'"
@@ -373,9 +377,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
-		"DatasetRefreshes Log_password": {
+		"LS_Capturing DatasetUsers ED_password": {
 			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DatasetRefreshes Log'"
+			"metadata": "Secure string for 'password' of 'LS_Capturing DatasetUsers ED'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -554,6 +558,18 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"DatasetLive_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DatasetRefreshes Log_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DatasetRefreshes Log_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"DatasetRefreshes Log_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -1449,15 +1465,15 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
 		},
-		"DatasetRefreshes Log_properties_typeProperties_server": {
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
 		},
-		"DatasetRefreshes Log_properties_typeProperties_database": {
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "PowerPulseDB-Dev"
 		},
-		"DatasetRefreshes Log_properties_typeProperties_userName": {
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -13163,6 +13179,8 @@
 								{
 									"name": "Get DatasetUsers_Live",
 									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Get DatasetUsers_Staging",
@@ -13426,6 +13444,8 @@
 								{
 									"name": "Capturing DatasetUsers Live",
 									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Get DatasetUsers_Live",
@@ -13451,6 +13471,123 @@
 											}
 										],
 										"setSystemVariable": true
+									}
+								},
+								{
+									"name": "Capturing Datausers ED",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Get DatasetUsers_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_DatasetRefrehesED]",
+										"storedProcedureParameters": {
+											"AppClientId": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppClientSecret": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppTentantId": {
+												"value": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "String"
+											},
+											"DatasetID": {
+												"value": {
+													"value": "@item().DatasetSourceKey",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ErrorMessage": {
+												"value": {
+													"value": "@activity('Get DatasetUsers_Staging').error?.message\r\n",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineName": {
+												"value": {
+													"value": "@pipeline().Pipeline",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineRunId": {
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ProcessEndTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"ProcessStartTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": {
+													"value": "@activity('Get DatasetUsers_Staging').Status",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"TenantId": {
+												"value": {
+													"value": "@pipeline().parameters.TenantId",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"WorkSpaceID": {
+												"value": {
+													"value": "@item().WorkspaceId",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_Capturing DatasetUsers ED",
+										"type": "LinkedServiceReference"
 									}
 								}
 							]
@@ -13814,7 +13951,8 @@
 				"[concat(variables('factoryId'), '/datasets/DatasetUsers_API')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetUsers_sql')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DatasetUsers_Staging')]",
-				"[concat(variables('factoryId'), '/datasets/SQL_DatasetUsersLive')]"
+				"[concat(variables('factoryId'), '/datasets/SQL_DatasetUsersLive')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Capturing DatasetUsers ED')]"
 			]
 		},
 		{
@@ -13944,7 +14082,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "TRUNCATE TABLE [dbo].[DatasetUsers];"
+									"text": "TRUNCATE TABLE [dbo].[DatasetUsers_Staging];"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -13953,6 +14091,8 @@
 					{
 						"name": "DatasetUsers History",
 						"type": "Copy",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "For Each Batch",
@@ -14203,6 +14343,8 @@
 					{
 						"name": "Capturing DatasetsUsers Status",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "DatasetUsers History",
@@ -57972,6 +58114,28 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes Log')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DatasetRefreshes Log_properties_typeProperties_server')]",
+					"database": "[parameters('DatasetRefreshes Log_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DatasetRefreshes Log_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DatasetRefreshes Log_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DatasetRefreshesHistory_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -60374,22 +60538,23 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes Log')]",
+			"name": "[concat(parameters('factoryName'), '/LS_Capturing DatasetUsers ED')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "LS_Capturing DatasetUsers ED",
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"server": "[parameters('DatasetRefreshes Log_properties_typeProperties_server')]",
-					"database": "[parameters('DatasetRefreshes Log_properties_typeProperties_database')]",
+					"server": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_database')]",
 					"encrypt": "mandatory",
 					"trustServerCertificate": false,
 					"authenticationType": "SQL",
-					"userName": "[parameters('DatasetRefreshes Log_properties_typeProperties_userName')]",
+					"userName": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_userName')]",
 					"password": {
 						"type": "SecureString",
-						"value": "[parameters('DatasetRefreshes Log_password')]"
+						"value": "[parameters('LS_Capturing DatasetUsers ED_password')]"
 					}
 				}
 			},

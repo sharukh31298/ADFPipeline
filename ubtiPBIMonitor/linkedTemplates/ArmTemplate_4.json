@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"get_refresh_schedules_api_ls_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'get_refresh_schedules_api_ls'"
+		},
 		"getdataflow_api_ls_clientSecret": {
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'getdataflow_api_ls'"
@@ -67,9 +71,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
-		"DatasetRefreshes Log_password": {
+		"LS_Capturing DatasetUsers ED_password": {
 			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DatasetRefreshes Log'"
+			"metadata": "Secure string for 'password' of 'LS_Capturing DatasetUsers ED'"
+		},
+		"get_refresh_schedules_api_ls_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkSpaceID,'/datasets/',linkedService().DatasetID,'/refreshSchedule')}"
+		},
+		"get_refresh_schedules_api_ls_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		},
 		"getdataflow_api_ls_properties_typeProperties_url": {
 			"type": "string",
@@ -195,15 +207,15 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
 		},
-		"DatasetRefreshes Log_properties_typeProperties_server": {
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
 		},
-		"DatasetRefreshes Log_properties_typeProperties_database": {
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_database": {
 			"type": "string",
 			"defaultValue": "PowerPulseDB-Dev"
 		},
-		"DatasetRefreshes Log_properties_typeProperties_userName": {
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -212,6 +224,36 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/get_refresh_schedules_api_ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"WorkSpaceID": {
+						"type": "string"
+					},
+					"DatasetID": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('get_refresh_schedules_api_ls_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('get_refresh_schedules_api_ls_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('get_refresh_schedules_api_ls_clientSecret')]"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/getdataflow_api_ls')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -686,22 +728,23 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes Log')]",
+			"name": "[concat(parameters('factoryName'), '/LS_Capturing DatasetUsers ED')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"description": "LS_Capturing DatasetUsers ED",
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"server": "[parameters('DatasetRefreshes Log_properties_typeProperties_server')]",
-					"database": "[parameters('DatasetRefreshes Log_properties_typeProperties_database')]",
+					"server": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_database')]",
 					"encrypt": "mandatory",
 					"trustServerCertificate": false,
 					"authenticationType": "SQL",
-					"userName": "[parameters('DatasetRefreshes Log_properties_typeProperties_userName')]",
+					"userName": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_userName')]",
 					"password": {
 						"type": "SecureString",
-						"value": "[parameters('DatasetRefreshes Log_password')]"
+						"value": "[parameters('LS_Capturing DatasetUsers ED_password')]"
 					}
 				}
 			},
@@ -810,25 +853,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/us_capturefirestrowlookup_Ls')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Capacities')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getCapacities",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Sample Datasets"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
 		}
 	]
 }
