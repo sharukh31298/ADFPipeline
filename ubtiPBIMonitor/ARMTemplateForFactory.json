@@ -345,8 +345,7 @@
 		},
 		"getgroups_sql_ls_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'getgroups_sql_ls'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=ubti-ssvr-d-pbimonitor.database.windows.net;Initial Catalog=PowerPulseDB-Dev;User ID=adminsql"
+			"metadata": "Secure string for 'connectionString' of 'getgroups_sql_ls'"
 		},
 		"getgroupsusers_api_ls_clientSecret": {
 			"type": "secureString",
@@ -57418,7 +57417,7 @@
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "WorkSpaces"
+					"table": "WorkSpaceUsers_Staging"
 				}
 			},
 			"dependsOn": [
@@ -60432,20 +60431,10 @@
 				"annotations": [],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"connectionString": "[parameters('getgroups_sql_ls_connectionString')]",
-					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureSQLCredentials",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "AzureSQLPassword"
-					}
+					"connectionString": "[parameters('getgroups_sql_ls_connectionString')]"
 				}
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSQLCredentials')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/getgroupsusers_api_ls')]",

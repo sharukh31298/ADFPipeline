@@ -345,8 +345,7 @@
 		},
 		"getgroups_sql_ls_connectionString": {
 			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'getgroups_sql_ls'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=ubti-ssvr-d-pbimonitor.database.windows.net;Initial Catalog=PowerPulseDB-Dev;User ID=adminsql"
+			"metadata": "Secure string for 'connectionString' of 'getgroups_sql_ls'"
 		},
 		"getgroupsusers_api_ls_clientSecret": {
 			"type": "secureString",
@@ -2502,6 +2501,9 @@
 					"getgroups_api_ds_clientSecret": {
 						"value": "[parameters('getgroups_api_ds_clientSecret')]"
 					},
+					"getgroups_sql_ls_connectionString": {
+						"value": "[parameters('getgroups_sql_ls_connectionString')]"
+					},
 					"getgroupsusers_api_ls_clientSecret": {
 						"value": "[parameters('getgroupsusers_api_ls_clientSecret')]"
 					},
@@ -2742,9 +2744,26 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"getgroups_sql_ls_connectionString": {
-						"value": "[parameters('getgroups_sql_ls_connectionString')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'ubtiPBIMonitor_ArmTemplate_8')]"
+			]
+		},
+		{
+			"name": "ubtiPBIMonitor_ArmTemplate_10",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_10.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
 					},
 					"getreports_sql_ds_connectionString": {
 						"value": "[parameters('getreports_sql_ds_connectionString')]"
@@ -2838,26 +2857,6 @@
 					},
 					"Ls_Api_Workspace_properties_typeProperties_clientId": {
 						"value": "[parameters('Ls_Api_Workspace_properties_typeProperties_clientId')]"
-					}
-				}
-			},
-			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'ubtiPBIMonitor_ArmTemplate_8')]"
-			]
-		},
-		{
-			"name": "ubtiPBIMonitor_ArmTemplate_10",
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2024-03-01",
-			"properties": {
-				"mode": "incremental",
-				"templateLink": {
-					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_10.json', parameters('containerSasToken'))]",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"factoryName": {
-						"value": "[parameters('factoryName')]"
 					}
 				}
 			},
