@@ -381,6 +381,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Capturing DatasetUsers ED'"
 		},
+		"LS_Capturing ReportPages ED_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Capturing ReportPages ED'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1474,6 +1478,18 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"LS_Capturing DatasetUsers ED_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"LS_Capturing ReportPages ED_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"LS_Capturing ReportPages ED_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"LS_Capturing ReportPages ED_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -25592,7 +25608,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select ReportSourceKey,WorkspaceId from [dbo].[Reports]where BatchNo =',pipeline().parameters.BatchNo)\n",
+									"value": "@concat('select ReportSourceKey,WorkspaceId \nfrom [dbo].[Reports_batch] where BatchNo = ',pipeline().parameters.BatchNo)\n",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -25778,6 +25794,8 @@
 								{
 									"name": "Get ReportPages_Live",
 									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Get ReportPage_Staging",
@@ -25993,6 +26011,8 @@
 								{
 									"name": "Capturing Get Reportpages Live Status",
 									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Get ReportPages_Live",
@@ -26018,6 +26038,123 @@
 											}
 										],
 										"setSystemVariable": true
+									}
+								},
+								{
+									"name": "Capturing ReportPages ED",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Get ReportPage_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_ReportPagesED]",
+										"storedProcedureParameters": {
+											"AppClientId": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppClientSecret": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppTentantId": {
+												"value": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "String"
+											},
+											"ErrorMessage": {
+												"value": {
+													"value": "@activity('Get ReportPage_Staging').error?.message",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineName": {
+												"value": {
+													"value": "@pipeline().Pipeline",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineRunId": {
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ProcessEndTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"ProcessStartTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"ReportID": {
+												"value": {
+													"value": "@item().ReportSourceKey",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"Status": {
+												"value": {
+													"value": "@activity('Get ReportPage_Staging').Status",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"TenantId": {
+												"value": {
+													"value": "@pipeline().parameters.TenantId",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"WorkSpaceID": {
+												"value": {
+													"value": "@item().WorkSpaceID",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_Capturing ReportPages ED",
+										"type": "LinkedServiceReference"
 									}
 								}
 							]
@@ -26530,7 +26667,8 @@
 				"[concat(variables('factoryId'), '/datasets/ReportPages_API')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPages_SQL')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPagesLive_SQL')]",
-				"[concat(variables('factoryId'), '/datasets/SQL_ReportPagesLive')]"
+				"[concat(variables('factoryId'), '/datasets/SQL_ReportPagesLive')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Capturing ReportPages ED')]"
 			]
 		},
 		{
@@ -26669,6 +26807,8 @@
 					{
 						"name": "ReportPages History",
 						"type": "Copy",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "For Each Batch",
@@ -26847,6 +26987,8 @@
 					{
 						"name": "Capturing ReportPages History Status",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "ReportPages History",
@@ -60555,6 +60697,29 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS_Capturing DatasetUsers ED_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Capturing ReportPages ED')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "LS_Capturing ReportPages ED",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Capturing ReportPages ED_password')]"
 					}
 				}
 			},
