@@ -717,8 +717,71 @@
 												"path": "['id']"
 											},
 											"sink": {
-												"name": "DatasetID",
+												"name": "WorkSpaceSourceKey",
 												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['isReadOnly']"
+											},
+											"sink": {
+												"name": "IsReadOnly",
+												"type": "Boolean"
+											}
+										},
+										{
+											"source": {
+												"path": "['isOnDedicatedCapacity']"
+											},
+											"sink": {
+												"name": "IsonDedicatedCapacity",
+												"type": "Boolean"
+											}
+										},
+										{
+											"source": {
+												"path": "['capacityMigrationStatus']"
+											},
+											"sink": {
+												"name": "CapacityMigrationStatus",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['description']"
+											},
+											"sink": {
+												"name": "WorkSpaceDescription",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['type']"
+											},
+											"sink": {
+												"name": "WorkSpaceType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['state']"
+											},
+											"sink": {
+												"name": "Status",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['hasWorkspaceLevelSettings ']"
+											},
+											"sink": {
+												"name": "HasWorkspaceLevelSetting",
+												"type": "Boolean"
 											}
 										},
 										{
@@ -726,115 +789,7 @@
 												"path": "['name']"
 											},
 											"sink": {
-												"name": "DatasetName",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['kind']"
-											},
-											"sink": {
-												"name": "Kind",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['capacity']['id']"
-											},
-											"sink": {
-												"name": "capacityId",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['capacity']['displayName']"
-											},
-											"sink": {
-												"name": "capacitydisplayName",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['capacity']['sku']"
-											},
-											"sink": {
-												"name": "capacitydisplaysku",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['group']['id']"
-											},
-											"sink": {
-												"name": "WorkSpaceID",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['group']['name']"
-											},
-											"sink": {
-												"name": "WorkspaceName",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['configuredBy'][0]"
-											},
-											"sink": {
-												"name": "configuredBy",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['lastRefresh']['id']"
-											},
-											"sink": {
-												"name": "DatasetRefreshesSourceKey",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['lastRefresh']['refreshType']"
-											},
-											"sink": {
-												"name": "RefreshType",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "$['lastRefresh']['startTime']"
-											},
-											"sink": {
-												"name": "StartTime",
-												"type": "DateTime"
-											}
-										},
-										{
-											"source": {
-												"path": "$['lastRefresh']['endTime']"
-											},
-											"sink": {
-												"name": "EndTime",
-												"type": "DateTime"
-											}
-										},
-										{
-											"source": {
-												"path": "$['lastRefresh']['status']"
-											},
-											"sink": {
-												"name": "Status",
+												"name": "WorkSpaceName",
 												"type": "String"
 											}
 										}
@@ -845,7 +800,13 @@
 							"inputs": [
 								{
 									"referenceName": "Ls_API_Workspaces",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"AppTentantId": {
+											"value": "@item().AppTentantId",
+											"type": "Expression"
+										}
+									}
 								}
 							],
 							"outputs": [
