@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"DatasetRefreshesHistory_sql_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DatasetRefreshesHistory_sql_UAT'"
+		},
 		"DatasetRefreshesLive_sql_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetRefreshesLive_sql_UAT'"
@@ -55,6 +59,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Capturing ReportPages ED'"
 		},
+		"LS_Capturing WorkSpaceUsers ED_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Capturing WorkSpaceUsers ED'"
+		},
 		"LS_Dataloadtracker_SQL_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Dataloadtracker_SQL'"
@@ -79,13 +87,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SQL_DatasetRefreshesLive'"
 		},
-		"LS_SQL_DatasetRefreshesLive_Staging_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SQL_DatasetRefreshesLive_Staging'"
+		"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
 		},
-		"LS_SQL_DatasetUsersLive_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SQL_DatasetUsersLive'"
+		"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"DatasetRefreshesLive_sql_UAT_properties_typeProperties_server": {
 			"type": "string",
@@ -193,11 +205,11 @@
 		},
 		"LS_API_Workspaces_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$expand=users&$top=2"
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5"
 		},
 		"LS_API_Workspaces_properties_typeProperties_clientId": {
 			"type": "string",
-			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+			"defaultValue": "@{linkedService().AppClientId}"
 		},
 		"LS_Capturing DatasetUsers ED_properties_typeProperties_server": {
 			"type": "string",
@@ -220,6 +232,18 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"LS_Capturing ReportPages ED_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -294,36 +318,35 @@
 		"LS_SQL_DatasetRefreshesLive_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"LS_SQL_DatasetUsersLive_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_SQL_DatasetUsersLive_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_SQL_DatasetUsersLive_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetRefreshesHistory_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DatasetRefreshesHistory_sql_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DatasetRefreshesLive_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -537,6 +560,17 @@
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
+				"parameters": {
+					"AppTentantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "RestService",
 				"typeProperties": {
@@ -548,7 +582,7 @@
 						"type": "SecureString",
 						"value": "[parameters('LS_API_Workspaces_clientSecret')]"
 					},
-					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTentantId,'/oauth2/v2.0/token')}",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
 				}
 			},
@@ -595,6 +629,28 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS_Capturing ReportPages ED_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Capturing WorkSpaceUsers ED')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_password')]"
 					}
 				}
 			},
@@ -729,50 +785,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS_SQL_DatasetRefreshesLive_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SQL_DatasetRefreshesLive_Staging')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SQL_DatasetUsersLive')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SQL_DatasetUsersLive_password')]"
 					}
 				}
 			},

@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DB_UAT'"
 		},
+		"DS_lookupClientInformation_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DS_lookupClientInformation'"
+		},
 		"DataflowHistory_sql_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DataflowHistory_sql_UAT'"
@@ -114,6 +118,10 @@
 		"LS_Capturing ReportPages ED_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Capturing ReportPages ED'"
+		},
+		"LS_Capturing WorkSpaceUsers ED_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Capturing WorkSpaceUsers ED'"
 		},
 		"LS_Dataloadtracker_SQL_password": {
 			"type": "secureString",
@@ -384,10 +392,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
-		"LS_Capturing WorkSpaceUsers ED_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Capturing WorkSpaceUsers ED'"
-		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -469,6 +473,18 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"DB_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DS_lookupClientInformation_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DS_lookupClientInformation_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"DS_lookupClientInformation_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -770,11 +786,11 @@
 		},
 		"LS_API_Workspaces_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$expand=users&$top=2"
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5"
 		},
 		"LS_API_Workspaces_properties_typeProperties_clientId": {
 			"type": "string",
-			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+			"defaultValue": "@{linkedService().AppClientId}"
 		},
 		"LS_Api_ReportPages_properties_typeProperties_url": {
 			"type": "string",
@@ -813,6 +829,18 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"LS_Capturing ReportPages ED_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -1496,18 +1524,6 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
 		},
-		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -1550,6 +1566,9 @@
 					"DB_UAT_password": {
 						"value": "[parameters('DB_UAT_password')]"
 					},
+					"DS_lookupClientInformation_password": {
+						"value": "[parameters('DS_lookupClientInformation_password')]"
+					},
 					"DataflowHistory_sql_UAT_password": {
 						"value": "[parameters('DataflowHistory_sql_UAT_password')]"
 					},
@@ -1576,9 +1595,6 @@
 					},
 					"DatasetRefreshes Log_password": {
 						"value": "[parameters('DatasetRefreshes Log_password')]"
-					},
-					"DatasetRefreshesHistory_sql_UAT_password": {
-						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_password')]"
 					},
 					"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 						"value": "[parameters('ADF_Pipeline_Status_Log_properties_typeProperties_server')]"
@@ -1624,6 +1640,15 @@
 					},
 					"DB_UAT_properties_typeProperties_userName": {
 						"value": "[parameters('DB_UAT_properties_typeProperties_userName')]"
+					},
+					"DS_lookupClientInformation_properties_typeProperties_server": {
+						"value": "[parameters('DS_lookupClientInformation_properties_typeProperties_server')]"
+					},
+					"DS_lookupClientInformation_properties_typeProperties_database": {
+						"value": "[parameters('DS_lookupClientInformation_properties_typeProperties_database')]"
+					},
+					"DS_lookupClientInformation_properties_typeProperties_userName": {
+						"value": "[parameters('DS_lookupClientInformation_properties_typeProperties_userName')]"
 					},
 					"DataflowHistory_sql_UAT_properties_typeProperties_server": {
 						"value": "[parameters('DataflowHistory_sql_UAT_properties_typeProperties_server')]"
@@ -1705,15 +1730,6 @@
 					},
 					"DatasetRefreshes Log_properties_typeProperties_userName": {
 						"value": "[parameters('DatasetRefreshes Log_properties_typeProperties_userName')]"
-					},
-					"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_server": {
-						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_server')]"
-					},
-					"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_database": {
-						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_database')]"
-					},
-					"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_userName": {
-						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -1732,6 +1748,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"DatasetRefreshesHistory_sql_UAT_password": {
+						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_password')]"
 					},
 					"DatasetRefreshesLive_sql_UAT_password": {
 						"value": "[parameters('DatasetRefreshesLive_sql_UAT_password')]"
@@ -1769,6 +1788,9 @@
 					"LS_Capturing ReportPages ED_password": {
 						"value": "[parameters('LS_Capturing ReportPages ED_password')]"
 					},
+					"LS_Capturing WorkSpaceUsers ED_password": {
+						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_password')]"
+					},
 					"LS_Dataloadtracker_SQL_password": {
 						"value": "[parameters('LS_Dataloadtracker_SQL_password')]"
 					},
@@ -1787,11 +1809,14 @@
 					"LS_SQL_DatasetRefreshesLive_password": {
 						"value": "[parameters('LS_SQL_DatasetRefreshesLive_password')]"
 					},
-					"LS_SQL_DatasetRefreshesLive_Staging_password": {
-						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_password')]"
+					"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_server": {
+						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_server')]"
 					},
-					"LS_SQL_DatasetUsersLive_password": {
-						"value": "[parameters('LS_SQL_DatasetUsersLive_password')]"
+					"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_database": {
+						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_database')]"
+					},
+					"DatasetRefreshesHistory_sql_UAT_properties_typeProperties_userName": {
+						"value": "[parameters('DatasetRefreshesHistory_sql_UAT_properties_typeProperties_userName')]"
 					},
 					"DatasetRefreshesLive_sql_UAT_properties_typeProperties_server": {
 						"value": "[parameters('DatasetRefreshesLive_sql_UAT_properties_typeProperties_server')]"
@@ -1895,6 +1920,15 @@
 					"LS_Capturing ReportPages ED_properties_typeProperties_userName": {
 						"value": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_userName')]"
 					},
+					"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server": {
+						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server')]"
+					},
+					"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database": {
+						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database')]"
+					},
+					"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName": {
+						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName')]"
+					},
 					"LS_Dataloadtracker_SQL_properties_typeProperties_server": {
 						"value": "[parameters('LS_Dataloadtracker_SQL_properties_typeProperties_server')]"
 					},
@@ -1948,24 +1982,6 @@
 					},
 					"LS_SQL_DatasetRefreshesLive_properties_typeProperties_userName": {
 						"value": "[parameters('LS_SQL_DatasetRefreshesLive_properties_typeProperties_userName')]"
-					},
-					"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_server": {
-						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_server')]"
-					},
-					"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_database": {
-						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_database')]"
-					},
-					"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_userName": {
-						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_userName')]"
-					},
-					"LS_SQL_DatasetUsersLive_properties_typeProperties_server": {
-						"value": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_server')]"
-					},
-					"LS_SQL_DatasetUsersLive_properties_typeProperties_database": {
-						"value": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_database')]"
-					},
-					"LS_SQL_DatasetUsersLive_properties_typeProperties_userName": {
-						"value": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -1986,6 +2002,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"LS_SQL_DatasetRefreshesLive_Staging_password": {
+						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_password')]"
+					},
+					"LS_SQL_DatasetUsersLive_password": {
+						"value": "[parameters('LS_SQL_DatasetUsersLive_password')]"
 					},
 					"LS_SQL_DatasetUsers_Live_password": {
 						"value": "[parameters('LS_SQL_DatasetUsers_Live_password')]"
@@ -2041,11 +2063,23 @@
 					"ReportsHistory_sql_UAT_password": {
 						"value": "[parameters('ReportsHistory_sql_UAT_password')]"
 					},
-					"ReportsLive_sql_UAT_password": {
-						"value": "[parameters('ReportsLive_sql_UAT_password')]"
+					"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_server": {
+						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_server')]"
 					},
-					"Rest_workspaces_clientSecret": {
-						"value": "[parameters('Rest_workspaces_clientSecret')]"
+					"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_database": {
+						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_database')]"
+					},
+					"LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_userName": {
+						"value": "[parameters('LS_SQL_DatasetRefreshesLive_Staging_properties_typeProperties_userName')]"
+					},
+					"LS_SQL_DatasetUsersLive_properties_typeProperties_server": {
+						"value": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_server')]"
+					},
+					"LS_SQL_DatasetUsersLive_properties_typeProperties_database": {
+						"value": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_database')]"
+					},
+					"LS_SQL_DatasetUsersLive_properties_typeProperties_userName": {
+						"value": "[parameters('LS_SQL_DatasetUsersLive_properties_typeProperties_userName')]"
 					},
 					"LS_SQL_DatasetUsers_Live_properties_typeProperties_server": {
 						"value": "[parameters('LS_SQL_DatasetUsers_Live_properties_typeProperties_server')]"
@@ -2205,21 +2239,6 @@
 					},
 					"ReportsHistory_sql_UAT_properties_typeProperties_userName": {
 						"value": "[parameters('ReportsHistory_sql_UAT_properties_typeProperties_userName')]"
-					},
-					"ReportsLive_sql_UAT_properties_typeProperties_server": {
-						"value": "[parameters('ReportsLive_sql_UAT_properties_typeProperties_server')]"
-					},
-					"ReportsLive_sql_UAT_properties_typeProperties_database": {
-						"value": "[parameters('ReportsLive_sql_UAT_properties_typeProperties_database')]"
-					},
-					"ReportsLive_sql_UAT_properties_typeProperties_userName": {
-						"value": "[parameters('ReportsLive_sql_UAT_properties_typeProperties_userName')]"
-					},
-					"Rest_workspaces_properties_typeProperties_url": {
-						"value": "[parameters('Rest_workspaces_properties_typeProperties_url')]"
-					},
-					"Rest_workspaces_properties_typeProperties_clientId": {
-						"value": "[parameters('Rest_workspaces_properties_typeProperties_clientId')]"
 					}
 				}
 			},
@@ -2240,6 +2259,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"ReportsLive_sql_UAT_password": {
+						"value": "[parameters('ReportsLive_sql_UAT_password')]"
+					},
+					"Rest_workspaces_clientSecret": {
+						"value": "[parameters('Rest_workspaces_clientSecret')]"
 					},
 					"RetriveClientInformation_password": {
 						"value": "[parameters('RetriveClientInformation_password')]"
@@ -2292,11 +2317,20 @@
 					"WorkSpaceUsersStaging_sql_UAT_password": {
 						"value": "[parameters('WorkSpaceUsersStaging_sql_UAT_password')]"
 					},
-					"getCapacities_clientSecret": {
-						"value": "[parameters('getCapacities_clientSecret')]"
+					"ReportsLive_sql_UAT_properties_typeProperties_server": {
+						"value": "[parameters('ReportsLive_sql_UAT_properties_typeProperties_server')]"
 					},
-					"getCapacities__connectionString": {
-						"value": "[parameters('getCapacities__connectionString')]"
+					"ReportsLive_sql_UAT_properties_typeProperties_database": {
+						"value": "[parameters('ReportsLive_sql_UAT_properties_typeProperties_database')]"
+					},
+					"ReportsLive_sql_UAT_properties_typeProperties_userName": {
+						"value": "[parameters('ReportsLive_sql_UAT_properties_typeProperties_userName')]"
+					},
+					"Rest_workspaces_properties_typeProperties_url": {
+						"value": "[parameters('Rest_workspaces_properties_typeProperties_url')]"
+					},
+					"Rest_workspaces_properties_typeProperties_clientId": {
+						"value": "[parameters('Rest_workspaces_properties_typeProperties_clientId')]"
 					},
 					"RetriveClientInformation_properties_typeProperties_server": {
 						"value": "[parameters('RetriveClientInformation_properties_typeProperties_server')]"
@@ -2444,12 +2478,6 @@
 					},
 					"WorkSpaceUsersStaging_sql_UAT_properties_typeProperties_userName": {
 						"value": "[parameters('WorkSpaceUsersStaging_sql_UAT_properties_typeProperties_userName')]"
-					},
-					"getCapacities_properties_typeProperties_url": {
-						"value": "[parameters('getCapacities_properties_typeProperties_url')]"
-					},
-					"getCapacities_properties_typeProperties_clientId": {
-						"value": "[parameters('getCapacities_properties_typeProperties_clientId')]"
 					}
 				}
 			},
@@ -2470,6 +2498,12 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"getCapacities_clientSecret": {
+						"value": "[parameters('getCapacities_clientSecret')]"
+					},
+					"getCapacities__connectionString": {
+						"value": "[parameters('getCapacities__connectionString')]"
 					},
 					"get_Capacities_connectionString": {
 						"value": "[parameters('get_Capacities_connectionString')]"
@@ -2525,11 +2559,11 @@
 					"us_capturefirestrowlookup_Ls_password": {
 						"value": "[parameters('us_capturefirestrowlookup_Ls_password')]"
 					},
-					"view_report_api_ls_clientSecret": {
-						"value": "[parameters('view_report_api_ls_clientSecret')]"
+					"getCapacities_properties_typeProperties_url": {
+						"value": "[parameters('getCapacities_properties_typeProperties_url')]"
 					},
-					"LS_Capturing WorkSpaceUsers ED_password": {
-						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_password')]"
+					"getCapacities_properties_typeProperties_clientId": {
+						"value": "[parameters('getCapacities_properties_typeProperties_clientId')]"
 					},
 					"get_dataset_refrehses_api_ls_properties_typeProperties_url": {
 						"value": "[parameters('get_dataset_refrehses_api_ls_properties_typeProperties_url')]"
@@ -2629,21 +2663,6 @@
 					},
 					"us_capturefirestrowlookup_Ls_properties_typeProperties_userName": {
 						"value": "[parameters('us_capturefirestrowlookup_Ls_properties_typeProperties_userName')]"
-					},
-					"view_report_api_ls_properties_typeProperties_url": {
-						"value": "[parameters('view_report_api_ls_properties_typeProperties_url')]"
-					},
-					"view_report_api_ls_properties_typeProperties_clientId": {
-						"value": "[parameters('view_report_api_ls_properties_typeProperties_clientId')]"
-					},
-					"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server": {
-						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server')]"
-					},
-					"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database": {
-						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database')]"
-					},
-					"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName": {
-						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -2664,6 +2683,15 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"view_report_api_ls_clientSecret": {
+						"value": "[parameters('view_report_api_ls_clientSecret')]"
+					},
+					"view_report_api_ls_properties_typeProperties_url": {
+						"value": "[parameters('view_report_api_ls_properties_typeProperties_url')]"
+					},
+					"view_report_api_ls_properties_typeProperties_clientId": {
+						"value": "[parameters('view_report_api_ls_properties_typeProperties_clientId')]"
 					}
 				}
 			},
@@ -2764,9 +2792,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"getreports_sql_ds_connectionString": {
-						"value": "[parameters('getreports_sql_ds_connectionString')]"
 					},
 					"AzureSqlDatabaseLS_properties_typeProperties_server": {
 						"value": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_server')]"
@@ -2877,6 +2902,9 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"getreports_sql_ds_connectionString": {
+						"value": "[parameters('getreports_sql_ds_connectionString')]"
 					}
 				}
 			},
