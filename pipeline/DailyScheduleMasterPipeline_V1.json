@@ -699,10 +699,6 @@
 					"storedProcedureName": "[dbo].[DataLoadTrack_Update]",
 					"storedProcedureParameters": {
 						"DataLoadTrackerID": {
-							"value": {
-								"value": "@activity('Execute_SP').output.firstRow.DataLoadTrackerId",
-								"type": "Expression"
-							},
 							"type": "String"
 						},
 						"ProcessEndTime": {
@@ -899,7 +895,43 @@
 					"items": {
 						"value": "@activity('Lookup the ClientInformation for DailySchedule Pipeline').output.value",
 						"type": "Expression"
-					}
+					},
+					"activities": [
+						{
+							"name": "DS_Workspaces_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "WorkSpaces",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTenantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientCode",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TenantId",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
 				}
 			}
 		],
