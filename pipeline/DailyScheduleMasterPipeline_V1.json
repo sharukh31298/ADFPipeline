@@ -5,14 +5,7 @@
 			{
 				"name": "Workspaces_Master",
 				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Execute_SP",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureInput": false
 				},
@@ -46,14 +39,7 @@
 			{
 				"name": "Reports_Master",
 				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Execute_SP",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureInput": false
 				},
@@ -130,14 +116,7 @@
 			{
 				"name": "Datasets_Master",
 				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Execute_SP",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureInput": false
 				},
@@ -214,14 +193,7 @@
 			{
 				"name": "Dataflows_Master",
 				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Execute_SP",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureInput": false
 				},
@@ -430,14 +402,7 @@
 			{
 				"name": "ViewReports_Master",
 				"type": "ExecutePipeline",
-				"dependsOn": [
-					{
-						"activity": "Execute_SP",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureInput": false
 				},
@@ -762,7 +727,7 @@
 				}
 			},
 			{
-				"name": "Execute_SP",
+				"name": "Lookup the ClientInformation for DailySchedule Pipeline",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -777,16 +742,17 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientCode,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(pipeline().parameters.TenantId),''','' ''')",
+							"value": "select AppTentantId,AppClientId,AppClientSecret,TentantId from [dbo].[DataLoadTracker]",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "AzureSQL_SP",
+						"referenceName": "DS_lookupClientInformation",
 						"type": "DatasetReference"
-					}
+					},
+					"firstRowOnly": false
 				}
 			},
 			{
@@ -913,6 +879,25 @@
 					"variableName": "Master DataflowRefreshes Status",
 					"value": {
 						"value": "@activity('DataflowRefreshes_Master').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Capturing ClientInformation",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup the ClientInformation for DailySchedule Pipeline",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup the ClientInformation for DailySchedule Pipeline').output.value",
 						"type": "Expression"
 					}
 				}
