@@ -220,13 +220,11 @@
 						{
 							"name": "Get WorkSpaceUsers_Live",
 							"type": "Copy",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
-									"activity": "Wait to WorkspaceUsers Staging complete",
+									"activity": "Get WorkSpace Users_Staging",
 									"dependencyConditions": [
-										"Succeeded"
+										"Completed"
 									]
 								}
 							],
@@ -465,8 +463,6 @@
 						{
 							"name": "Capturing Status in WorkSpaceUsers Live",
 							"type": "SetVariable",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "Get WorkSpaceUsers_Live",
@@ -492,24 +488,6 @@
 									}
 								],
 								"setSystemVariable": true
-							}
-						},
-						{
-							"name": "Wait to WorkspaceUsers Staging complete",
-							"type": "Wait",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
-							"dependsOn": [
-								{
-									"activity": "Get WorkSpace Users_Staging",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitTimeInSeconds": 60
 							}
 						},
 						{
