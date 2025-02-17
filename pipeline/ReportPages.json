@@ -173,10 +173,6 @@
 											"value": "@item().ReportSourceKey",
 											"type": "Expression"
 										},
-										"WorkSpaceID": {
-											"value": "@item().WorkSpaceID",
-											"type": "Expression"
-										},
 										"AppTenantId": {
 											"value": "@pipeline().parameters.AppTenantId",
 											"type": "Expression"
@@ -202,6 +198,8 @@
 						{
 							"name": "Get ReportPages_Live",
 							"type": "Copy",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "Get ReportPage_Staging",
@@ -415,6 +413,8 @@
 						{
 							"name": "Capturing Get Reportpages Live Status",
 							"type": "SetVariable",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
 									"activity": "Get ReportPages_Live",
