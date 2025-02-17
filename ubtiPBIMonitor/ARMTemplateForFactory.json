@@ -1442,7 +1442,7 @@
 		},
 		"getdatasetusers_api_ls_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkSpaceID,'/datasets/',linkedService().DatasetID,'/users')}\n\n\n"
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/datasets/',linkedService().DatasetID,'/users')}\n\n\n"
 		},
 		"getdatasetusers_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
@@ -7362,10 +7362,6 @@
 											"parameters": {
 												"DatasetID": {
 													"value": "@item().DatasetSourceKey",
-													"type": "Expression"
-												},
-												"WorkSpaceID": {
-													"value": "@item().WorkspaceId",
 													"type": "Expression"
 												},
 												"AppTenantId": {
@@ -29180,6 +29176,38 @@
 														"name": "TenantId",
 														"type": "Int32"
 													}
+												},
+												{
+													"source": {
+														"path": "$['graphId']"
+													},
+													"sink": {
+														"name": "DatasetUserSourceKey"
+													}
+												},
+												{
+													"source": {
+														"path": "$['emailAddress']"
+													},
+													"sink": {
+														"name": "EmailAddress"
+													}
+												},
+												{
+													"source": {
+														"path": "$['displayName']"
+													},
+													"sink": {
+														"name": "UserName"
+													}
+												},
+												{
+													"source": {
+														"path": "$['userType']"
+													},
+													"sink": {
+														"name": "UserType"
+													}
 												}
 											],
 											"collectionReference": "$['value']"
@@ -29192,10 +29220,6 @@
 											"parameters": {
 												"DatasetID": {
 													"value": "@item().DatasetSourceKey",
-													"type": "Expression"
-												},
-												"WorkSpaceID": {
-													"value": "@item().WorkspaceId",
 													"type": "Expression"
 												},
 												"AppTenantId": {
@@ -32137,10 +32161,6 @@
 											"parameters": {
 												"DatasetID": {
 													"value": "@item().DatasetSourceKey",
-													"type": "Expression"
-												},
-												"WorkSpaceID": {
-													"value": "@item().WorkspaceId",
 													"type": "Expression"
 												},
 												"AppTenantId": {
@@ -68602,10 +68622,6 @@
 							"value": "@dataset().DatasetID",
 							"type": "Expression"
 						},
-						"WorkSpaceID": {
-							"value": "@dataset().WorkSpaceID",
-							"type": "Expression"
-						},
 						"AppTenantId": {
 							"value": "@dataset().AppTenantId",
 							"type": "Expression"
@@ -68622,9 +68638,6 @@
 				},
 				"parameters": {
 					"DatasetID": {
-						"type": "string"
-					},
-					"WorkSpaceID": {
 						"type": "string"
 					},
 					"AppTenantId": {
@@ -76531,9 +76544,6 @@
 			"properties": {
 				"parameters": {
 					"DatasetID": {
-						"type": "string"
-					},
-					"WorkSpaceID": {
 						"type": "string"
 					},
 					"AppTenantId": {
