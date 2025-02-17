@@ -54,7 +54,7 @@
 											"path": "[['id']"
 										},
 										"sink": {
-											"name": "DatasetID",
+											"name": "WorkSpaceSourceKey",
 											"type": "String"
 										}
 									},
@@ -63,7 +63,7 @@
 											"path": "[['name']"
 										},
 										"sink": {
-											"name": "DatasetName",
+											"name": "WorkSpaceName",
 											"type": "String"
 										}
 									},
@@ -72,108 +72,57 @@
 											"path": "[['kind']"
 										},
 										"sink": {
-											"name": "Kind",
+											"name": "WorkSpaceType",
 											"type": "String"
 										}
 									},
 									{
 										"source": {
-											"path": "[['capacity']['id']"
+											"path": "[['refreshSchedule']['enabled']"
 										},
-										"sink": {
-											"name": "capacityId",
-											"type": "String"
-										}
+										"sink": {}
 									},
 									{
 										"source": {
-											"path": "[['capacity']['displayName']"
+											"path": "[['refreshSchedule']['localTimeZoneId']"
 										},
-										"sink": {
-											"name": "capacitydisplayName",
-											"type": "String"
-										}
+										"sink": {}
 									},
 									{
 										"source": {
-											"path": "[['capacity']['sku']"
+											"path": "[['refreshSchedule']['notifyOption']"
 										},
-										"sink": {
-											"name": "capacitydisplaysku",
-											"type": "String"
-										}
+										"sink": {}
 									},
 									{
 										"source": {
-											"path": "[['group']['id']"
+											"path": "$['@odata.context']"
 										},
-										"sink": {
-											"name": "WorkSpaceID",
-											"type": "String"
-										}
+										"sink": {}
 									},
 									{
 										"source": {
-											"path": "[['group']['name']"
+											"path": "$['@odata.count']"
 										},
-										"sink": {
-											"name": "WorkspaceName",
-											"type": "String"
-										}
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['refreshSchedule']['days'][0]"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['refreshSchedule']['times'][0]"
+										},
+										"sink": {}
 									},
 									{
 										"source": {
 											"path": "[['configuredBy'][0]"
 										},
-										"sink": {
-											"name": "configuredBy",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['id']"
-										},
-										"sink": {
-											"name": "DatasetRefreshesSourceKey",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['refreshType']"
-										},
-										"sink": {
-											"name": "RefreshType",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['startTime']"
-										},
-										"sink": {
-											"name": "StartTime",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['endTime']"
-										},
-										"sink": {
-											"name": "EndTime",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['status']"
-										},
-										"sink": {
-											"name": "Status",
-											"type": "String"
-										}
+										"sink": {}
 									}
 								],
 								"collectionReference": "$['value']"
@@ -193,7 +142,7 @@
 										"type": "Expression"
 									},
 									"AppClientCode": {
-										"value": "@pipeline().parameters. AppClientCode",
+										"value": "@pipeline().parameters.AppClientCode",
 										"type": "Expression"
 									}
 								}
@@ -218,7 +167,7 @@
 					"AppClientId": {
 						"type": "String"
 					},
-					" AppClientCode": {
+					"AppClientCode": {
 						"type": "String"
 					}
 				},
@@ -635,10 +584,6 @@
 											"parameters": {
 												"ReportID": {
 													"value": "@item().ReportSourceKey",
-													"type": "Expression"
-												},
-												"WorkSpaceID": {
-													"value": "@item().WorkSpaceID",
 													"type": "Expression"
 												},
 												"AppTenantId": {

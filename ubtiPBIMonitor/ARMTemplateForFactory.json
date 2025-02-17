@@ -786,7 +786,7 @@
 		},
 		"LS_API_Workspaces_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5"
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/capacities/refreshables"
 		},
 		"LS_API_Workspaces_properties_typeProperties_clientId": {
 			"type": "string",
@@ -1474,7 +1474,7 @@
 		},
 		"getreport_pages_api_ls_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkSpaceID,'/reports/',linkedService().ReportID,'/pages')}"
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/admin/reports/',linkedService().ReportID,'/pages')}"
 		},
 		"getreport_pages_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
@@ -10238,10 +10238,6 @@
 											"parameters": {
 												"ReportID": {
 													"value": "@item().ReportSourceKey",
-													"type": "Expression"
-												},
-												"WorkSpaceID": {
-													"value": "@item().WorkSpaceID",
 													"type": "Expression"
 												},
 												"AppTenantId": {
@@ -37076,7 +37072,7 @@
 											"path": "[['id']"
 										},
 										"sink": {
-											"name": "DatasetID",
+											"name": "WorkSpaceSourceKey",
 											"type": "String"
 										}
 									},
@@ -37085,7 +37081,7 @@
 											"path": "[['name']"
 										},
 										"sink": {
-											"name": "DatasetName",
+											"name": "WorkSpaceName",
 											"type": "String"
 										}
 									},
@@ -37094,108 +37090,57 @@
 											"path": "[['kind']"
 										},
 										"sink": {
-											"name": "Kind",
+											"name": "WorkSpaceType",
 											"type": "String"
 										}
 									},
 									{
 										"source": {
-											"path": "[['capacity']['id']"
+											"path": "[['refreshSchedule']['enabled']"
 										},
-										"sink": {
-											"name": "capacityId",
-											"type": "String"
-										}
+										"sink": {}
 									},
 									{
 										"source": {
-											"path": "[['capacity']['displayName']"
+											"path": "[['refreshSchedule']['localTimeZoneId']"
 										},
-										"sink": {
-											"name": "capacitydisplayName",
-											"type": "String"
-										}
+										"sink": {}
 									},
 									{
 										"source": {
-											"path": "[['capacity']['sku']"
+											"path": "[['refreshSchedule']['notifyOption']"
 										},
-										"sink": {
-											"name": "capacitydisplaysku",
-											"type": "String"
-										}
+										"sink": {}
 									},
 									{
 										"source": {
-											"path": "[['group']['id']"
+											"path": "$['@odata.context']"
 										},
-										"sink": {
-											"name": "WorkSpaceID",
-											"type": "String"
-										}
+										"sink": {}
 									},
 									{
 										"source": {
-											"path": "[['group']['name']"
+											"path": "$['@odata.count']"
 										},
-										"sink": {
-											"name": "WorkspaceName",
-											"type": "String"
-										}
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['refreshSchedule']['days'][0]"
+										},
+										"sink": {}
+									},
+									{
+										"source": {
+											"path": "[['refreshSchedule']['times'][0]"
+										},
+										"sink": {}
 									},
 									{
 										"source": {
 											"path": "[['configuredBy'][0]"
 										},
-										"sink": {
-											"name": "configuredBy",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['id']"
-										},
-										"sink": {
-											"name": "DatasetRefreshesSourceKey",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['refreshType']"
-										},
-										"sink": {
-											"name": "RefreshType",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['startTime']"
-										},
-										"sink": {
-											"name": "StartTime",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['endTime']"
-										},
-										"sink": {
-											"name": "EndTime",
-											"type": "DateTime"
-										}
-									},
-									{
-										"source": {
-											"path": "$['lastRefresh']['status']"
-										},
-										"sink": {
-											"name": "Status",
-											"type": "String"
-										}
+										"sink": {}
 									}
 								],
 								"collectionReference": "$['value']"
@@ -37215,7 +37160,7 @@
 										"type": "Expression"
 									},
 									"AppClientCode": {
-										"value": "@pipeline().parameters. AppClientCode",
+										"value": "@pipeline().parameters.AppClientCode",
 										"type": "Expression"
 									}
 								}
@@ -37240,7 +37185,7 @@
 					"AppClientId": {
 						"type": "String"
 					},
-					" AppClientCode": {
+					"AppClientCode": {
 						"type": "String"
 					}
 				},
@@ -41871,10 +41816,6 @@
 													"value": "@item().ReportSourceKey",
 													"type": "Expression"
 												},
-												"WorkSpaceID": {
-													"value": "@item().WorkSpaceID",
-													"type": "Expression"
-												},
 												"AppTenantId": {
 													"value": "@pipeline().parameters.AppTenantId",
 													"type": "Expression"
@@ -41901,6 +41842,8 @@
 								{
 									"name": "Get ReportPages_Live",
 									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Get ReportPage_Staging",
@@ -42116,6 +42059,8 @@
 								{
 									"name": "Capturing Get Reportpages Live Status",
 									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "Get ReportPages_Live",
@@ -44935,10 +44880,6 @@
 											"parameters": {
 												"ReportID": {
 													"value": "@item().ReportSourceKey",
-													"type": "Expression"
-												},
-												"WorkSpaceID": {
-													"value": "@item().WorkSpaceID",
 													"type": "Expression"
 												},
 												"AppTenantId": {
@@ -70534,10 +70475,6 @@
 							"value": "@dataset().ReportID",
 							"type": "Expression"
 						},
-						"WorkSpaceID": {
-							"value": "@dataset().WorkSpaceID",
-							"type": "Expression"
-						},
 						"AppTenantId": {
 							"value": "@dataset().AppTenantId",
 							"type": "Expression"
@@ -70554,9 +70491,6 @@
 				},
 				"parameters": {
 					"ReportID": {
-						"type": "string"
-					},
-					"WorkSpaceID": {
 						"type": "string"
 					},
 					"AppTenantId": {
@@ -76688,9 +76622,6 @@
 			"properties": {
 				"parameters": {
 					"ReportID": {
-						"type": "string"
-					},
-					"WorkSpaceID": {
 						"type": "string"
 					},
 					"AppTenantId": {
