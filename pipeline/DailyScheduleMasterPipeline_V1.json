@@ -386,40 +386,6 @@
 				}
 			},
 			{
-				"name": "ViewReports_Master",
-				"type": "ExecutePipeline",
-				"dependsOn": [],
-				"policy": {
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"pipeline": {
-						"referenceName": "ViewReports",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"AppTenantId": {
-							"value": "@pipeline().parameters.AppTenantId",
-							"type": "Expression"
-						},
-						"AppClientId": {
-							"value": "@pipeline().parameters.AppClientId",
-							"type": "Expression"
-						},
-						"AppClientCode": {
-							"value": "@pipeline().parameters.AppClientCode",
-							"type": "Expression"
-						},
-						"TenantId": {
-							"value": "@pipeline().parameters.TenantId",
-							"type": "Expression"
-						}
-					}
-				}
-			},
-			{
 				"name": "WorkspaceUsers__Master",
 				"type": "ExecutePipeline",
 				"dependsOn": [
@@ -645,12 +611,6 @@
 						]
 					},
 					{
-						"activity": "ViewReports_Master",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
 						"activity": "Capturing ReportsMaster status",
 						"dependencyConditions": [
 							"Completed"
@@ -808,14 +768,7 @@
 			{
 				"name": "Capturing Viewreports Master Status",
 				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "ViewReports_Master",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"secureOutput": false,
 					"secureInput": false
@@ -1254,8 +1207,144 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "DS_Datasetrefresh_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Datasets_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_DatasetRefreshes_Batch",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTentantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "DS_Capturing Datasetsrefresh Master Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_Datasetrefresh_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master Datasetfreshes status",
+								"value": {
+									"value": "@activity('DS_Datasetrefresh_Master').Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "DS_ViewReports_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Workspaces_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_ViewReports",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTentantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TentantId",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
+				}
+			},
+			{
+				"name": "ViewReports_Master",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "ViewReports",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"AppTenantId": {
+							"value": "@pipeline().parameters.AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@pipeline().parameters.AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@pipeline().parameters.AppClientCode",
+							"type": "Expression"
+						},
+						"TenantId": {
+							"value": "@pipeline().parameters.TenantId",
+							"type": "Expression"
+						}
+					}
 				}
 			}
 		],
