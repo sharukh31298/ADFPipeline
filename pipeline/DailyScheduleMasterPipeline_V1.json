@@ -1124,6 +1124,47 @@
 									"type": "Expression"
 								}
 							}
+						},
+						{
+							"name": "DS_Datasets_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Workspaces_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Datasets",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTentantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TentantId",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
