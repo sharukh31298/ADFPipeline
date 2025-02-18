@@ -8546,7 +8546,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select WorkSpaceSourceKey from [dbo].[Workspaces_batch] \nwhere BatchNo =',pipeline().parameters.BatchNo)",
+									"value": "@concat('SELECT WorkSpaceSourceKey FROM [dbo].[Workspaces_batch] \nWHERE BatchNo = ', string(pipeline().parameters.BatchNo), \n' AND TenantId = ', string(pipeline().parameters.TenantId))",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
