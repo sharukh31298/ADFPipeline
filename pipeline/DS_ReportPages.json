@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select ReportSourceKey,WorkspaceId \nfrom [dbo].[Reports_batch] where BatchNo = ',pipeline().parameters.BatchNo)\n",
+							"value": "@concat('select ReportSourceKey,WorkspaceId \nfrom [dbo].[Reports_batch] \nwhere BatchNo = ',string(pipeline().parameters.BatchNo), \n' AND TenantId = ', string(pipeline().parameters.TenantId))\n",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
