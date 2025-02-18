@@ -1165,6 +1165,30 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "DS_Capturing Datasets Master Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_Datasets_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master Datasets Status",
+								"value": {
+									"value": "@activity('DS_Datasets_Master').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
