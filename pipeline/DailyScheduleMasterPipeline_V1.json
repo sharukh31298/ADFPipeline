@@ -53,7 +53,14 @@
 						{
 							"name": "DS_Workspaces_Master",
 							"type": "ExecutePipeline",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "DS_Insert Log",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
 							"policy": {
 								"secureInput": false
 							},
@@ -777,6 +784,132 @@
 							},
 							"linkedServiceName": {
 								"referenceName": "LS_Dataloadtracker_SQL",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "DS_Insert Log",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',item().AppTentantId,''',''',item().AppClientId,''',''',item().AppClientSecret,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(item().TentantId),''','' ''')",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "DS_InsertSP",
+									"type": "DatasetReference"
+								}
+							}
+						},
+						{
+							"name": "DS_SP_Call_UpdateStatus",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "DS_Capturing DatasetUsersMaster Status",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Capturing Datasetsrefresh Master Status",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Capturing DataflowsRefreshes Master Status",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_sp_Dataloadtracker",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Capturing Viewreports Master Status",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Capturing Dataflows Master Status",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Capturing Datasets Master Status",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Capturing ReportPagesMaster Status",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Capturing ReportsMaster status",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[DataLoadTrack_Update]",
+								"storedProcedureParameters": {
+									"DataLoadTrackerID": {
+										"value": {
+											"value": "@activity('DS_Insert Log').output.firstRow.DataLoadTrackerId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ProcessEndTime": {
+										"value": {
+											"value": "@utcNow()",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"Status": {
+										"value": {
+											"value": "@if(and(and(and(and(and(and(and(and(and(\nequals(variables('Master Workspaces Status'),'Succeeded'),\nequals(variables('Master WorkSpaceUsers Status'),'Succeeded')),\nequals(variables('Master Report status'),'Succeeded')),\nequals(variables('Master ReportPages Status'),'Succeeded')),\nequals(variables('Master Datasets Status'),'Succeeded')),\nequals(variables('Master Datasetusers Status'),'Succeeded')),\nequals(variables('Master Datasetfreshes status'),'Succeeded')),\nequals(variables('Master Dataflows Status'),'Succeeded')),\nequals(variables('Master DataflowRefreshes Status'),'Succeeded')),\nequals(variables('Master Viewreports Status'),'Succeeded')),\n'Succeeded','Failed')",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "DS_updateLog_SP",
 								"type": "LinkedServiceReference"
 							}
 						}
