@@ -1309,6 +1309,30 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "DS_Capturing Viewreports Master Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_ViewReports_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master Viewreports Status",
+								"value": {
+									"value": "@activity('DS_ViewReports_Master').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
