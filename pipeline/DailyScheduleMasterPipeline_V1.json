@@ -947,7 +947,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "DS_WorkSpacesUsers",
+									"referenceName": "DS_WorkSpacesUsers_Batch",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -1057,6 +1057,47 @@
 								"value": {
 									"value": "@activity('DS_Reports_Master').Status",
 									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "DS_ReportPages_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Reports_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_ReportPages_Batch",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTentantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TentantId",
+										"type": "Expression"
+									}
 								}
 							}
 						}
