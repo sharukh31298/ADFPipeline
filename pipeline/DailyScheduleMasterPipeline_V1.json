@@ -907,7 +907,7 @@
 							}
 						},
 						{
-							"name": "Capturing Workspaces_Master status_copy1",
+							"name": "DS_Capturing Workspaces_Master status",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -972,7 +972,7 @@
 							}
 						},
 						{
-							"name": "Capturing WorkSpaceUsers Master Status_copy1",
+							"name": "DS_Capturing WorkSpaceUsers Master Status",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
@@ -1033,6 +1033,30 @@
 										"value": "@item().TentantId",
 										"type": "Expression"
 									}
+								}
+							}
+						},
+						{
+							"name": "DS_Capturing ReportsMaster status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_Reports_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master Report status",
+								"value": {
+									"value": "@activity('DS_Reports_Master').Status",
+									"type": "Expression"
 								}
 							}
 						}
