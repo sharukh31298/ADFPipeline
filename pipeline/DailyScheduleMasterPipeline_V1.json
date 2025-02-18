@@ -1230,6 +1230,30 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "DS_Capturing DatasetUsersMaster Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_Datasetusers_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master Datasetusers Status",
+								"value": {
+									"value": "@activity('DS_Datasetusers_Master').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
