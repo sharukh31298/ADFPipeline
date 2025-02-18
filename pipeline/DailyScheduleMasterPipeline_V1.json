@@ -925,13 +925,13 @@
 							"typeProperties": {
 								"variableName": "Master Workspaces Status",
 								"value": {
-									"value": "@activity('DS_Workspaces_Master').output.Status",
+									"value": "@activity('DS_Workspaces_Master').Status",
 									"type": "Expression"
 								}
 							}
 						},
 						{
-							"name": "WorkspaceUsers__Master_copy1",
+							"name": "DS_WorkspaceUsers__Master",
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
@@ -951,6 +951,71 @@
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTentantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TentantId",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "Capturing WorkSpaceUsers Master Status_copy1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_WorkspaceUsers__Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master WorkSpaceUsers Status",
+								"value": {
+									"value": "@activity('DS_WorkspaceUsers__Master').Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "DS_Reports_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Workspaces_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Reports",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false,
 								"parameters": {
 									"AppTenantId": {
 										"value": "@item().AppTentantId",
