@@ -1100,6 +1100,30 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "DS_Capturing ReportPagesMaster Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_ReportPages_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master ReportPages Status",
+								"value": {
+									"value": "@activity('DS_ReportPages_Master').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
