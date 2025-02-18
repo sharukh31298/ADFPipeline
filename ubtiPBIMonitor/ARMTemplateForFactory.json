@@ -1462,7 +1462,7 @@
 		},
 		"getgroups_api_ds_properties_typeProperties_url": {
 			"type": "string",
-			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5000"
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=10"
 		},
 		"getgroups_api_ds_properties_typeProperties_clientId": {
 			"type": "string",
@@ -3268,7 +3268,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows_batch] where BatchNo =',pipeline().parameters.BatchNo)",
+									"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows_batch] \nwhere BatchNo =',string(pipeline().parameters.BatchNo),\n' AND TenantId = ',string(pipeline().parameters.TenantId))",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -4211,7 +4211,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT DISTINCT BatchNo FROM \n[dbo].[DataFlows_batch] \nORDER BY 1",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[DataFlows_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -5677,7 +5680,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Dataset_batch] \nwhere BatchNo = ',pipeline().parameters.BatchNo)\n",
+									"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Dataset_batch] \nwhere BatchNo = ',string(pipeline().parameters.BatchNo),\n'AND TenantId = ',string(pipeline().parameters.TenantId))",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -6651,7 +6654,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT DISTINCT BatchNo \nFROM [dbo].[Dataset_batch] \nORDER BY 1",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[Dataset_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -7248,7 +7254,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Dataset_batch] \nwhere BatchNo = ',pipeline().parameters.BatchNo)",
+									"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Dataset_batch] \nwhere BatchNo = ',string(pipeline().parameters.BatchNo),\n'AND TenantId = ',string(pipeline().parameters.TenantId))",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -8230,7 +8236,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT DISTINCT BatchNo \nFROM [dbo].[Dataset_batch] \nORDER BY 1",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[Dataset_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -10120,7 +10129,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select ReportSourceKey,WorkspaceId \nfrom [dbo].[Reports_batch] where BatchNo = ',pipeline().parameters.BatchNo)\n",
+									"value": "@concat('select ReportSourceKey,WorkspaceId \nfrom [dbo].[Reports_batch] \nwhere BatchNo = ',string(pipeline().parameters.BatchNo), \n' AND TenantId = ', string(pipeline().parameters.TenantId))\n",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -11203,7 +11212,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT DISTINCT BatchNo \nFROM [dbo].[Reports_batch]\nORDER BY 1",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[Reports_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
