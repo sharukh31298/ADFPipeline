@@ -905,6 +905,71 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "Capturing Workspaces_Master status_copy1",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_Workspaces_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master Workspaces Status",
+								"value": {
+									"value": "@activity('DS_Workspaces_Master').output.Status",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "WorkspaceUsers__Master_copy1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Workspaces_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_WorkSpacesUsers",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTentantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TentantId",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
