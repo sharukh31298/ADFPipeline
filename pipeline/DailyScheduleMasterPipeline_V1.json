@@ -1443,6 +1443,30 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "DS_Capturing DataflowsRefreshes Master Status",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "DS_DataflowRefreshes_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Master DataflowRefreshes Status",
+								"value": {
+									"value": "@activity('DS_DataflowRefreshes_Master').Status",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
