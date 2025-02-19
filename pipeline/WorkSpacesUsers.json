@@ -218,16 +218,11 @@
 							]
 						},
 						{
-							"name": "Get WorkSpaceUsers_Live",
+							"name": "Get WorkSpaceUsers_Live_copy",
 							"type": "Copy",
-							"dependsOn": [
-								{
-									"activity": "Get WorkSpace Users_Staging",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -461,11 +456,13 @@
 							}
 						},
 						{
-							"name": "Capturing Status in WorkSpaceUsers Live",
+							"name": "Capturing Status in WorkSpaceUsers Live_copy",
 							"type": "SetVariable",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [
 								{
-									"activity": "Get WorkSpaceUsers_Live",
+									"activity": "Get WorkSpaceUsers_Live_copy",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -750,6 +747,280 @@
 							"value": {
 								"type": "Expression",
 								"content": "@activity('Get WorkSpaces').Status"
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "Get WorkSpaceUsers_Live",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace ID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"WorkSpaceUserSourceKey"
+							]
+						},
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 4,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "WorkSpaceUserSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "WorkSpaceUserSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "EmailAddress",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "EmailAddress",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserName",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserName",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Identifier",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "Identifier",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "UserType",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "UserType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "GroupUserAccessRight",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "GroupUserAccessRight",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "PrincipalType",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "PrincipalType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TenantId",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "TenantId",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "LS_SQL_WorkspacesUsers_Live",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "WorkSpacesUsers_Live_SQL",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Capturing Status in WorkSpaceUsers Live_copy1",
+				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "WorkSpaceUserLive Status",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('Get WorkSpaceUsers_Live').Status"
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "Capturing Status in WorkSpaceUsers Live",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get WorkSpaceUsers_Live",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "WorkSpaceUserLive Status",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('Get WorkSpaceUsers_Live').Status"
 							}
 						}
 					],
