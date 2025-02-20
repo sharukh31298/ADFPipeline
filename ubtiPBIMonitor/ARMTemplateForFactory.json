@@ -18303,8 +18303,6 @@
 								{
 									"name": "DS_Capturing Workspaces_Master status",
 									"type": "SetVariable",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Workspaces_Master",
@@ -18329,6 +18327,8 @@
 								{
 									"name": "DS_WorkspaceUsers__Master",
 									"type": "ExecutePipeline",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Workspaces_Master",
@@ -78324,37 +78324,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Testing Trigger for Parallel run')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "DailyScheduleMasterPipeline_V1",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Hour",
-						"interval": 1,
-						"startTime": "2025-02-20T12:07:00",
-						"endTime": "2025-02-20T12:32:00",
-						"timeZone": "India Standard Time"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/DailyScheduleMasterPipeline_V1')]"
 			]
 		}
 	]
