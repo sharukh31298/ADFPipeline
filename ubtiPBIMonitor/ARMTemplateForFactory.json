@@ -18295,9 +18295,9 @@
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
-											"activity": "DS_Workspaces_Master",
+											"activity": "Wait1",
 											"dependencyConditions": [
-												"Completed"
+												"Succeeded"
 											]
 										}
 									],
@@ -19101,6 +19101,22 @@
 									"linkedServiceName": {
 										"referenceName": "DS_updateLog_SP",
 										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Wait1",
+									"type": "Wait",
+									"dependsOn": [
+										{
+											"activity": "DS_Workspaces_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 50
 									}
 								}
 							]
