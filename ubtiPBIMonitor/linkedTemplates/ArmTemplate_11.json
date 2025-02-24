@@ -7361,7 +7361,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "Truncate Table [dbo].[WorkSpaces_Staging];\n\n",
+								"preCopyScript": {
+									"value": "@concat('Truncate table [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
