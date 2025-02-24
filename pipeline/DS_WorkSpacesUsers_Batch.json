@@ -43,9 +43,9 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Truncate WorkspacesUsers",
+						"activity": "Get WorkSpace Batches",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -315,14 +315,9 @@
 			{
 				"name": "Truncate WorkspacesUsers",
 				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpace Batches",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
