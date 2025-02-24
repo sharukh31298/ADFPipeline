@@ -8621,7 +8621,13 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -9057,8 +9063,7 @@
 								"upsertSettings": {
 									"useTempDB": true,
 									"keys": [
-										"WorkSpaceID",
-										"TenantId"
+										"WorkSpaceID"
 									]
 								},
 								"sqlWriterUseTableLock": false,
