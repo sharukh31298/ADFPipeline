@@ -67,6 +67,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DataflowStaging_sql_UAT'"
 		},
+		"DatasetHistory_sql_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DatasetHistory_sql_UAT'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -246,141 +250,24 @@
 		"DataflowStaging_sql_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
+		},
+		"DatasetHistory_sql_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DatasetHistory_sql_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DatasetHistory_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/Test_variable')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Wait1",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					},
-					{
-						"name": "Wait2",
-						"type": "Wait",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					},
-					{
-						"name": "Wait3",
-						"type": "Wait",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					},
-					{
-						"name": "Set variable1",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Wait1",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "Wait1",
-							"value": "[[object Object]"
-						}
-					},
-					{
-						"name": "Set variable2",
-						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [
-							{
-								"activity": "Wait2",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "Wait2",
-							"value": {
-								"value": "@activity('Wait2').Duration",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set variable3",
-						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [
-							{
-								"activity": "Wait3",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "Wait3",
-							"value": {
-								"value": "@activity('Wait3').Duration",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"Wait1": {
-						"type": "String"
-					},
-					"Wait2": {
-						"type": "String"
-					},
-					"Wait3": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ADF_Pipeline_Status_Log')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -756,6 +643,29 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DataflowStaging_sql_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetHistory_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DatasetHistory_sql_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DatasetHistory_sql_UAT_password')]"
 					}
 				}
 			},

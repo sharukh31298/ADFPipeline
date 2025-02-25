@@ -13,69 +13,6 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/PipelineBatch')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Test for batch pipeline",
-						"description": "",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "WorkSpacesUsers_Batch",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": false,
-							"parameters": {
-								"AppTenantId": {
-									"value": "@pipeline().parameters.AppTenantId",
-									"type": "Expression"
-								},
-								"AppClientId": {
-									"value": "@pipeline().parameters.AppClientId",
-									"type": "Expression"
-								},
-								"AppClientCode": {
-									"value": "@pipeline().parameters.AppClientCode",
-									"type": "Expression"
-								},
-								"TenantId": {
-									"value": "@pipeline().parameters.TenantId",
-									"type": "Expression"
-								}
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					},
-					"TenantId": {
-						"type": "int"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/ReportPages_Batch')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
