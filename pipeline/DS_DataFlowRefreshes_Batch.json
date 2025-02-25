@@ -43,9 +43,9 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get DataFlow Batches",
+						"activity": "Truncate Dataflow Refreshes",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -133,9 +133,14 @@
 			{
 				"name": "Truncate Dataflow Refreshes",
 				"type": "Script",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Get DataFlow Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -152,7 +157,10 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "TRUNCATE TABLE [dbo].[DataflowRefreshes_Staging];"
+							"text": {
+								"value": "@concat('DELETE  [DataflowRefreshes_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))\n\n\n\n\n\n\n",
+								"type": "Expression"
+							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"

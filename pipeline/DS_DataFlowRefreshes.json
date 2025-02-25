@@ -573,7 +573,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Get DataflowRefresh_Live",
+						"activity": "InserUpdate DataflowRefreshes",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -601,14 +601,9 @@
 			{
 				"name": "Get DataflowRefresh_Live",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Dataflow ID in Loop",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -804,6 +799,39 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "InserUpdate DataflowRefreshes",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Dataflow ID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "InserUpdate Dataflowrefreshes",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC DataflowRefreshes_InsertUpsert"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
 			}
 		],
 		"parameters": {
