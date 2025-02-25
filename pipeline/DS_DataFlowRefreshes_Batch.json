@@ -43,9 +43,9 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Truncate Dataflow Refreshes",
+						"activity": "Get DataFlow Batches",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -133,14 +133,9 @@
 			{
 				"name": "Truncate Dataflow Refreshes",
 				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "Get DataFlow Batches",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
