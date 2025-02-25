@@ -792,11 +792,9 @@
 			{
 				"name": "Capturing DatasetRefreshes Live Status",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
-						"activity": "Get DatasetRefreshes_Live",
+						"activity": "InsertUpdate Datasetrefreshes",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -814,7 +812,7 @@
 							"key": "DatasetRefreshes Live Status",
 							"value": {
 								"type": "Expression",
-								"content": "@activity('Get DatasetRefreshes_Live').Status"
+								"content": "@activity('InsertUpdate Datasetrefreshes').Status"
 							}
 						}
 					],
@@ -822,7 +820,7 @@
 				}
 			},
 			{
-				"name": "Script1",
+				"name": "InsertUpdate Datasetrefreshes",
 				"type": "Script",
 				"dependsOn": [
 					{
@@ -848,7 +846,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "EXEC UpsertFromSourceToTarget;"
+							"text": "EXEC DatasetRefreshes_InsertUpsert;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
