@@ -1218,9 +1218,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Truncate Dataflow Refreshes",
+								"activity": "Get DataFlow Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -1308,14 +1308,9 @@
 					{
 						"name": "Truncate Dataflow Refreshes",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get DataFlow Batches",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -2459,15 +2454,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"DatasetID",
-													"Identifier"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -2944,6 +2931,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": "EXEC UpsertFromSourceToTarget;",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
