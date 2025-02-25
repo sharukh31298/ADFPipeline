@@ -6052,9 +6052,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Truncate ReportPages",
+								"activity": "Get ReportPages in Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -6110,14 +6110,9 @@
 					{
 						"name": "Truncate ReportPages",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get ReportPages in Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,

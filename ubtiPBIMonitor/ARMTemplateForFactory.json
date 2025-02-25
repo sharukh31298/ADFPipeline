@@ -10194,8 +10194,16 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"ReportID"
+												]
+											},
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
 										},
 										"enableStaging": false,
 										"dataIntegrationUnits": 4,
@@ -10679,8 +10687,8 @@
 								"upsertSettings": {
 									"useTempDB": true,
 									"keys": [
-										"ReportID",
-										"TenantId"
+										"WorkSpaceID",
+										"ReportID"
 									]
 								},
 								"sqlWriterUseTableLock": false,
@@ -11221,9 +11229,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Truncate ReportPages",
+								"activity": "Get ReportPages in Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -11279,14 +11287,9 @@
 					{
 						"name": "Truncate ReportPages",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get ReportPages in Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
