@@ -43,9 +43,9 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Dataset Batches",
+						"activity": "Truncate Dataset Users",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
@@ -101,9 +101,14 @@
 			{
 				"name": "Truncate Dataset Users",
 				"type": "Script",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Get Dataset Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
