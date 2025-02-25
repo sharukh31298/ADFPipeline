@@ -555,14 +555,9 @@
 			{
 				"name": "Get DatasetUsers_Live",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DatasetID in Loop",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -783,7 +778,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Get DatasetUsers_Live",
+						"activity": "InsertUpdate DatasetUsers",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -801,11 +796,44 @@
 							"key": "DatasetUser Live Status",
 							"value": {
 								"type": "Expression",
-								"content": "@activity('Get DatasetUsers_Live').Status"
+								"content": "@activity('InsertUpdate DatasetUsers').Status"
 							}
 						}
 					],
 					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "InsertUpdate DatasetUsers",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "DatasetID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "InserUpdate DatasetUsers",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC DatasetUsers_InsertUpsert"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
