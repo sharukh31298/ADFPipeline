@@ -408,6 +408,22 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Upsert Query Dataset Refreshes'"
 		},
+		"InsertUpdate WorkspaceUsers Live table_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'InsertUpdate WorkspaceUsers Live table'"
+		},
+		"InsertUpdate Reportpages_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'InsertUpdate Reportpages'"
+		},
+		"InserUpdate DatasetUsers_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'InserUpdate DatasetUsers'"
+		},
+		"InserUpdate Dataflowrefreshes_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'InserUpdate Dataflowrefreshes'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1585,6 +1601,54 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"Upsert Query Dataset Refreshes_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"InsertUpdate WorkspaceUsers Live table_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"InsertUpdate WorkspaceUsers Live table_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"InsertUpdate WorkspaceUsers Live table_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"InsertUpdate Reportpages_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"InsertUpdate Reportpages_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"InsertUpdate Reportpages_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"InserUpdate DatasetUsers_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"InserUpdate DatasetUsers_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"InserUpdate DatasetUsers_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"InserUpdate Dataflowrefreshes_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"InserUpdate Dataflowrefreshes_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"InserUpdate Dataflowrefreshes_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -3841,7 +3905,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "Get DataflowRefresh_Live",
+								"activity": "InserUpdate DataflowRefreshes",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -3859,7 +3923,7 @@
 									"key": "DataflowRefreshesLive Status",
 									"value": {
 										"type": "Expression",
-										"content": "@activity('Get DataflowRefresh_Live').Status"
+										"content": "@activity('InserUpdate DataflowRefreshes').Status"
 									}
 								}
 							],
@@ -3869,14 +3933,9 @@
 					{
 						"name": "Get DataflowRefresh_Live",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Dataflow ID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -4074,6 +4133,39 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "InserUpdate DataflowRefreshes",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Dataflow ID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "InserUpdate Dataflowrefreshes",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC DataflowRefreshes_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
@@ -4175,6 +4267,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DataFlowRefreshLive_Staging')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DataFlowRefeshLive')]",
+				"[concat(variables('factoryId'), '/linkedServices/InserUpdate Dataflowrefreshes')]",
 				"[concat(variables('factoryId'), '/datasets/DataFlowRefreshes_API')]",
 				"[concat(variables('factoryId'), '/datasets/DataFlowRefreshes_SQL')]",
 				"[concat(variables('factoryId'), '/linkedServices/Capturing Error Message')]"
@@ -4228,9 +4321,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get DataFlow Batches",
+								"activity": "Truncate Dataflow Refreshes",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
@@ -4318,9 +4411,14 @@
 					{
 						"name": "Truncate Dataflow Refreshes",
 						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Get DataFlow Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -4337,7 +4435,10 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "TRUNCATE TABLE [dbo].[DataflowRefreshes_Staging];"
+									"text": {
+										"value": "@concat('DELETE  [DataflowRefreshes_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))\n\n\n\n\n\n\n",
+										"type": "Expression"
+									}
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -4346,8 +4447,6 @@
 					{
 						"name": "DataFlow Refreshes History",
 						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "For Each Batch",
@@ -4574,8 +4673,6 @@
 					{
 						"name": "Capturing DataflowRefreshes History Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "DataFlow Refreshes History",
@@ -6450,11 +6547,9 @@
 					{
 						"name": "Capturing DatasetRefreshes Live Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
-								"activity": "Get DatasetRefreshes_Live",
+								"activity": "InsertUpdate Datasetrefreshes",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -6472,7 +6567,7 @@
 									"key": "DatasetRefreshes Live Status",
 									"value": {
 										"type": "Expression",
-										"content": "@activity('Get DatasetRefreshes_Live').Status"
+										"content": "@activity('InsertUpdate Datasetrefreshes').Status"
 									}
 								}
 							],
@@ -6480,7 +6575,7 @@
 						}
 					},
 					{
-						"name": "Script1",
+						"name": "InsertUpdate Datasetrefreshes",
 						"type": "Script",
 						"dependsOn": [
 							{
@@ -6506,7 +6601,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "EXEC UpsertFromSourceToTarget;"
+									"text": "EXEC DatasetRefreshes_InsertUpsert;"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -6787,8 +6882,6 @@
 					{
 						"name": "DatasetRefreshes History",
 						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "For Each Batch",
@@ -7027,8 +7120,6 @@
 					{
 						"name": "Capturing DatasetRefreshes History status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "DatasetRefreshes History",
@@ -7815,14 +7906,9 @@
 					{
 						"name": "Get DatasetUsers_Live",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "DatasetID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -8045,7 +8131,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "Get DatasetUsers_Live",
+								"activity": "InsertUpdate DatasetUsers",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -8063,11 +8149,44 @@
 									"key": "DatasetUser Live Status",
 									"value": {
 										"type": "Expression",
-										"content": "@activity('Get DatasetUsers_Live').Status"
+										"content": "@activity('InsertUpdate DatasetUsers').Status"
 									}
 								}
 							],
 							"setSystemVariable": true
+						}
+					},
+					{
+						"name": "InsertUpdate DatasetUsers",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DatasetID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "InserUpdate DatasetUsers",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC DatasetUsers_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -8225,6 +8344,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DatasetUsers_Staging')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DatasetUsersLive')]",
+				"[concat(variables('factoryId'), '/linkedServices/InserUpdate DatasetUsers')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetUsers_API')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetUsers_sql')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Capturing DatasetUsers ED')]"
@@ -8372,8 +8492,6 @@
 					{
 						"name": "DatasetUsers History",
 						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "For Each Batch",
@@ -8624,8 +8742,6 @@
 					{
 						"name": "Capturing DatasetsUsers Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "DatasetUsers History",
@@ -10235,14 +10351,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"ReportID"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -10700,14 +10809,9 @@
 					{
 						"name": "Get ReportPages_Live",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "ReportID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -10888,7 +10992,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "Get ReportPages_Live",
+								"activity": "InsertUpdate ReportPages",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -10906,11 +11010,44 @@
 									"key": "ReportPages Live Status",
 									"value": {
 										"type": "Expression",
-										"content": "@activity('Get ReportPages_Live').Status"
+										"content": "@activity('InsertUpdate ReportPages').Status"
 									}
 								}
 							],
 							"setSystemVariable": true
+						}
+					},
+					{
+						"name": "InsertUpdate ReportPages",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "ReportID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "InsertUpdate Reportpages",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC ReportPages_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -11217,6 +11354,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPagesLive_SQL')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_ReportPagesLive')]",
+				"[concat(variables('factoryId'), '/linkedServices/InsertUpdate Reportpages')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPages_API')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPages_SQL')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Capturing ReportPages ED')]"
@@ -11270,9 +11408,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get ReportPages in Batches",
+								"activity": "Delete ReportPages",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
@@ -11326,11 +11464,16 @@
 						}
 					},
 					{
-						"name": "Truncate ReportPages",
+						"name": "Delete ReportPages",
 						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Get ReportPages in Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -11347,7 +11490,10 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "TRUNCATE TABLE[dbo].[ReportPages_Staging];"
+									"text": {
+										"value": "@concat('DELETE  [dbo].[ReportPages_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))\n",
+										"type": "Expression"
+									}
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -16305,7 +16451,7 @@
 							{
 								"activity": "Get WorkSpaces",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -16358,15 +16504,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"UserName",
-													"Identifier"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -16774,14 +16912,9 @@
 					{
 						"name": "Get WorkSpaceUsers_Live",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "WorkSpace ID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -16975,7 +17108,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "Get WorkSpaceUsers_Live",
+								"activity": "InsertUpdate the WorkspaceLive table",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -16993,11 +17126,44 @@
 									"key": "WorkSpaceUserLive Status",
 									"value": {
 										"type": "Expression",
-										"content": "@activity('Get WorkSpaceUsers_Live').Status"
+										"content": "@activity('InsertUpdate the WorkspaceLive table').Status"
 									}
 								}
 							],
 							"setSystemVariable": true
+						}
+					},
+					{
+						"name": "InsertUpdate the WorkspaceLive table",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "WorkSpace ID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "InsertUpdate WorkspaceUsers Live table",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC WorkSpaceUsers_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -17368,6 +17534,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
+				"[concat(variables('factoryId'), '/linkedServices/InsertUpdate WorkspaceUsers Live table')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_SQL')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Capturing WorkSpaceUsers ED')]"
@@ -17421,9 +17588,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get WorkSpace Batches",
+								"activity": "Delete WorkSpaceUsers_Staging",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
@@ -17859,6 +18026,42 @@
 						"linkedServiceName": {
 							"referenceName": "ADF_Pipeline_Status_Log",
 							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Delete WorkSpaceUsers_Staging",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Get WorkSpace Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "getreports_sql_ds",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('DELETE  [dbo].[WorkSpaces_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -18474,8 +18677,6 @@
 								{
 									"name": "DS_ReportPages_Master",
 									"type": "ExecutePipeline",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Reports_Master",
@@ -18517,8 +18718,6 @@
 								{
 									"name": "DS_Capturing ReportPagesMaster Status",
 									"type": "SetVariable",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_ReportPages_Master",
@@ -18584,8 +18783,6 @@
 								{
 									"name": "DS_Capturing Datasets Master Status",
 									"type": "SetVariable",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Datasets_Master",
@@ -18610,8 +18807,6 @@
 								{
 									"name": "DS_Datasetusers_Master",
 									"type": "ExecutePipeline",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Datasets_Master",
@@ -18653,8 +18848,6 @@
 								{
 									"name": "DS_Capturing DatasetUsersMaster Status",
 									"type": "SetVariable",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Datasetusers_Master",
@@ -18679,8 +18872,6 @@
 								{
 									"name": "DS_Datasetrefresh_Master",
 									"type": "ExecutePipeline",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Datasets_Master",
@@ -18722,8 +18913,6 @@
 								{
 									"name": "DS_Capturing Datasetsrefresh Master Status",
 									"type": "SetVariable",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Datasetrefresh_Master",
@@ -18878,8 +19067,6 @@
 								{
 									"name": "DS_DataflowRefreshes_Master",
 									"type": "ExecutePipeline",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_Dataflows_Master",
@@ -18921,8 +19108,6 @@
 								{
 									"name": "DS_Capturing DataflowsRefreshes Master Status",
 									"type": "SetVariable",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [
 										{
 											"activity": "DS_DataflowRefreshes_Master",
@@ -78406,6 +78591,98 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('Upsert Query Dataset Refreshes_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/InsertUpdate WorkspaceUsers Live table')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "InsertUpdate WorkspaceUsers Live table",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('InsertUpdate WorkspaceUsers Live table_properties_typeProperties_server')]",
+					"database": "[parameters('InsertUpdate WorkspaceUsers Live table_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('InsertUpdate WorkspaceUsers Live table_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('InsertUpdate WorkspaceUsers Live table_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/InsertUpdate Reportpages')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "InsertUpdate Reportpages",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('InsertUpdate Reportpages_properties_typeProperties_server')]",
+					"database": "[parameters('InsertUpdate Reportpages_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('InsertUpdate Reportpages_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('InsertUpdate Reportpages_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/InserUpdate DatasetUsers')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "InserUpdate DatasetUsers",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('InserUpdate DatasetUsers_properties_typeProperties_server')]",
+					"database": "[parameters('InserUpdate DatasetUsers_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('InserUpdate DatasetUsers_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('InserUpdate DatasetUsers_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/InserUpdate Dataflowrefreshes')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "InserUpdate Dataflowrefreshes",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('InserUpdate Dataflowrefreshes_properties_typeProperties_server')]",
+					"database": "[parameters('InserUpdate Dataflowrefreshes_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('InserUpdate Dataflowrefreshes_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('InserUpdate Dataflowrefreshes_password')]"
 					}
 				}
 			},
