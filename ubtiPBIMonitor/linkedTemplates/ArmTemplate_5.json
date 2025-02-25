@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
+		"Upsert Query Dataset Refreshes_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Upsert Query Dataset Refreshes'"
+		},
 		"getreports_current_api_ls_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{\n    concat(\n'https://api.powerbi.com/v1.0/myorg/admin/reports?$filter=modifiedDateTime ge ',formatDateTime(linkedService().date,'yyyy-MM-ddTHH:mm:ss.fffZ'))}"
@@ -58,6 +62,18 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
+		},
+		"Upsert Query Dataset Refreshes_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Upsert Query Dataset Refreshes_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"Upsert Query Dataset Refreshes_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -171,6 +187,29 @@
 					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
 					"scope": "https://analysis.windows.net/powerbi/api/.default",
 					"dataFactoryName": "UsageMetricsDF"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Upsert Query Dataset Refreshes')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Upsert Query Dataset Refreshes",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Upsert Query Dataset Refreshes_properties_typeProperties_server')]",
+					"database": "[parameters('Upsert Query Dataset Refreshes_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Upsert Query Dataset Refreshes_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Upsert Query Dataset Refreshes_password')]"
+					}
 				}
 			},
 			"dependsOn": []
@@ -872,55 +911,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "DataflowHistory"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlow_SQL_Staging')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "objectId",
-						"type": "varchar"
-					},
-					{
-						"name": "name",
-						"type": "varchar"
-					},
-					{
-						"name": "description",
-						"type": "varchar"
-					},
-					{
-						"name": "workspaceId",
-						"type": "varchar"
-					},
-					{
-						"name": "configuredBy",
-						"type": "varchar"
-					},
-					{
-						"name": "updatedtime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "Dataflows_Staging"
 				}
 			},
 			"dependsOn": []

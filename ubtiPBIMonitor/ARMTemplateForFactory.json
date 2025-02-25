@@ -404,6 +404,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
+		"Upsert Query Dataset Refreshes_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Upsert Query Dataset Refreshes'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1571,6 +1575,18 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
+		},
+		"Upsert Query Dataset Refreshes_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Upsert Query Dataset Refreshes_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"Upsert Query Dataset Refreshes_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -6223,14 +6239,9 @@
 					{
 						"name": "Get DatasetRefreshes_Live",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "DatasetID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -6439,6 +6450,8 @@
 					{
 						"name": "Capturing DatasetRefreshes Live Status",
 						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Get DatasetRefreshes_Live",
@@ -6464,6 +6477,39 @@
 								}
 							],
 							"setSystemVariable": true
+						}
+					},
+					{
+						"name": "Script1",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DatasetID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Upsert Query Dataset Refreshes",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC UpsertFromSourceToTarget;"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -6593,6 +6639,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DatasetRefreshesLive_Staging')]",
 				"[concat(variables('factoryId'), '/datasets/SQl_DatasetRefreshesLive')]",
+				"[concat(variables('factoryId'), '/linkedServices/Upsert Query Dataset Refreshes')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetRefreshes_API')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetRefreshes_SQL')]",
 				"[concat(variables('factoryId'), '/linkedServices/DatasetRefreshes Log')]"
@@ -78340,6 +78387,29 @@
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Upsert Query Dataset Refreshes')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Upsert Query Dataset Refreshes",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Upsert Query Dataset Refreshes_properties_typeProperties_server')]",
+					"database": "[parameters('Upsert Query Dataset Refreshes_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Upsert Query Dataset Refreshes_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Upsert Query Dataset Refreshes_password')]"
+					}
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }
