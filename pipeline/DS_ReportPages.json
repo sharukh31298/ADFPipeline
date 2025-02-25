@@ -562,14 +562,9 @@
 			{
 				"name": "Get ReportPages_Live",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "ReportID in Loop",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -748,7 +743,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Get ReportPages_Live",
+						"activity": "InsertUpdate ReportPages",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -766,11 +761,44 @@
 							"key": "ReportPages Live Status",
 							"value": {
 								"type": "Expression",
-								"content": "@activity('Get ReportPages_Live').Status"
+								"content": "@activity('InsertUpdate ReportPages').Status"
 							}
 						}
 					],
 					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "InsertUpdate ReportPages",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "ReportID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "InsertUpdate Reportpages",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC ReportPages_InsertUpsert"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
