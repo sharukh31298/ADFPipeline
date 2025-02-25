@@ -38,7 +38,7 @@
 					{
 						"activity": "Get WorkSpaces",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -506,14 +506,9 @@
 			{
 				"name": "Get WorkSpaceUsers_Live",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "WorkSpace ID in Loop",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -705,7 +700,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Get WorkSpaceUsers_Live",
+						"activity": "InsertUpdate the WorkspaceLive table",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -723,11 +718,44 @@
 							"key": "WorkSpaceUserLive Status",
 							"value": {
 								"type": "Expression",
-								"content": "@activity('Get WorkSpaceUsers_Live').Status"
+								"content": "@activity('InsertUpdate the WorkspaceLive table').Status"
 							}
 						}
 					],
 					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "InsertUpdate the WorkspaceLive table",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace ID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "InsertUpdate WorkspaceUsers Live table",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC WorkSpaceUsers_InsertUpsert"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
