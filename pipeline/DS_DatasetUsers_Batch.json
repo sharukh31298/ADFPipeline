@@ -125,7 +125,10 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "TRUNCATE TABLE [dbo].[DatasetUsers_Staging];"
+							"text": {
+								"value": "@concat('DELETE from [dbo].[DatasetUsers_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
+								"type": "Expression"
+							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"

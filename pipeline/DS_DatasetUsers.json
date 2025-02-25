@@ -579,16 +579,7 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"WorkSpaceID",
-								"DatasetID",
-								"Identifier"
-							]
-						},
-						"sqlWriterUseTableLock": false,
+						"sqlWriterStoredProcedureName": "[dbo].[UpsertFromSourceToTarget]",
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
