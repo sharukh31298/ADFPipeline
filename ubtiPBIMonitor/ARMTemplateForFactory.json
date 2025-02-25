@@ -7792,21 +7792,13 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "EXEC UpsertFromSourceToTarget;",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceID",
-										"DatasetID",
-										"Identifier"
-									]
-								},
+								"preCopyScript": "EXEC UpsertFromSourceToTarget;",
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -8327,7 +8319,7 @@
 								{
 									"type": "Query",
 									"text": {
-										"value": "@concat('DELETE from [dbo].[DatasetUsers_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
+										"value": "@concat('DELETE  [dbo].[DatasetUsers_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
 										"type": "Expression"
 									}
 								}
