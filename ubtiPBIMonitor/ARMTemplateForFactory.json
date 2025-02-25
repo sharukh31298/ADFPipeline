@@ -7315,8 +7315,16 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DatasetID"
+												]
+											},
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
 										},
 										"enableStaging": false,
 										"dataIntegrationUnits": 4,
@@ -7800,7 +7808,8 @@
 								"upsertSettings": {
 									"useTempDB": true,
 									"keys": [
-										"DatasetUserSourceKey"
+										"WorkSpaceID",
+										"DatasetID"
 									]
 								},
 								"sqlWriterUseTableLock": false,
@@ -8240,9 +8249,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Truncate Dataset Users",
+								"activity": "Get Dataset Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -8298,14 +8307,9 @@
 					{
 						"name": "Truncate Dataset Users",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get Dataset Batches",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
