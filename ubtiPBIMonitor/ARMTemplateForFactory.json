@@ -1026,7 +1026,7 @@
 		},
 		"LS_SQL_DemoWorkSpaceUsers_properties_typeProperties_database": {
 			"type": "string",
-			"defaultValue": "pbimonitor"
+			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"LS_SQL_DemoWorkSpaceUsers_properties_typeProperties_userName": {
 			"type": "string",
@@ -42279,38 +42279,127 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Test for batch pipeline",
-						"description": "",
-						"type": "ExecutePipeline",
+						"name": "Lookup1",
+						"type": "Lookup",
 						"dependsOn": [],
 						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
 							"secureInput": false
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"pipeline": {
-								"referenceName": "WorkSpacesUsers_Batch",
-								"type": "PipelineReference"
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "select AppTentantId,AppClientId,AppClientSecret,TentantId from [dbo].[DataLoadTracker]",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
 							},
-							"waitOnCompletion": false,
-							"parameters": {
-								"AppTenantId": {
-									"value": "@pipeline().parameters.AppTenantId",
-									"type": "Expression"
-								},
-								"AppClientId": {
-									"value": "@pipeline().parameters.AppClientId",
-									"type": "Expression"
-								},
-								"AppClientCode": {
-									"value": "@pipeline().parameters.AppClientCode",
-									"type": "Expression"
-								},
-								"TenantId": {
-									"value": "@pipeline().parameters.TenantId",
-									"type": "Expression"
-								}
+							"dataset": {
+								"referenceName": "DS_lookupClientInformation",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Completed"
+								]
 							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"batchCount": 50,
+							"activities": [
+								{
+									"name": "Execute Pipeline1",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "WorkSpaces_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTentantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TentantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Execute Pipeline2",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Execute Pipeline1",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "WorkSpacesUsers_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTentantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TentantId",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
 						}
 					}
 				],
@@ -42334,7 +42423,9 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch')]"
+				"[concat(variables('factoryId'), '/datasets/DS_lookupClientInformation')]",
+				"[concat(variables('factoryId'), '/pipelines/WorkSpaces_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_UAT')]"
 			]
 		},
 		{
@@ -70659,7 +70750,7 @@
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "DemoWorkSpaceUsers"
+					"table": "WorkSpaces"
 				}
 			},
 			"dependsOn": [
