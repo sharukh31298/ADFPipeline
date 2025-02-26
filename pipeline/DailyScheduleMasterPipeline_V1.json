@@ -121,9 +121,9 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "Wait1",
+									"activity": "DS_Workspaces_Master",
 									"dependencyConditions": [
-										"Succeeded"
+										"Completed"
 									]
 								}
 							],
@@ -184,14 +184,7 @@
 						{
 							"name": "DS_Reports_Master",
 							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "DS_Workspaces_Master",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"secureInput": false
 							},
@@ -314,14 +307,7 @@
 						{
 							"name": "DS_Datasets_Master",
 							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "DS_Workspaces_Master",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"secureInput": false
 							},
@@ -509,14 +495,7 @@
 						{
 							"name": "DS_ViewReports_Master",
 							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "DS_Workspaces_Master",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"secureInput": false
 							},
@@ -574,14 +553,7 @@
 						{
 							"name": "DS_Dataflows_Master",
 							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "DS_Workspaces_Master",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"secureInput": false
 							},
@@ -591,7 +563,7 @@
 									"referenceName": "DS_DataFlows",
 									"type": "PipelineReference"
 								},
-								"waitOnCompletion": false,
+								"waitOnCompletion": true,
 								"parameters": {
 									"AppTenantId": {
 										"value": "@item().AppTentantId",
@@ -869,6 +841,12 @@
 									"dependencyConditions": [
 										"Completed"
 									]
+								},
+								{
+									"activity": "DS_Workspaces_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
 								}
 							],
 							"policy": {
@@ -908,22 +886,6 @@
 							"linkedServiceName": {
 								"referenceName": "DS_updateLog_SP",
 								"type": "LinkedServiceReference"
-							}
-						},
-						{
-							"name": "Wait1",
-							"type": "Wait",
-							"dependsOn": [
-								{
-									"activity": "DS_Workspaces_Master",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitTimeInSeconds": 50
 							}
 						}
 					]
