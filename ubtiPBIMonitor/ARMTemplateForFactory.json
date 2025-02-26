@@ -18629,7 +18629,7 @@
 											"referenceName": "DS_Reports",
 											"type": "PipelineReference"
 										},
-										"waitOnCompletion": false,
+										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
 												"value": "@item().AppTentantId",
@@ -18759,7 +18759,7 @@
 											"referenceName": "DS_Datasets",
 											"type": "PipelineReference"
 										},
-										"waitOnCompletion": false,
+										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
 												"value": "@item().AppTentantId",
@@ -42398,6 +42398,47 @@
 											}
 										}
 									}
+								},
+								{
+									"name": "Execute Pipeline3",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "Execute Pipeline1",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Reports_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTentantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
 								}
 							]
 						}
@@ -42425,7 +42466,8 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_lookupClientInformation')]",
 				"[concat(variables('factoryId'), '/pipelines/WorkSpaces_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/Reports_UAT')]"
 			]
 		},
 		{
