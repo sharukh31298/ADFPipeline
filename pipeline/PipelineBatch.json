@@ -3,38 +3,121 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Test for batch pipeline",
-				"description": "",
-				"type": "ExecutePipeline",
+				"name": "Lookup1",
+				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
 					"secureInput": false
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"pipeline": {
-						"referenceName": "WorkSpacesUsers_Batch",
-						"type": "PipelineReference"
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select AppTentantId,AppClientId,AppClientSecret,TentantId from [dbo].[DataLoadTracker]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
 					},
-					"waitOnCompletion": false,
-					"parameters": {
-						"AppTenantId": {
-							"value": "@pipeline().parameters.AppTenantId",
-							"type": "Expression"
-						},
-						"AppClientId": {
-							"value": "@pipeline().parameters.AppClientId",
-							"type": "Expression"
-						},
-						"AppClientCode": {
-							"value": "@pipeline().parameters.AppClientCode",
-							"type": "Expression"
-						},
-						"TenantId": {
-							"value": "@pipeline().parameters.TenantId",
-							"type": "Expression"
-						}
+					"dataset": {
+						"referenceName": "DS_lookupClientInformation",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup1",
+						"dependencyConditions": [
+							"Completed"
+						]
 					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"activities": [
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "WorkSpaces_UAT",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTentantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TentantId",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "Execute Pipeline2",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "Execute Pipeline1",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "WorkSpacesUsers_UAT",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTentantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TentantId",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
 				}
 			}
 		],
