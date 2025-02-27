@@ -22,7 +22,7 @@
 						"referenceName": "WorkSpaces_UAT",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false,
+					"waitOnCompletion": true,
 					"parameters": {
 						"AppTenantId": {
 							"value": "@pipeline().parameters.AppTenantId",
@@ -63,7 +63,7 @@
 						"referenceName": "Reports_UAT",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": false,
+					"waitOnCompletion": true,
 					"parameters": {
 						"AppTenantId": {
 							"value": "@pipeline().parameters.AppTenantId",
@@ -87,7 +87,14 @@
 			{
 				"name": "ReportPages_Master",
 				"type": "ExecutePipeline",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Reports_Master",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -248,7 +255,7 @@
 					{
 						"activity": "Datasets_Master",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -298,7 +305,7 @@
 						"referenceName": "DataFlowRefreshes_Batch_UAT",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true,
+					"waitOnCompletion": false,
 					"parameters": {
 						"AppTenantId": {
 							"value": "@pipeline().parameters.AppTenantId",
@@ -452,7 +459,7 @@
 					{
 						"activity": "Workspaces_Master",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -612,12 +619,6 @@
 				"dependsOn": [
 					{
 						"activity": "Capturing Workspaces_Master status",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "Capturing WorkSpaceUsers Master Status",
 						"dependencyConditions": [
 							"Completed"
 						]
