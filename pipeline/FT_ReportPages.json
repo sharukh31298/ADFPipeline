@@ -1,9 +1,9 @@
 {
-	"name": "FT_WorkSpacesUsers",
+	"name": "FT_ReportPages",
 	"properties": {
 		"activities": [
 			{
-				"name": "Get WorkSpaces",
+				"name": "Get Reports",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -18,41 +18,41 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('SELECT WorkSpaceSourceKey FROM [dbo].[Workspaces_batch] \nWHERE BatchNo = ', string(pipeline().parameters.BatchNo), \n' AND TenantId = ', string(pipeline().parameters.TenantId))",
+							"value": "@concat('select ReportSourceKey,WorkspaceId \nfrom [dbo].[Reports_batch] \nwhere BatchNo = ',string(pipeline().parameters.BatchNo), \n' AND TenantId = ', string(pipeline().parameters.TenantId))\n",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "WorkSpaces_SQL",
+						"referenceName": "Reports_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "WorkSpace ID in Loop",
+				"name": "ReportID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get WorkSpaces",
+						"activity": "Get Reports",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get WorkSpaces').output.value",
+						"value": "@activity('Get Reports').output.value",
 						"type": "Expression"
 					},
 					"isSequential": false,
 					"batchCount": 50,
 					"activities": [
 						{
-							"name": "Get WorkSpace Users_Staging",
+							"name": "Get ReportPage_Staging",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -68,9 +68,16 @@
 									"type": "RestSource",
 									"additionalColumns": [
 										{
-											"name": "WorkSpaceID",
+											"name": "Reportid",
 											"value": {
-												"value": "@item().WorkSpaceSourceKey",
+												"value": "@item().ReportSourceKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "WorkSpaceid",
+											"value": {
+												"value": "@item().WorkSpaceID",
 												"type": "Expression"
 											}
 										},
@@ -102,19 +109,10 @@
 									"mappings": [
 										{
 											"source": {
-												"path": "['emailAddress']"
+												"path": "['name']"
 											},
 											"sink": {
-												"name": "EmailAddress",
-												"type": "String"
-											}
-										},
-										{
-											"source": {
-												"path": "['groupUserAccessRight']"
-											},
-											"sink": {
-												"name": "GroupUserAccessRight",
+												"name": "ReportPageName",
 												"type": "String"
 											}
 										},
@@ -123,31 +121,31 @@
 												"path": "['displayName']"
 											},
 											"sink": {
-												"name": "UserName",
+												"name": "ReportPageDisplayName",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['identifier']"
+												"path": "['order']"
 											},
 											"sink": {
-												"name": "Identifier",
-												"type": "String"
+												"name": "report_order",
+												"type": "Int32"
 											}
 										},
 										{
 											"source": {
-												"path": "['principalType']"
+												"path": "$['Reportid']"
 											},
 											"sink": {
-												"name": "PrincipalType",
+												"name": "ReportID",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['WorkSpaceID']"
+												"path": "$['WorkSpaceid']"
 											},
 											"sink": {
 												"name": "WorkSpaceID",
@@ -164,17 +162,16 @@
 											}
 										}
 									],
-									"collectionReference": "$['value']",
-									"mapComplexValuesToString": true
+									"collectionReference": "$['value']"
 								}
 							},
 							"inputs": [
 								{
-									"referenceName": "WorkSpaceUsers_Staging_API",
+									"referenceName": "ReportPages_API",
 									"type": "DatasetReference",
 									"parameters": {
-										"WorkspaceID": {
-											"value": "@item().WorkSpaceSourceKey",
+										"ReportID": {
+											"value": "@item().ReportSourceKey",
 											"type": "Expression"
 										},
 										"AppTenantId": {
@@ -188,23 +185,27 @@
 										"AppClientCode": {
 											"value": "@pipeline().parameters.AppClientCode",
 											"type": "Expression"
+										},
+										"WorkspaceID": {
+											"value": "@item().WorkSpaceID\n",
+											"type": "Expression"
 										}
 									}
 								}
 							],
 							"outputs": [
 								{
-									"referenceName": "WorkSpaceUsers_SQL",
+									"referenceName": "ReportPages_SQL",
 									"type": "DatasetReference"
 								}
 							]
 						},
 						{
-							"name": "Capturing Status in WorkSpace Users Staging",
+							"name": "Capturing GetreportPage Staging status",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Get WorkSpace Users_Staging",
+									"activity": "Get ReportPage_Staging",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -219,10 +220,10 @@
 								"variableName": "pipelineReturnValue",
 								"value": [
 									{
-										"key": "WorkspaceUsers Staging Staus",
+										"key": "ReportPage Staging Status",
 										"value": {
 											"type": "Expression",
-											"content": "@activity('Get WorkSpace Users_Staging').Status"
+											"content": "@activity('Get ReportPage_Staging').Status"
 										}
 									}
 								],
@@ -230,11 +231,11 @@
 							}
 						},
 						{
-							"name": "Capturing WorkspaceUsers ED",
+							"name": "Capturing ReportPages ED",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Get WorkSpace Users_Staging",
+									"activity": "Get ReportPage_Staging",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -249,7 +250,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[dbo].[Sp_WorkSpaceUsersED]",
+								"storedProcedureName": "[dbo].[Sp_ReportPagesED]",
 								"storedProcedureParameters": {
 									"AppClientId": {
 										"value": {
@@ -278,7 +279,7 @@
 									},
 									"ErrorMessage": {
 										"value": {
-											"value": "@activity('Get WorkSpace Users_Staging').error?.message",
+											"value": "@activity('Get ReportPage_Staging').error?.message",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -311,9 +312,16 @@
 										},
 										"type": "DateTime"
 									},
+									"ReportID": {
+										"value": {
+											"value": "@item().ReportSourceKey",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
 									"Status": {
 										"value": {
-											"value": "@activity('Get WorkSpace Users_Staging').Status",
+											"value": "@activity('Get ReportPage_Staging').Status",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -327,7 +335,7 @@
 									},
 									"WorkSpaceID": {
 										"value": {
-											"value": "@item().WorkSpaceSourceKey",
+											"value": "@item().WorkSpaceID",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -335,7 +343,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "LS_Capturing WorkSpaceUsers ED",
+								"referenceName": "LS_Capturing ReportPages ED",
 								"type": "LinkedServiceReference"
 							}
 						}
@@ -343,7 +351,7 @@
 				}
 			},
 			{
-				"name": "Sp_TrackProcessSuccess",
+				"name": "sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -357,22 +365,71 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[sp_ChildPipelineLog_Update]",
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
 					"storedProcedureParameters": {
 						"EndTime": {
 							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
 								"type": "Expression"
 							},
 							"type": "DateTime"
 						},
-						"LogTrackerID": {
-							"value": "",
+						"ErrorMessage": {
+							"value": "NA",
 							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"type": "Expression"
+							},
+							"type": "DateTime"
 						},
 						"Status": {
 							"value": {
-								"value": "@if(and(and(and(and(\nequals(variables('Get Workspaces Status'),'Succeeded'),\nequals(variables('WorkspaceUsers Staging Staus'),'Succeeded')),\nequals(variables('WorkSpaceUserLive Status'),'Succeeded')),\nequals(variables('WorkSpaces Batch'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
+								"value": "@if(and(and(and(and(\nequals(variables('Get ReportPages Status'),'Succeeded'),\nequals(variables('ReportPages Staging Status'),'Succeeded')),\nequals(variables('ReportPages Live Status'),'Succeeded')),\nequals(variables('ReportPages Batch Status'),'Succeeded')),\nequals(variables('ReportPages History Status'),'Succeeded')),\n'Succeeded','Failed')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TenantID": {
+							"value": {
+								"value": "@pipeline().parameters.TenantID",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -385,7 +442,7 @@
 				}
 			},
 			{
-				"name": "Sp_TrackProcessFailure",
+				"name": "sp_TrackProcessFailure",
 				"type": "SqlServerStoredProcedure",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -428,7 +485,7 @@
 						},
 						"StartTime": {
 							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
 								"type": "Expression"
 							},
 							"type": "DateTime"
@@ -466,11 +523,11 @@
 				}
 			},
 			{
-				"name": "Capturing Status for Get WorkSpaces",
+				"name": "Capturing Get Reportspages Status",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Get WorkSpaces",
+						"activity": "Get Reports",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -485,10 +542,10 @@
 					"variableName": "pipelineReturnValue",
 					"value": [
 						{
-							"key": "Get Workspaces Status",
+							"key": "Get ReportPage Status",
 							"value": {
 								"type": "Expression",
-								"content": "@activity('Get WorkSpaces').Status"
+								"content": "@activity('Get Reports').Status"
 							}
 						}
 					],
@@ -496,7 +553,7 @@
 				}
 			},
 			{
-				"name": "Get WorkSpaceUsers_Live",
+				"name": "Get ReportPages_Live",
 				"type": "Copy",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -522,8 +579,7 @@
 							"useTempDB": true,
 							"keys": [
 								"WorkSpaceID",
-								"UserName",
-								"Identifier"
+								"ReportID"
 							]
 						},
 						"sqlWriterUseTableLock": false,
@@ -536,6 +592,18 @@
 						"mappings": [
 							{
 								"source": {
+									"name": "ReportID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ReportID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
 									"name": "WorkSpaceID",
 									"type": "String",
 									"physicalType": "varchar"
@@ -548,62 +616,38 @@
 							},
 							{
 								"source": {
-									"name": "EmailAddress",
+									"name": "ReportPageName",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "EmailAddress",
+									"name": "ReportPageName",
 									"type": "String",
 									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"name": "UserName",
+									"name": "ReportPageDisplayName",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "UserName",
+									"name": "ReportPageDisplayName",
 									"type": "String",
 									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"name": "Identifier",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "report_order",
+									"type": "Int32",
+									"physicalType": "int"
 								},
 								"sink": {
-									"name": "Identifier",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "GroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "GroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
-								}
-							},
-							{
-								"source": {
-									"name": "PrincipalType",
-									"type": "String",
-									"physicalType": "varchar"
-								},
-								"sink": {
-									"name": "PrincipalType",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "report_order",
+									"type": "Int32",
+									"physicalType": "int"
 								}
 							},
 							{
@@ -676,23 +720,23 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "LS_SQL_WorkspacesUsers_Live",
+						"referenceName": "ReportPagesLive_SQL",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "WorkSpacesUsers_Live_SQL",
+						"referenceName": "SQL_ReportPagesLive",
 						"type": "DatasetReference"
 					}
 				]
 			},
 			{
-				"name": "Capturing Status in WorkSpaceUsers Live",
+				"name": "Capturing Get Reportpages Live Status",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "InsertUpdate the WorkspaceLive table",
+						"activity": "InsertUpdate ReportPages",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -707,10 +751,10 @@
 					"variableName": "pipelineReturnValue",
 					"value": [
 						{
-							"key": "WorkSpaceUserLive Status",
+							"key": "ReportPages Live Status",
 							"value": {
 								"type": "Expression",
-								"content": "@activity('InsertUpdate the WorkspaceLive table').Status"
+								"content": "@activity('InsertUpdate ReportPages').Status"
 							}
 						}
 					],
@@ -718,11 +762,11 @@
 				}
 			},
 			{
-				"name": "InsertUpdate the WorkspaceLive table",
+				"name": "InsertUpdate ReportPages",
 				"type": "Script",
 				"dependsOn": [
 					{
-						"activity": "WorkSpace ID in Loop",
+						"activity": "ReportID in Loop",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -737,14 +781,14 @@
 				},
 				"userProperties": [],
 				"linkedServiceName": {
-					"referenceName": "InsertUpdate WorkspaceUsers Live table",
+					"referenceName": "InsertUpdate Reportpages",
 					"type": "LinkedServiceReference"
 				},
 				"typeProperties": {
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "EXEC WorkSpaceUsers_InsertUpsert"
+							"text": "EXEC ReportPages_InsertUpsert"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
@@ -770,35 +814,8 @@
 			}
 		},
 		"variables": {
-			"WorkSpaceUsers_Status": {
-				"type": "String"
-			},
-			"WorkSpaceUsers_StartTime": {
-				"type": "String"
-			},
-			"WorkSpaceUsers_EndTime": {
-				"type": "String"
-			},
-			"WorkSpacesUsers_IST": {
-				"type": "String"
-			},
-			"WorkSpacesUsers_IST2": {
-				"type": "String"
-			},
-			"Reports_Staging_Status": {
-				"type": "String"
-			},
-			"Reports Staging_StartTime": {
-				"type": "String"
-			},
-			"Reports Staging_Execution EndTime": {
-				"type": "String"
-			},
-			"Reports Staging_IST2": {
-				"type": "String"
-			},
-			"Reports Staging_IST": {
-				"type": "String"
+			"CountWorkspace": {
+				"type": "Integer"
 			},
 			"ReportPages_Status": {
 				"type": "String"
@@ -950,42 +967,6 @@
 			"ViewReports_IST2": {
 				"type": "String"
 			},
-			"WorkspaceUsers Staging Staus": {
-				"type": "String"
-			},
-			"WorkSpaceUserLive Status": {
-				"type": "String"
-			},
-			"Get Workspaces Status": {
-				"type": "String"
-			},
-			"WorkSpaces Batch": {
-				"type": "String"
-			},
-			"WorkSpacesUsers History Status": {
-				"type": "String"
-			},
-			"Get WorkSpaces Batch Status": {
-				"type": "String"
-			},
-			"ViewReportStaging Status": {
-				"type": "String"
-			},
-			"ViewReport Live Status": {
-				"type": "String"
-			},
-			"ViewReport History Status": {
-				"type": "String"
-			},
-			"Reports Staging Status": {
-				"type": "String"
-			},
-			"Report History Status": {
-				"type": "String"
-			},
-			"Report Live Status": {
-				"type": "String"
-			},
 			"ReportPages Staging Status": {
 				"type": "String"
 			},
@@ -1107,8 +1088,6 @@
 		"folder": {
 			"name": "Dev_FirstTimeLoadchildPipeline"
 		},
-		"annotations": [],
-		"lastPublishTime": "2023-11-29T06:27:10Z"
-	},
-	"type": "Microsoft.DataFactory/factories/pipelines"
+		"annotations": []
+	}
 }

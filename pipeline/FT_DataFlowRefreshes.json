@@ -1,9 +1,9 @@
 {
-	"name": "FT_WorkSpacesUsers",
+	"name": "FT_DataFlowRefreshes",
 	"properties": {
 		"activities": [
 			{
-				"name": "Get WorkSpaces",
+				"name": "Get Dataflows",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -18,41 +18,40 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('SELECT WorkSpaceSourceKey FROM [dbo].[Workspaces_batch] \nWHERE BatchNo = ', string(pipeline().parameters.BatchNo), \n' AND TenantId = ', string(pipeline().parameters.TenantId))",
+							"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows_batch] \nwhere BatchNo =',string(pipeline().parameters.BatchNo),\n' AND TenantId = ',string(pipeline().parameters.TenantId))",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "WorkSpaces_SQL",
+						"referenceName": "DataFlow_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
 				}
 			},
 			{
-				"name": "WorkSpace ID in Loop",
+				"name": "Dataflow ID in Loop",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get WorkSpaces",
+						"activity": "Get Dataflows",
 						"dependencyConditions": [
-							"Completed"
+							"Succeeded"
 						]
 					}
 				],
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get WorkSpaces').output.value",
+						"value": "@activity('Get Dataflows').output.value",
 						"type": "Expression"
 					},
 					"isSequential": false,
-					"batchCount": 50,
 					"activities": [
 						{
-							"name": "Get WorkSpace Users_Staging",
+							"name": "Get DataflowRefresh_Staging",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -70,7 +69,14 @@
 										{
 											"name": "WorkSpaceID",
 											"value": {
-												"value": "@item().WorkSpaceSourceKey",
+												"value": "@item().WorkSpaceID",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "DataFlowID",
+											"value": {
+												"value": "@item().DataflowSourceKey",
 												"type": "Expression"
 											}
 										},
@@ -102,46 +108,46 @@
 									"mappings": [
 										{
 											"source": {
-												"path": "['emailAddress']"
+												"path": "['id']"
 											},
 											"sink": {
-												"name": "EmailAddress",
+												"name": "DataflowRefreshesSourcekey",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['groupUserAccessRight']"
+												"path": "['refreshType']"
 											},
 											"sink": {
-												"name": "GroupUserAccessRight",
+												"name": "RefreshType",
 												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "['displayName']"
+												"path": "['startTime']"
 											},
 											"sink": {
-												"name": "UserName",
-												"type": "String"
+												"name": "StartTime",
+												"type": "DateTime"
 											}
 										},
 										{
 											"source": {
-												"path": "['identifier']"
+												"path": "['endTime']"
 											},
 											"sink": {
-												"name": "Identifier",
-												"type": "String"
+												"name": "EndTime",
+												"type": "DateTime"
 											}
 										},
 										{
 											"source": {
-												"path": "['principalType']"
+												"path": "['status']"
 											},
 											"sink": {
-												"name": "PrincipalType",
+												"name": "Status",
 												"type": "String"
 											}
 										},
@@ -156,6 +162,15 @@
 										},
 										{
 											"source": {
+												"path": "$['DataFlowID']"
+											},
+											"sink": {
+												"name": "DataflowID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
 												"path": "$['TenantId']"
 											},
 											"sink": {
@@ -164,17 +179,20 @@
 											}
 										}
 									],
-									"collectionReference": "$['value']",
-									"mapComplexValuesToString": true
+									"collectionReference": "$['value']"
 								}
 							},
 							"inputs": [
 								{
-									"referenceName": "WorkSpaceUsers_Staging_API",
+									"referenceName": "DataFlowRefreshes_API",
 									"type": "DatasetReference",
 									"parameters": {
-										"WorkspaceID": {
-											"value": "@item().WorkSpaceSourceKey",
+										"WorkSpaceID": {
+											"value": "@item().WorkSpaceID",
+											"type": "Expression"
+										},
+										"DataFlowID": {
+											"value": "@item().DataflowSourceKey",
 											"type": "Expression"
 										},
 										"AppTenantId": {
@@ -194,17 +212,17 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "WorkSpaceUsers_SQL",
+									"referenceName": "DataFlowRefreshes_SQL",
 									"type": "DatasetReference"
 								}
 							]
 						},
 						{
-							"name": "Capturing Status in WorkSpace Users Staging",
+							"name": "Capturing DataflowRefreshes Staging",
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Get WorkSpace Users_Staging",
+									"activity": "Get DataflowRefresh_Staging",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -219,10 +237,10 @@
 								"variableName": "pipelineReturnValue",
 								"value": [
 									{
-										"key": "WorkspaceUsers Staging Staus",
+										"key": "DataflowRefreshes Staging Status",
 										"value": {
 											"type": "Expression",
-											"content": "@activity('Get WorkSpace Users_Staging').Status"
+											"content": "@activity('Get DataflowRefresh_Staging').Status"
 										}
 									}
 								],
@@ -230,11 +248,11 @@
 							}
 						},
 						{
-							"name": "Capturing WorkspaceUsers ED",
+							"name": "Capturing EM",
 							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Get WorkSpace Users_Staging",
+									"activity": "Get DataflowRefresh_Staging",
 									"dependencyConditions": [
 										"Completed"
 									]
@@ -249,7 +267,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[dbo].[Sp_WorkSpaceUsersED]",
+								"storedProcedureName": "[dbo].[Sp_Capturing Error Message]",
 								"storedProcedureParameters": {
 									"AppClientId": {
 										"value": {
@@ -278,14 +296,7 @@
 									},
 									"ErrorMessage": {
 										"value": {
-											"value": "@activity('Get WorkSpace Users_Staging').error?.message",
-											"type": "Expression"
-										},
-										"type": "String"
-									},
-									"PipelineName": {
-										"value": {
-											"value": "@pipeline().Pipeline",
+											"value": "@activity('Get DataflowRefresh_Staging').error?.message",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -313,7 +324,7 @@
 									},
 									"Status": {
 										"value": {
-											"value": "@activity('Get WorkSpace Users_Staging').Status",
+											"value": "@activity('Get DataflowRefresh_Staging').Status",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -325,9 +336,23 @@
 										},
 										"type": "Int32"
 									},
+									"PipelineName": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
 									"WorkSpaceID": {
 										"value": {
-											"value": "@item().WorkSpaceSourceKey",
+											"value": "@item().WorkSpaceID",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"DataFlowID": {
+										"value": {
+											"value": "@item().DataflowSourceKey",
 											"type": "Expression"
 										},
 										"type": "String"
@@ -335,7 +360,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "LS_Capturing WorkSpaceUsers ED",
+								"referenceName": "Capturing Error Message",
 								"type": "LinkedServiceReference"
 							}
 						}
@@ -357,7 +382,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[dbo].[sp_ChildPipelineLog_Update]",
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
 					"storedProcedureParameters": {
 						"EndTime": {
 							"value": {
@@ -366,13 +391,62 @@
 							},
 							"type": "DateTime"
 						},
-						"LogTrackerID": {
-							"value": "",
+						"ErrorMessage": {
+							"value": "NA",
 							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
 						},
 						"Status": {
 							"value": {
-								"value": "@if(and(and(and(and(\nequals(variables('Get Workspaces Status'),'Succeeded'),\nequals(variables('WorkspaceUsers Staging Staus'),'Succeeded')),\nequals(variables('WorkSpaceUserLive Status'),'Succeeded')),\nequals(variables('WorkSpaces Batch'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
+								"value": "@activity('Get Dataflows').Status",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TenantID": {
+							"value": {
+								"value": "@pipeline().parameters.TenantID",
 								"type": "Expression"
 							},
 							"type": "String"
@@ -403,13 +477,12 @@
 					"storedProcedureParameters": {
 						"EndTime": {
 							"value": {
-								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
 								"type": "Expression"
 							},
 							"type": "DateTime"
 						},
 						"ErrorMessage": {
-							"value": null,
 							"type": "String"
 						},
 						"PipelineName": {
@@ -466,11 +539,11 @@
 				}
 			},
 			{
-				"name": "Capturing Status for Get WorkSpaces",
+				"name": "Capturing Get Dataflows Status",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Get WorkSpaces",
+						"activity": "Get Dataflows",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -485,10 +558,10 @@
 					"variableName": "pipelineReturnValue",
 					"value": [
 						{
-							"key": "Get Workspaces Status",
+							"key": "Get Dataflowsrefreshes Status",
 							"value": {
 								"type": "Expression",
-								"content": "@activity('Get WorkSpaces').Status"
+								"content": "@activity('Get Dataflows').Status"
 							}
 						}
 					],
@@ -496,7 +569,37 @@
 				}
 			},
 			{
-				"name": "Get WorkSpaceUsers_Live",
+				"name": "Capturing DataflowRefreshes Live Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "InserUpdate DataflowRefreshes",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "DataflowRefreshesLive Status",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('InserUpdate DataflowRefreshes').Status"
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "Get DataflowRefresh_Live",
 				"type": "Copy",
 				"state": "Inactive",
 				"onInactiveMarkAs": "Succeeded",
@@ -521,9 +624,7 @@
 						"upsertSettings": {
 							"useTempDB": true,
 							"keys": [
-								"WorkSpaceID",
-								"UserName",
-								"Identifier"
+								"DataflowRefreshesSourcekey"
 							]
 						},
 						"sqlWriterUseTableLock": false,
@@ -536,6 +637,18 @@
 						"mappings": [
 							{
 								"source": {
+									"name": "DataflowRefreshesSourcekey",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "DataflowRefreshesSourcekey",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
 									"name": "WorkSpaceID",
 									"type": "String",
 									"physicalType": "varchar"
@@ -548,60 +661,60 @@
 							},
 							{
 								"source": {
-									"name": "EmailAddress",
+									"name": "DataflowID",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "EmailAddress",
+									"name": "DataflowID",
 									"type": "String",
 									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"name": "UserName",
+									"name": "RefreshType",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "UserName",
+									"name": "RefreshType",
 									"type": "String",
 									"physicalType": "varchar"
 								}
 							},
 							{
 								"source": {
-									"name": "Identifier",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "StartTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
 								},
 								"sink": {
-									"name": "Identifier",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "StartTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
 								}
 							},
 							{
 								"source": {
-									"name": "GroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "EndTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
 								},
 								"sink": {
-									"name": "GroupUserAccessRight",
-									"type": "String",
-									"physicalType": "varchar"
+									"name": "EndTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
 								}
 							},
 							{
 								"source": {
-									"name": "PrincipalType",
+									"name": "Status",
 									"type": "String",
 									"physicalType": "varchar"
 								},
 								"sink": {
-									"name": "PrincipalType",
+									"name": "Status",
 									"type": "String",
 									"physicalType": "varchar"
 								}
@@ -676,53 +789,23 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "LS_SQL_WorkspacesUsers_Live",
+						"referenceName": "SQL_DataFlowRefreshLive_Staging",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "WorkSpacesUsers_Live_SQL",
+						"referenceName": "SQL_DataFlowRefeshLive",
 						"type": "DatasetReference"
 					}
 				]
 			},
 			{
-				"name": "Capturing Status in WorkSpaceUsers Live",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "InsertUpdate the WorkspaceLive table",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "pipelineReturnValue",
-					"value": [
-						{
-							"key": "WorkSpaceUserLive Status",
-							"value": {
-								"type": "Expression",
-								"content": "@activity('InsertUpdate the WorkspaceLive table').Status"
-							}
-						}
-					],
-					"setSystemVariable": true
-				}
-			},
-			{
-				"name": "InsertUpdate the WorkspaceLive table",
+				"name": "InserUpdate DataflowRefreshes",
 				"type": "Script",
 				"dependsOn": [
 					{
-						"activity": "WorkSpace ID in Loop",
+						"activity": "Dataflow ID in Loop",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -737,14 +820,14 @@
 				},
 				"userProperties": [],
 				"linkedServiceName": {
-					"referenceName": "InsertUpdate WorkspaceUsers Live table",
+					"referenceName": "InserUpdate Dataflowrefreshes",
 					"type": "LinkedServiceReference"
 				},
 				"typeProperties": {
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "EXEC WorkSpaceUsers_InsertUpsert"
+							"text": "EXEC DataflowRefreshes_InsertUpsert"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
@@ -770,156 +853,6 @@
 			}
 		},
 		"variables": {
-			"WorkSpaceUsers_Status": {
-				"type": "String"
-			},
-			"WorkSpaceUsers_StartTime": {
-				"type": "String"
-			},
-			"WorkSpaceUsers_EndTime": {
-				"type": "String"
-			},
-			"WorkSpacesUsers_IST": {
-				"type": "String"
-			},
-			"WorkSpacesUsers_IST2": {
-				"type": "String"
-			},
-			"Reports_Staging_Status": {
-				"type": "String"
-			},
-			"Reports Staging_StartTime": {
-				"type": "String"
-			},
-			"Reports Staging_Execution EndTime": {
-				"type": "String"
-			},
-			"Reports Staging_IST2": {
-				"type": "String"
-			},
-			"Reports Staging_IST": {
-				"type": "String"
-			},
-			"ReportPages_Status": {
-				"type": "String"
-			},
-			"ReportPages_StartTime": {
-				"type": "String"
-			},
-			"ReportPages_IST": {
-				"type": "String"
-			},
-			"ReportPages_IST2": {
-				"type": "String"
-			},
-			"ReportPages_EndTime": {
-				"type": "String"
-			},
-			"RefreshSchedules_Status": {
-				"type": "String"
-			},
-			"RefreshSchedules": {
-				"type": "String"
-			},
-			"RefreshSchedules_EndTime": {
-				"type": "String"
-			},
-			"RefreshSchedules_IST": {
-				"type": "String"
-			},
-			"RefreshSchedules_IST2": {
-				"type": "String"
-			},
-			"ReportUsers_Status": {
-				"type": "String"
-			},
-			"ReportUsers_StartTime": {
-				"type": "String"
-			},
-			"ReportUsers_EndTime": {
-				"type": "String"
-			},
-			"ReportUsers_IST": {
-				"type": "String"
-			},
-			"ReportUsers_IST2": {
-				"type": "String"
-			},
-			"Datasources_Status": {
-				"type": "String"
-			},
-			"Datasources_StartTime": {
-				"type": "String"
-			},
-			"Datasources_EndTime": {
-				"type": "String"
-			},
-			"Datasources_IST": {
-				"type": "String"
-			},
-			"Datasources_IST2": {
-				"type": "String"
-			},
-			"DatasetUsers_Status": {
-				"type": "String"
-			},
-			"DatasetUsers_StartTime": {
-				"type": "String"
-			},
-			"DatasetUsers_EndTime": {
-				"type": "String"
-			},
-			"DatasetUsers_IST": {
-				"type": "String"
-			},
-			"DatasetUsers_IST2": {
-				"type": "String"
-			},
-			"Datasets_status": {
-				"type": "String"
-			},
-			"Datasets_startTime": {
-				"type": "String"
-			},
-			"Datasets_EndTime": {
-				"type": "String"
-			},
-			"Datasets_IST": {
-				"type": "String"
-			},
-			"Datasets_IST2": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_status": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_StartTime": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_EndTime": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_IST": {
-				"type": "String"
-			},
-			"DatasetsRefreshes_IST2": {
-				"type": "String"
-			},
-			"DataFlows_Status": {
-				"type": "String"
-			},
-			"DataFlows_StartTime": {
-				"type": "String"
-			},
-			"DataFlows_EndTime": {
-				"type": "String"
-			},
-			"DataFlows_IST": {
-				"type": "String"
-			},
-			"DataFlows_IST2": {
-				"type": "String"
-			},
 			"DataFlowRefreshes_Status": {
 				"type": "String"
 			},
@@ -935,109 +868,7 @@
 			"DataFlowRefreshes_IST2": {
 				"type": "String"
 			},
-			"ViewReports_Status": {
-				"type": "String"
-			},
-			"ViewReports_StartTime": {
-				"type": "String"
-			},
-			"ViewReports_EndTime": {
-				"type": "String"
-			},
-			"ViewReports_IST": {
-				"type": "String"
-			},
-			"ViewReports_IST2": {
-				"type": "String"
-			},
-			"WorkspaceUsers Staging Staus": {
-				"type": "String"
-			},
-			"WorkSpaceUserLive Status": {
-				"type": "String"
-			},
-			"Get Workspaces Status": {
-				"type": "String"
-			},
-			"WorkSpaces Batch": {
-				"type": "String"
-			},
-			"WorkSpacesUsers History Status": {
-				"type": "String"
-			},
-			"Get WorkSpaces Batch Status": {
-				"type": "String"
-			},
-			"ViewReportStaging Status": {
-				"type": "String"
-			},
-			"ViewReport Live Status": {
-				"type": "String"
-			},
-			"ViewReport History Status": {
-				"type": "String"
-			},
-			"Reports Staging Status": {
-				"type": "String"
-			},
-			"Report History Status": {
-				"type": "String"
-			},
-			"Report Live Status": {
-				"type": "String"
-			},
-			"ReportPages Staging Status": {
-				"type": "String"
-			},
-			"Get ReportPages Status": {
-				"type": "String"
-			},
-			"ReportPages Batch Status": {
-				"type": "String"
-			},
-			"ReportPages History Status": {
-				"type": "String"
-			},
-			"DatasetUsers Staging Status": {
-				"type": "String"
-			},
-			"DatasetUsers Live Status": {
-				"type": "String"
-			},
-			"Datasets Batches Status": {
-				"type": "String"
-			},
-			"DatasetUsers History Status": {
-				"type": "String"
-			},
-			"Get Datasets Status": {
-				"type": "String"
-			},
-			"Dataset staging Status": {
-				"type": "String"
-			},
-			"Dataset Live Status": {
-				"type": "String"
-			},
-			"Dataset History Status": {
-				"type": "String"
-			},
-			"Get DatasetRefreshes Status": {
-				"type": "String"
-			},
-			"Get DatasetsRefreshes Batch Status": {
-				"type": "String"
-			},
-			"DatasetRefreshes History Status": {
-				"type": "String"
-			},
-			"Dataflows Staging Status": {
-				"type": "String"
-			},
-			"Dataflows Live Status": {
-				"type": "String"
-			},
-			"Dataflows History Status": {
+			"DataflowRefreshes Status": {
 				"type": "String"
 			},
 			"Get Dataflowsrefreshes Status": {
@@ -1079,36 +910,19 @@
 			"Master DataflowRefreshes Status": {
 				"type": "String"
 			},
-			"Get ReportPage Status": {
-				"type": "String"
-			},
-			"ReportPage Staging Status": {
-				"type": "String"
-			},
-			"DatasetUser Staging Status": {
-				"type": "String"
-			},
-			"DatasetUser Live Status": {
-				"type": "String"
-			},
-			"Get DatasetRefreshes_ Status": {
-				"type": "String"
-			},
-			"Get DatasetRefreshe Status": {
-				"type": "String"
-			},
-			"Get DatasetsRefreshes Status": {
-				"type": "String"
-			},
 			"DataflowRefreshesLive Status": {
+				"type": "String"
+			},
+			"Dataflowrefreshes Staging EM": {
+				"type": "String"
+			},
+			"DataflowRefreshes Staging Status": {
 				"type": "String"
 			}
 		},
 		"folder": {
 			"name": "Dev_FirstTimeLoadchildPipeline"
 		},
-		"annotations": [],
-		"lastPublishTime": "2023-11-29T06:27:10Z"
-	},
-	"type": "Microsoft.DataFactory/factories/pipelines"
+		"annotations": []
+	}
 }
