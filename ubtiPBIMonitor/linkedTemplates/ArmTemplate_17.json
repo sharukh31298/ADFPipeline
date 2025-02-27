@@ -1,0 +1,2927 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "ubtiPBIMonitor"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/FirstTimeLoadMasterPipeline_UAT')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Workspaces_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Execute_SP",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpaces_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Reports_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Execute_SP",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Reports_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "ReportPages_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ReportPages_Batch_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Datasets_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Execute_SP",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Datasets_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Datasetusers_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetUsers_Batch_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Dataflows_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Execute_SP",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlows_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Datasetrefresh_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetRefreshes_Batch_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "DataflowRefreshes_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlowRefreshes_Batch_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "sp_Dataloadtracker",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[DataLoadTrack_Insert]",
+							"storedProcedureParameters": {
+								"AppClientId": {
+									"value": {
+										"value": "@pipeline().parameters.AppClientId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"AppClientSecret": {
+									"value": {
+										"value": "@pipeline().parameters.AppClientCode",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"AppTentantId": {
+									"value": {
+										"value": "@pipeline().parameters.AppTenantId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"CreatedDate": {
+									"value": "",
+									"type": "DateTime"
+								},
+								"CurrentStatus": {
+									"value": "Started",
+									"type": "String"
+								},
+								"DataLoadTrackerId": {
+									"value": "",
+									"type": "String"
+								},
+								"IsFirstTimeLoad": {
+									"value": "",
+									"type": "Boolean"
+								},
+								"ModifiedDate": {
+									"value": "",
+									"type": "DateTime"
+								},
+								"PipelineRunId": {
+									"value": "",
+									"type": "String"
+								},
+								"ProcessEndTime": {
+									"value": "",
+									"type": "DateTime"
+								},
+								"ProcessStartTime": {
+									"value": "",
+									"type": "DateTime"
+								},
+								"Status": {
+									"value": "",
+									"type": "String"
+								},
+								"TentantId": {
+									"value": "",
+									"type": "Int32"
+								},
+								"TriggerType": {
+									"value": "",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_Dataloadtracker_SQL",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ViewReports_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Execute_SP",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ViewReports_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "WorkspaceUsers__Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpacesUsers_Batch_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Capturing Workspaces_Master status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master Workspaces Status",
+							"value": {
+								"value": "@activity('Workspaces_Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing Datasetsrefresh Master Status",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Datasetrefresh_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master Datasetfreshes status",
+							"value": {
+								"value": "@activity('Datasetrefresh_Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing Dataflows Master Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master Dataflows Status",
+							"value": {
+								"value": "@activity('Dataflows_Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing Datasets Master Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master Datasets Status",
+							"value": {
+								"value": "@activity('Datasets_Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing ReportsMaster status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master Report status",
+							"value": {
+								"value": "@activity('Reports_Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "SP_Call_UpdateStatus",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Capturing Workspaces_Master status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing WorkSpaceUsers Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "ViewReports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing ReportsMaster status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Datasets Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "WorkspaceUsers__Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Dataflows Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
+							"storedProcedureParameters": {
+								"DataLoadTrackerID": {
+									"value": {
+										"value": "@activity('Execute_SP').output.firstRow.DataLoadTrackerId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"ProcessEndTime": {
+									"value": {
+										"value": "@utcNow()",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"Status": {
+									"value": {
+										"value": "@if(and(and(and(and(and(and(and(and(and(\nequals(variables('Master Workspaces Status'),'Succeeded'),\nequals(variables('Master WorkSpaceUsers Status'),'Succeeded')),\nequals(variables('Master Report status'),'Succeeded')),\nequals(variables('Master ReportPages Status'),'Succeeded')),\nequals(variables('Master Datasets Status'),'Succeeded')),\nequals(variables('Master Datasetusers Status'),'Succeeded')),\nequals(variables('Master Datasetfreshes status'),'Succeeded')),\nequals(variables('Master Dataflows Status'),'Succeeded')),\nequals(variables('Master DataflowRefreshes Status'),'Succeeded')),\nequals(variables('Master Viewreports Status'),'Succeeded')),\n'Succeeded','Success')",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_Dataloadtracker_Sql_UAT",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Execute_SP",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientCode,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(pipeline().parameters.TenantId),''','' ''')",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "LS_ExecuteSP_UAT",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Capturing WorkSpaceUsers Master Status",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "WorkspaceUsers__Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master WorkSpaceUsers Status",
+							"value": {
+								"value": "@activity('WorkspaceUsers__Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing ReportPagesMaster Status",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master ReportPages Status",
+							"value": {
+								"value": "@activity('ReportPages_Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing DatasetUsersMaster Status",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master Datasetusers Status",
+							"value": {
+								"value": "@activity('Datasetusers_Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing Viewreports Master Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "ViewReports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master Viewreports Status",
+							"value": {
+								"value": "@activity('ViewReports_Master').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing DataflowsRefreshes Master Status",
+						"type": "SetVariable",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "DataflowRefreshes_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Master DataflowRefreshes Status",
+							"value": {
+								"value": "@activity('DataflowRefreshes_Master').Status",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					}
+				},
+				"variables": {
+					"InProgress Status": {
+						"type": "String",
+						"defaultValue": "InProgress"
+					},
+					"LogID": {
+						"type": "Integer"
+					},
+					"Result": {
+						"type": "String",
+						"defaultValue": "Success"
+					},
+					"a": {
+						"type": "String"
+					},
+					"Master Workspaces Status": {
+						"type": "String"
+					},
+					"Master WorkSpaceUsers Status": {
+						"type": "String"
+					},
+					"Master Report status": {
+						"type": "String"
+					},
+					"Master ReportPages Status": {
+						"type": "String"
+					},
+					"Master Datasets Status": {
+						"type": "String"
+					},
+					"Master Datasetfreshes status": {
+						"type": "String"
+					},
+					"Master Datasetusers Status": {
+						"type": "String"
+					},
+					"Master Viewreports Status": {
+						"type": "String"
+					},
+					"Master Dataflows Status": {
+						"type": "String"
+					},
+					"Master DataflowRefreshes Status": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "UBTI_UAT Master"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FirstTimeLoadMasterPipelinesExecution')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Workspaces_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Capturing LogID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpaces",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								},
+								"ClientId": {
+									"value": "@pipeline().parameters.ClientId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Reports_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Reports",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "ReportPages_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ReportPages_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasets_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Datasets",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasetusers_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetUsers_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Dataflows_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlows",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasetrefresh_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetRefreshes_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "DataflowRefreshes_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlowRefreshes_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Stored Precodure_startPipelineExecution",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_StartPipelineExecution]",
+							"storedProcedureParameters": {
+								"PipelineName": {
+									"value": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunningStatus": {
+									"value": "False",
+									"type": "Boolean"
+								},
+								"StartTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"TenantId": {
+									"value": {
+										"value": "@pipeline().parameters.TenantId",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Capturing LogID",
+						"type": "Lookup",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Stored Precodure_startPipelineExecution",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Stored procedure_UpdatePIpelineExecution",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Datasetrefresh_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DataflowRefreshes_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_UpdatePipelineExecutionStatus]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogID": {
+									"value": {
+										"value": "@activity('Capturing LogID').output.count",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"RunningStatus": {
+									"value": "True",
+									"type": "Boolean"
+								},
+								"Status": {
+									"value": "Success",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ViewReports_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ViewReports",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "WorkspaceUsers__Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpacesUsers_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ClientId": {
+						"type": "String",
+						"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+					},
+					"TenantId": {
+						"type": "String",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+					},
+					"AZSecretName": {
+						"type": "String",
+						"defaultValue": "UBTIClientSecretName"
+					}
+				},
+				"variables": {
+					"InProgress Status": {
+						"type": "String",
+						"defaultValue": "InProgress"
+					},
+					"LogID": {
+						"type": "Integer"
+					}
+				},
+				"folder": {
+					"name": "Master Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FirstTimeLoadMasterPipelinesExecution_V1_2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Workspaces_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Capturing LogID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpaces",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"AppTenantId": {
+									"value": "@pipeline().parameters.AppTenantId",
+									"type": "Expression"
+								},
+								"AppClientId": {
+									"value": "@pipeline().parameters.AppClientId",
+									"type": "Expression"
+								},
+								"AppClientCode": {
+									"value": "@pipeline().parameters.AppClientCode",
+									"type": "Expression"
+								},
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Reports_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Reports",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "ReportPages_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ReportPages_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasets_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Datasets",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasetusers_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetUsers_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Dataflows_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlows",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasetrefresh_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetRefreshes_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "DataflowRefreshes_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlowRefreshes_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Add Data Load Tracker Details",
+						"description": "Added Tracker Id",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[DataLoadTrack_Insert]",
+							"storedProcedureParameters": {
+								"AppTentantId": {
+									"value": null,
+									"type": "String"
+								},
+								"AppClientId": {
+									"value": null,
+									"type": "String"
+								},
+								"AppClientSecret": {
+									"value": null,
+									"type": "String"
+								},
+								"PipelineRunId": {
+									"value": null,
+									"type": "String"
+								},
+								"ProcessStartTime": {
+									"value": null,
+									"type": "Datetime"
+								},
+								"ProcessEndTime": {
+									"value": null,
+									"type": "Datetime"
+								},
+								"Status": {
+									"value": null,
+									"type": "String"
+								},
+								"CurrentStatus": {
+									"value": null,
+									"type": "String"
+								},
+								"IsFirstTimeLoad": {
+									"value": null,
+									"type": "Boolean"
+								},
+								"TriggerType": {
+									"value": null,
+									"type": "String"
+								},
+								"CreatedDate": {
+									"value": null,
+									"type": "Datetime"
+								},
+								"ModifiedDate": {
+									"value": null,
+									"type": "Datetime"
+								},
+								"TenantId": {
+									"value": null,
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_Dataloadtracker_SQL",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Capturing LogID",
+						"type": "Lookup",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Add Data Load Tracker Details",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Stored procedure_UpdatePIpelineExecution",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Datasetrefresh_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DataflowRefreshes_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_UpdatePipelineExecutionStatus]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogID": {
+									"value": {
+										"value": "@activity('Capturing LogID').output.count",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"RunningStatus": {
+									"value": "True",
+									"type": "Boolean"
+								},
+								"Status": {
+									"value": "Success",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ViewReports_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ViewReports",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "WorkspaceUsers__Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpacesUsers_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					}
+				},
+				"variables": {
+					"InProgress Status": {
+						"type": "String",
+						"defaultValue": "InProgress"
+					},
+					"LogID": {
+						"type": "Integer"
+					}
+				},
+				"folder": {
+					"name": "Master Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/InitialDataLoad_MasterPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Workspaces_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Capturing LogID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpaces",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								},
+								"ClientId": {
+									"value": "@pipeline().parameters.ClientId",
+									"type": "Expression"
+								},
+								"OrganisationId": {
+									"value": "@pipeline().parameters.OrganisationId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Reports_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Reports",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "ReportPages_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ReportPages_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasets_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Datasets",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasetusers_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetUsers_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Dataflows_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlows",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasetrefresh_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetRefreshes_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "DataflowRefreshes_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlowRefreshes_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Stored Precodure_startPipelineExecution",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_StartPipelineExecution]",
+							"storedProcedureParameters": {
+								"PipelineName": {
+									"value": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunningStatus": {
+									"value": "",
+									"type": "Boolean"
+								},
+								"StartTime": {
+									"value": "",
+									"type": "DateTime"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Capturing LogID",
+						"type": "Lookup",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Stored Precodure_startPipelineExecution",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Stored procedure_UpdatePIpelineExecution",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Datasetrefresh_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DataflowRefreshes_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_UpdatePipelineExecutionStatus]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogID": {
+									"value": {
+										"value": "@activity('Capturing LogID').output.count",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"RunningStatus": {
+									"value": "True",
+									"type": "Boolean"
+								},
+								"Status": {
+									"value": "Success",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ViewReports_Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ViewReports",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "WorkspaceUsers__Master",
+						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpacesUsers_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Capturing DataLoadTrackerId",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ClientId": {
+						"type": "String",
+						"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+					},
+					"TenantId": {
+						"type": "String",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+					},
+					"AZSecretName": {
+						"type": "String",
+						"defaultValue": "UBTIClientSecretName"
+					},
+					"OrganisationId": {
+						"type": "String",
+						"defaultValue": "001"
+					}
+				},
+				"variables": {
+					"InProgress Status": {
+						"type": "String",
+						"defaultValue": "InProgress"
+					},
+					"LID": {
+						"type": "Integer"
+					},
+					"LogID": {
+						"type": "Integer"
+					}
+				},
+				"folder": {
+					"name": "Master Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Upset Master Pipelines Execution')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Workspaces_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Capturing LogID",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpaces",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {
+								"TenantId": {
+									"value": "@pipeline().parameters.TenantId",
+									"type": "Expression"
+								},
+								"ClientId": {
+									"value": "@pipeline().parameters.ClientId",
+									"type": "Expression"
+								},
+								"OrganisationId": {
+									"value": "@pipeline().parameters.OrganisationId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Reports_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Reports",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "ReportPages_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ReportPages_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasets_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Datasets",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasetusers_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetUsers_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Dataflows_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlows",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Datasetrefresh_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DatasetRefreshes_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "DataflowRefreshes_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "DataFlowRefreshes_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "Stored Precodure_startPipelineExecution",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_StartPipelineExecution]",
+							"storedProcedureParameters": {
+								"PipelineName": {
+									"value": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunningStatus": {
+									"value": "False",
+									"type": "Boolean"
+								},
+								"StartTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Capturing LogID",
+						"type": "Lookup",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Stored Precodure_startPipelineExecution",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "AzureSqlTable1",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Stored procedure_UpdatePIpelineExecution",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Datasetrefresh_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "DataflowRefreshes_Master",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_UpdatePipelineExecutionStatus]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogID": {
+									"value": {
+										"value": "@activity('Capturing LogID').output.count",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"RunningStatus": {
+									"value": "True",
+									"type": "Boolean"
+								},
+								"Status": {
+									"value": "Success",
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ViewReports_Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "ViewReports",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "WorkspaceUsers__Master",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Workspaces_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "WorkSpacesUsers_Batch",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ClientId": {
+						"type": "String",
+						"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+					},
+					"TenantId": {
+						"type": "String",
+						"defaultValue": "008502d6-3f79-46f0-ab37-9354e3fe80ff"
+					},
+					"AZSecretName": {
+						"type": "String",
+						"defaultValue": "UBTIClientSecretName"
+					},
+					"OrganisationId": {
+						"type": "String",
+						"defaultValue": "001"
+					}
+				},
+				"variables": {
+					"InProgress Status": {
+						"type": "String",
+						"defaultValue": "InProgress"
+					},
+					"LID": {
+						"type": "Integer"
+					},
+					"LogID": {
+						"type": "Integer"
+					}
+				},
+				"folder": {
+					"name": "Master Pipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Daily 1 PM Data Refresh')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Daily Upsert the data for each Tenant (Organisation)",
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "Upset Master Pipelines Execution",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2024-11-13T10:13:00",
+						"timeZone": "India Standard Time",
+						"schedule": {
+							"minutes": [
+								0
+							],
+							"hours": [
+								1
+							]
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Upset Master Pipelines Execution')]"
+			]
+		}
+	]
+}
