@@ -220,14 +220,7 @@
 						{
 							"name": "Get WorkSpaceUsers_Live",
 							"type": "Copy",
-							"dependsOn": [
-								{
-									"activity": "Wait to WorkspaceUsers Staging complete",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -476,22 +469,6 @@
 									"value": "@activity('Get WorkSpaceUsers_Live').Status",
 									"type": "Expression"
 								}
-							}
-						},
-						{
-							"name": "Wait to WorkspaceUsers Staging complete",
-							"type": "Wait",
-							"dependsOn": [
-								{
-									"activity": "Get WorkSpace Users_Staging",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitTimeInSeconds": 2
 							}
 						}
 					]
