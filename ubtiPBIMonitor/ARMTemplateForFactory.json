@@ -38239,7 +38239,7 @@
 								"referenceName": "Reports",
 								"type": "PipelineReference"
 							},
-							"waitOnCompletion": false,
+							"waitOnCompletion": true,
 							"parameters": {
 								"AppTenantId": {
 									"value": "@pipeline().parameters.AppTenantId",
@@ -38263,13 +38263,11 @@
 					{
 						"name": "ReportPages_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Reports_Master",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -38347,13 +38345,11 @@
 					{
 						"name": "Datasetusers_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -38431,13 +38427,11 @@
 					{
 						"name": "Datasetrefresh_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasets_Master",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -38474,13 +38468,11 @@
 					{
 						"name": "DataflowRefreshes_Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Dataflows_Master",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -38493,7 +38485,7 @@
 								"referenceName": "DataFlowRefreshes",
 								"type": "PipelineReference"
 							},
-							"waitOnCompletion": true,
+							"waitOnCompletion": false,
 							"parameters": {
 								"AppTenantId": {
 									"value": "@pipeline().parameters.AppTenantId",
@@ -38505,10 +38497,6 @@
 								},
 								"AppClientCode": {
 									"value": "@pipeline().parameters.AppClientCode",
-									"type": "Expression"
-								},
-								"TenantID": {
-									"value": "@pipeline().parameters.TenantId",
 									"type": "Expression"
 								}
 							}
@@ -38647,8 +38635,6 @@
 					{
 						"name": "WorkspaceUsers__Master",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Workspaces_Master",
@@ -38714,8 +38700,6 @@
 					{
 						"name": "Capturing Datasetsrefresh Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasetrefresh_Master",
@@ -38814,37 +38798,7 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "Dataflows_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Datasets_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
 								"activity": "WorkspaceUsers__Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "ReportPages_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Datasetusers_Master",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Datasetrefresh_Master",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -38893,6 +38847,60 @@
 							},
 							{
 								"activity": "Reports_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasets_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasetrefresh_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Dataflows_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Datasetsrefresh Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing DatasetUsersMaster Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing ReportPagesMaster Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing DataflowsRefreshes Master Status",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -38969,8 +38977,6 @@
 					{
 						"name": "Capturing WorkSpaceUsers Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkspaceUsers__Master",
@@ -38995,8 +39001,6 @@
 					{
 						"name": "Capturing ReportPagesMaster Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "ReportPages_Master",
@@ -39021,8 +39025,6 @@
 					{
 						"name": "Capturing DatasetUsersMaster Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Datasetusers_Master",
@@ -39071,8 +39073,6 @@
 					{
 						"name": "Capturing DataflowsRefreshes Master Status",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "DataflowRefreshes_Master",
@@ -81064,7 +81064,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_WorkSpacesUsers",
+											"referenceName": "FT_WorkSpacesUsers",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -81872,7 +81872,7 @@
 				"[concat(variables('factoryId'), '/linkedServices/getreports_sql_ds')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_ChildPipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpacesUsers')]"
+				"[concat(variables('factoryId'), '/pipelines/FT_WorkSpacesUsers')]"
 			]
 		},
 		{
@@ -85166,7 +85166,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_ReportPages",
+											"referenceName": "FT_ReportPages",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -85703,7 +85703,7 @@
 				"[concat(variables('factoryId'), '/datasets/ReportPages_SQL_History')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_ChildPipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_ReportPages')]"
+				"[concat(variables('factoryId'), '/pipelines/FT_ReportPages')]"
 			]
 		},
 		{
@@ -88149,7 +88149,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_DatasetUsers",
+											"referenceName": "FT_DatasetUsers",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -88713,7 +88713,7 @@
 				"[concat(variables('factoryId'), '/datasets/DatasetUserHistory_sql')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_ChildPipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DatasetUsers')]"
+				"[concat(variables('factoryId'), '/pipelines/FT_DatasetUsers')]"
 			]
 		},
 		{
@@ -89793,7 +89793,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_DatasetRefreshes",
+											"referenceName": "FT_DatasetRefreshes",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -90323,7 +90323,7 @@
 				"[concat(variables('factoryId'), '/datasets/DatasetRefreshes_SQL_History')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_ChildPipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DatasetRefreshes')]"
+				"[concat(variables('factoryId'), '/pipelines/FT_DatasetRefreshes')]"
 			]
 		},
 		{
@@ -92298,7 +92298,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_DataFlowRefreshes",
+											"referenceName": "FT_DataFlowRefreshes",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -92790,7 +92790,7 @@
 				"[concat(variables('factoryId'), '/datasets/DataFlowRefreshes_SQL_History')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_ChildPipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DataFlowRefreshes')]"
+				"[concat(variables('factoryId'), '/pipelines/FT_DataFlowRefreshes')]"
 			]
 		},
 		{
