@@ -424,6 +424,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
+		"CaptureCI_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'CaptureCI'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1652,6 +1656,18 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
 		},
+		"CaptureCI_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"CaptureCI_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"CaptureCI_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -2866,6 +2882,9 @@
 					"view_report_api_ls_clientSecret": {
 						"value": "[parameters('view_report_api_ls_clientSecret')]"
 					},
+					"CaptureCI_password": {
+						"value": "[parameters('CaptureCI_password')]"
+					},
 					"getgroupsusers_api_ls_properties_typeProperties_url": {
 						"value": "[parameters('getgroupsusers_api_ls_properties_typeProperties_url')]"
 					},
@@ -2916,6 +2935,15 @@
 					},
 					"view_report_api_ls_properties_typeProperties_clientId": {
 						"value": "[parameters('view_report_api_ls_properties_typeProperties_clientId')]"
+					},
+					"CaptureCI_properties_typeProperties_server": {
+						"value": "[parameters('CaptureCI_properties_typeProperties_server')]"
+					},
+					"CaptureCI_properties_typeProperties_database": {
+						"value": "[parameters('CaptureCI_properties_typeProperties_database')]"
+					},
+					"CaptureCI_properties_typeProperties_userName": {
+						"value": "[parameters('CaptureCI_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -3052,12 +3080,6 @@
 					},
 					"DatasetuserHistory_sql_properties_typeProperties_userName": {
 						"value": "[parameters('DatasetuserHistory_sql_properties_typeProperties_userName')]"
-					},
-					"LS_API_Dataflow_properties_typeProperties_url": {
-						"value": "[parameters('LS_API_Dataflow_properties_typeProperties_url')]"
-					},
-					"LS_API_Dataflow_properties_typeProperties_clientId": {
-						"value": "[parameters('LS_API_Dataflow_properties_typeProperties_clientId')]"
 					}
 				}
 			},
@@ -3081,6 +3103,12 @@
 					},
 					"getreports_sql_ds_connectionString": {
 						"value": "[parameters('getreports_sql_ds_connectionString')]"
+					},
+					"LS_API_Dataflow_properties_typeProperties_url": {
+						"value": "[parameters('LS_API_Dataflow_properties_typeProperties_url')]"
+					},
+					"LS_API_Dataflow_properties_typeProperties_clientId": {
+						"value": "[parameters('LS_API_Dataflow_properties_typeProperties_clientId')]"
 					},
 					"LS_API_Dataflowrefreshes_properties_typeProperties_url": {
 						"value": "[parameters('LS_API_Dataflowrefreshes_properties_typeProperties_url')]"
