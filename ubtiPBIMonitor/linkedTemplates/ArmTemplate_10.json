@@ -42,24 +42,34 @@
 		"DatasetUsers_sql_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"DatasetuserHistory_sql_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DatasetuserHistory_sql_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"DatasetuserHistory_sql_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/WorkSpaceUsersLive_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "WorkSpaceUsersLive_sql_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Datasets_UAT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WorkSpaceUsers"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/WorkSpaceUsersStaging_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -829,32 +839,6 @@
 					"trustServerCertificate": false,
 					"authenticationType": "SQL",
 					"userName": "[parameters('DatasetUsers_sql_properties_typeProperties_userName')]",
-					"password": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "AzureSQLCredentials",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "AzureSQLPassword"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetuserHistory_sql')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DatasetuserHistory_sql_properties_typeProperties_server')]",
-					"database": "[parameters('DatasetuserHistory_sql_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DatasetuserHistory_sql_properties_typeProperties_userName')]",
 					"password": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
