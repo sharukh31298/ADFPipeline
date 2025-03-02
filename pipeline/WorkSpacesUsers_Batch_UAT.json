@@ -67,7 +67,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "FT_WorkSpacesUsers",
+									"referenceName": "WorkSpacesUsers_UAT",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -101,8 +101,6 @@
 			{
 				"name": "WorkSpaceUsers History",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "For Each Batch",
@@ -301,13 +299,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "WorkSpaceUsers_SQL",
+						"referenceName": "WorkSpaceUsersStaging_sql_UAT",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "WorkSpaceUsers_SQL_History",
+						"referenceName": "WorkSpaceUsersHistory_sql_UAT",
 						"type": "DatasetReference"
 					}
 				]
@@ -367,8 +365,6 @@
 			{
 				"name": "Capturing Status in WorkSpaces Users History",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpaceUsers History",
@@ -413,7 +409,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "Execute_ChildPipelineLogs",
+						"referenceName": "Execute_UATChildpipelineLogs",
 						"type": "DatasetReference"
 					}
 				}
@@ -508,7 +504,7 @@
 						{
 							"type": "Query",
 							"text": {
-								"value": "@concat('DELETE  [dbo].[WorkSpaces_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
+								"value": "@concat('DELETE  [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
 								"type": "Expression"
 							}
 						}
