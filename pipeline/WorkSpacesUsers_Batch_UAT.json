@@ -5,7 +5,14 @@
 			{
 				"name": "Get WorkSpace Batches",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Execute_ChildPipelinelogs",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -17,12 +24,15 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select distinct BatchNo from [dbo].[Workspaces_batch] ORDER BY 1",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[Workspaces_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "WorkSpaceLive_Sql_UAT",
+						"referenceName": "WorkSpaceUsers_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -33,7 +43,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Truncate WorkspacesUsers",
+						"activity": "Delete WorkSpaceUsers_Staging",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -57,7 +67,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "WorkSpacesUsers_UAT",
+									"referenceName": "FT_WorkSpacesUsers",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -91,6 +101,8 @@
 			{
 				"name": "WorkSpaceUsers History",
 				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "For Each Batch",
@@ -289,13 +301,13 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "WorkSpaceUsersStaging_sql_UAT",
+						"referenceName": "WorkSpaceUsers_SQL",
 						"type": "DatasetReference"
 					}
 				],
 				"outputs": [
 					{
-						"referenceName": "WorkSpaceUsersHistory_sql_UAT",
+						"referenceName": "WorkSpaceUsers_SQL_History",
 						"type": "DatasetReference"
 					}
 				]
@@ -303,14 +315,9 @@
 			{
 				"name": "Truncate WorkspacesUsers",
 				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpace Batches",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -327,7 +334,7 @@
 					"scripts": [
 						{
 							"type": "Query",
-							"text": "TRUNCATE TABLE [dbo].[WorkSpaces_Staging];"
+							"text": "TRUNCATE TABLE [dbo].[WorkSpaceUsers_Staging];"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
@@ -350,22 +357,18 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "pipelineReturnValue",
-					"value": [
-						{
-							"key": "Get WorkSpaces Batch Status",
-							"value": {
-								"type": "Expression",
-								"content": "@activity('Get WorkSpace Batches').status"
-							}
-						}
-					],
-					"setSystemVariable": true
+					"variableName": "Get WorkSpaces Batch Status",
+					"value": {
+						"value": "@activity('Get WorkSpace Batches').Status",
+						"type": "Expression"
+					}
 				}
 			},
 			{
 				"name": "Capturing Status in WorkSpaces Users History",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "WorkSpaceUsers History",
@@ -380,17 +383,137 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "pipelineReturnValue",
-					"value": [
-						{
-							"key": "WorkSpacesUsers History Status",
+					"variableName": "WorkSpacesUsers History Status",
+					"value": {
+						"value": "@activity('WorkSpaceUsers History').Status",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Execute_ChildPipelinelogs",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Execute_ChildPipelineLogs",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Sp_TrackProcessSuccess",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "WorkSpaceUsers History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Status in WorkSpaces Users History",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Capturing Workspaces Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[sp_ChildPipelineLog_Update]",
+					"storedProcedureParameters": {
+						"EndTime": {
 							"value": {
-								"type": "Expression",
-								"content": "@activity('WorkSpaceUsers History').Status"
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"LogTrackerID": {
+							"value": {
+								"value": "@activity('Execute_ChildPipelinelogs').output.firstRow.LogTrackerID",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"Status": {
+							"value": {
+								"value": "@if(and(and(and(and(\nequals(variables('Get Workspaces Status'),'Succeeded'),\nequals(variables('WorkspaceUsers Staging Staus'),'Succeeded')),\nequals(variables('WorkSpaceUserLive Status'),'Succeeded')),\nequals(variables('WorkSpaces Batch'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Delete WorkSpaceUsers_Staging",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Get WorkSpace Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "getreports_sql_ds",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "@concat('DELETE  [dbo].[WorkSpaces_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
+								"type": "Expression"
 							}
 						}
 					],
-					"setSystemVariable": true
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
@@ -616,9 +739,6 @@
 			"ReportPages Staging Status": {
 				"type": "String"
 			},
-			"ReportPages Live Status": {
-				"type": "String"
-			},
 			"Get ReportPages Status": {
 				"type": "String"
 			},
@@ -652,12 +772,6 @@
 			"Dataset History Status": {
 				"type": "String"
 			},
-			"Dataset Refreshes Staging Status": {
-				"type": "String"
-			},
-			"DatasetRefreshes Live Status": {
-				"type": "String"
-			},
 			"Get DatasetRefreshes Status": {
 				"type": "String"
 			},
@@ -674,9 +788,6 @@
 				"type": "String"
 			},
 			"Dataflows History Status": {
-				"type": "String"
-			},
-			"DataflowRefreshes Staging Status": {
 				"type": "String"
 			},
 			"DataflowRefreshes Status": {
@@ -719,6 +830,30 @@
 				"type": "String"
 			},
 			"Master DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"Get ReportPage Status": {
+				"type": "String"
+			},
+			"ReportPage Staging Status": {
+				"type": "String"
+			},
+			"DatasetUser Staging Status": {
+				"type": "String"
+			},
+			"DatasetUser Live Status": {
+				"type": "String"
+			},
+			"Get DatasetRefreshes_ Status": {
+				"type": "String"
+			},
+			"Get DatasetRefreshe Status": {
+				"type": "String"
+			},
+			"Get DatasetsRefreshes Status": {
+				"type": "String"
+			},
+			"DataflowRefreshesLive Status": {
 				"type": "String"
 			}
 		},

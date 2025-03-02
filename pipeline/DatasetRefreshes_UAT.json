@@ -18,14 +18,14 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select DatasetSourceKey,WorkspaceId from [dbo].[Dataset_batch] where BatchNo =',pipeline().parameters.BatchNo)",
+							"value": "@concat('select WorkspaceId,DatasetSourceKey from [dbo].[Dataset_batch] \nwhere BatchNo = ',string(pipeline().parameters.BatchNo),\n'AND TenantId = ',string(pipeline().parameters.TenantId))",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "DatasetLive_sql_UAT",
+						"referenceName": "Dataset_SQL",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -99,7 +99,8 @@
 								"sink": {
 									"type": "AzureSqlSink",
 									"writeBehavior": "insert",
-									"sqlWriterUseTableLock": false
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
 								},
 								"enableStaging": false,
 								"dataIntegrationUnits": 4,
@@ -222,226 +223,7 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "DatasetRefreshesStaging_sql_UAT",
-									"type": "DatasetReference"
-								}
-							]
-						},
-						{
-							"name": "Get DatasetRefreshes_Live",
-							"type": "Copy",
-							"dependsOn": [
-								{
-									"activity": "Get DatasetRefreshes_Staging",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "AzureSqlSource",
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"sink": {
-									"type": "AzureSqlSink",
-									"writeBehavior": "upsert",
-									"upsertSettings": {
-										"useTempDB": true,
-										"keys": [
-											"DatasetRefreshesSourceKey"
-										]
-									},
-									"sqlWriterUseTableLock": false,
-									"disableMetricsCollection": false
-								},
-								"enableStaging": false,
-								"dataIntegrationUnits": 4,
-								"translator": {
-									"type": "TabularTranslator",
-									"mappings": [
-										{
-											"source": {
-												"name": "DatasetRefreshesSourceKey",
-												"type": "String",
-												"physicalType": "varchar"
-											},
-											"sink": {
-												"name": "DatasetRefreshesSourceKey",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "WorkSpaceID",
-												"type": "String",
-												"physicalType": "varchar"
-											},
-											"sink": {
-												"name": "WorkSpaceID",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "DatasetID",
-												"type": "String",
-												"physicalType": "varchar"
-											},
-											"sink": {
-												"name": "DatasetID",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "RefreshType",
-												"type": "String",
-												"physicalType": "varchar"
-											},
-											"sink": {
-												"name": "RefreshType",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "StartTime",
-												"type": "DateTime",
-												"physicalType": "datetime"
-											},
-											"sink": {
-												"name": "StartTime",
-												"type": "DateTime",
-												"physicalType": "datetime"
-											}
-										},
-										{
-											"source": {
-												"name": "EndTime",
-												"type": "DateTime",
-												"physicalType": "datetime"
-											},
-											"sink": {
-												"name": "EndTime",
-												"type": "DateTime",
-												"physicalType": "datetime"
-											}
-										},
-										{
-											"source": {
-												"name": "RequestId",
-												"type": "String",
-												"physicalType": "varchar"
-											},
-											"sink": {
-												"name": "RequestId",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "Status",
-												"type": "String",
-												"physicalType": "varchar"
-											},
-											"sink": {
-												"name": "Status",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "CreatedDate",
-												"type": "DateTime",
-												"physicalType": "datetime"
-											},
-											"sink": {
-												"name": "CreatedDate",
-												"type": "DateTime",
-												"physicalType": "datetime"
-											}
-										},
-										{
-											"source": {
-												"name": "ModifiedDate",
-												"type": "DateTime",
-												"physicalType": "datetime"
-											},
-											"sink": {
-												"name": "ModifiedDate",
-												"type": "DateTime",
-												"physicalType": "datetime"
-											}
-										},
-										{
-											"source": {
-												"name": "CreatedBy",
-												"type": "String",
-												"physicalType": "varchar"
-											},
-											"sink": {
-												"name": "CreatedBy",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "ModifiedBy",
-												"type": "String",
-												"physicalType": "varchar"
-											},
-											"sink": {
-												"name": "ModifiedBy",
-												"type": "String",
-												"physicalType": "varchar"
-											}
-										},
-										{
-											"source": {
-												"name": "TenantId",
-												"type": "Int32",
-												"physicalType": "int"
-											},
-											"sink": {
-												"name": "TenantId",
-												"type": "Int32",
-												"physicalType": "int"
-											}
-										}
-									],
-									"typeConversion": true,
-									"typeConversionSettings": {
-										"allowDataTruncation": true,
-										"treatBooleanAsNumber": false
-									}
-								}
-							},
-							"inputs": [
-								{
-									"referenceName": "DatasetRefreshesStaging_sql_UAT",
-									"type": "DatasetReference"
-								}
-							],
-							"outputs": [
-								{
-									"referenceName": "DatasetRefreshesLive_sql_UAT",
+									"referenceName": "DatasetRefreshes_SQL",
 									"type": "DatasetReference"
 								}
 							]
@@ -463,35 +245,134 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "Dataset Refreshes Staging Status",
-								"value": {
-									"value": "@activity('Get DatasetRefreshes_Staging').Status",
-									"type": "Expression"
-								}
+								"variableName": "pipelineReturnValue",
+								"value": [
+									{
+										"key": "Dataset Refreshes Staging Status",
+										"value": {
+											"type": "Expression",
+											"content": "@activity('Get DatasetRefreshes_Staging').Status"
+										}
+									}
+								],
+								"setSystemVariable": true
 							}
 						},
 						{
-							"name": "Capturing DatasetRefreshes Live Status",
-							"type": "SetVariable",
+							"name": "Capturing DatasetRefreshes ED",
+							"type": "SqlServerStoredProcedure",
 							"dependsOn": [
 								{
-									"activity": "Get DatasetRefreshes_Live",
+									"activity": "Get DatasetRefreshes_Staging",
 									"dependencyConditions": [
 										"Completed"
 									]
 								}
 							],
 							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
 								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "DatasetRefreshes Live Status",
-								"value": {
-									"value": "@activity('Get DatasetRefreshes_Live').Status",
-									"type": "Expression"
+								"storedProcedureName": "[dbo].[Sp_DatasetRefrehesED]",
+								"storedProcedureParameters": {
+									"AppClientId": {
+										"value": {
+											"value": "@pipeline().parameters.AppClientId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"AppClientSecret": {
+										"value": {
+											"value": "@pipeline().parameters.AppClientCode",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"AppTentantId": {
+										"value": {
+											"value": "@pipeline().parameters.AppTenantId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"DataLoadTrackerId": {
+										"value": "",
+										"type": "String"
+									},
+									"DatasetID": {
+										"value": {
+											"value": "@item().DatasetSourceKey",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ErrorMessage": {
+										"value": {
+											"value": "@activity('Get DatasetRefreshes_Staging').error?.message",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineName": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineRunId": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ProcessEndTime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"ProcessStartTime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"Status": {
+										"value": {
+											"value": "@activity('Get DatasetRefreshes_Staging').Status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"TenantId": {
+										"value": {
+											"value": "@pipeline().parameters.TenantID",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"WorkSpaceID": {
+										"value": {
+											"value": "@item().WorkspaceId",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
 								}
+							},
+							"linkedServiceName": {
+								"referenceName": "DatasetRefreshes Log",
+								"type": "LinkedServiceReference"
 							}
 						}
 					]
@@ -500,20 +381,9 @@
 			{
 				"name": "Sp_TrackProcessSuccess",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Get Datasets",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
-						"activity": "DatasetID in Loop",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -595,7 +465,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "LS_ADF_Pipeline_Status_Log",
+					"referenceName": "ADF_Pipeline_Status_Log",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -697,11 +567,289 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "Get DatasetRefreshes Status",
-					"value": {
-						"value": "@activity('Get Datasets').Status",
-						"type": "Expression"
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "Get DatasetRefreshe Status",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('Get Datasets').Status"
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "Get DatasetRefreshes_Live",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": "EXEC UpsertFromSourceToTarget;",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 4,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "DatasetRefreshesSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "DatasetRefreshesSourceKey",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "DatasetID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "DatasetID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "RefreshType",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "RefreshType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "StartTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "StartTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "EndTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "EndTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "RequestId",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "RequestId",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TenantId",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "TenantId",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
 					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SQL_DatasetRefreshesLive_Staging",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SQl_DatasetRefreshesLive",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Capturing DatasetRefreshes Live Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "InsertUpdate Datasetrefreshes",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "DatasetRefreshes Live Status",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('InsertUpdate Datasetrefreshes').Status"
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "InsertUpdate Datasetrefreshes",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "DatasetID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "Upsert Query Dataset Refreshes",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC DatasetRefreshes_InsertUpsert;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
@@ -748,12 +896,6 @@
 			"Dataset History Status": {
 				"type": "String"
 			},
-			"Dataset Refreshes Staging Status": {
-				"type": "String"
-			},
-			"DatasetRefreshes Live Status": {
-				"type": "String"
-			},
 			"Get DatasetRefreshes Status": {
 				"type": "String"
 			},
@@ -770,12 +912,6 @@
 				"type": "String"
 			},
 			"Dataflows History Status": {
-				"type": "String"
-			},
-			"DataflowRefreshes Staging Status": {
-				"type": "String"
-			},
-			"DataflowRefreshes Status": {
 				"type": "String"
 			},
 			"Get Dataflowsrefreshes Status": {
@@ -815,6 +951,18 @@
 				"type": "String"
 			},
 			"Master DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"Get DatasetRefreshes_ Status": {
+				"type": "String"
+			},
+			"Get DatasetRefreshe Status": {
+				"type": "String"
+			},
+			"Get DatasetsRefreshes Status": {
+				"type": "String"
+			},
+			"DataflowRefreshesLive Status": {
 				"type": "String"
 			}
 		},
