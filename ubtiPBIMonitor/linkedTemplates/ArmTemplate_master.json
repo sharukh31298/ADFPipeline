@@ -432,6 +432,18 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Execute_UATChildpipelineLogs'"
 		},
+		"Capture_WorkSpacelive_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Capture_WorkSpacelive_UAT'"
+		},
+		"Ls_CapturingWorkspaceusersED_UAT_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ls_CapturingWorkspaceusersED_UAT'"
+		},
+		"WorkspaceUsers live_insertupdate UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'WorkspaceUsers live_insertupdate UAT'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1684,6 +1696,30 @@
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -2904,6 +2940,15 @@
 					"Execute_UATChildpipelineLogs_password": {
 						"value": "[parameters('Execute_UATChildpipelineLogs_password')]"
 					},
+					"Capture_WorkSpacelive_UAT_password": {
+						"value": "[parameters('Capture_WorkSpacelive_UAT_password')]"
+					},
+					"Ls_CapturingWorkspaceusersED_UAT_connectionString": {
+						"value": "[parameters('Ls_CapturingWorkspaceusersED_UAT_connectionString')]"
+					},
+					"WorkspaceUsers live_insertupdate UAT_password": {
+						"value": "[parameters('WorkspaceUsers live_insertupdate UAT_password')]"
+					},
 					"getgroupsusers_api_ls_properties_typeProperties_url": {
 						"value": "[parameters('getgroupsusers_api_ls_properties_typeProperties_url')]"
 					},
@@ -2972,6 +3017,24 @@
 					},
 					"Execute_UATChildpipelineLogs_properties_typeProperties_userName": {
 						"value": "[parameters('Execute_UATChildpipelineLogs_properties_typeProperties_userName')]"
+					},
+					"Capture_WorkSpacelive_UAT_properties_typeProperties_server": {
+						"value": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_server')]"
+					},
+					"Capture_WorkSpacelive_UAT_properties_typeProperties_database": {
+						"value": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_database')]"
+					},
+					"Capture_WorkSpacelive_UAT_properties_typeProperties_userName": {
+						"value": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_userName')]"
+					},
+					"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server": {
+						"value": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server')]"
+					},
+					"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database": {
+						"value": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database')]"
+					},
+					"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName": {
+						"value": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -3072,6 +3135,29 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'ubtiPBIMonitor_ArmTemplate_9')]"
+			]
+		},
+		{
+			"name": "ubtiPBIMonitor_ArmTemplate_11",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_11.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"getreports_sql_ds_connectionString": {
+						"value": "[parameters('getreports_sql_ds_connectionString')]"
 					},
 					"AzureSqlDatabaseLS_properties_typeProperties_server": {
 						"value": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_server')]"
@@ -3099,29 +3185,6 @@
 					},
 					"DatasetUsers_sql_properties_typeProperties_userName": {
 						"value": "[parameters('DatasetUsers_sql_properties_typeProperties_userName')]"
-					}
-				}
-			},
-			"dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'ubtiPBIMonitor_ArmTemplate_9')]"
-			]
-		},
-		{
-			"name": "ubtiPBIMonitor_ArmTemplate_11",
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2024-03-01",
-			"properties": {
-				"mode": "incremental",
-				"templateLink": {
-					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_11.json', parameters('containerSasToken'))]",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"factoryName": {
-						"value": "[parameters('factoryName')]"
-					},
-					"getreports_sql_ds_connectionString": {
-						"value": "[parameters('getreports_sql_ds_connectionString')]"
 					},
 					"DatasetuserHistory_sql_properties_typeProperties_server": {
 						"value": "[parameters('DatasetuserHistory_sql_properties_typeProperties_server')]"

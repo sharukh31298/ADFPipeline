@@ -47,6 +47,18 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Execute_UATChildpipelineLogs'"
 		},
+		"Capture_WorkSpacelive_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Capture_WorkSpacelive_UAT'"
+		},
+		"Ls_CapturingWorkspaceusersED_UAT_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ls_CapturingWorkspaceusersED_UAT'"
+		},
+		"WorkspaceUsers live_insertupdate UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'WorkspaceUsers live_insertupdate UAT'"
+		},
 		"getgroupsusers_api_ls_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkspaceID,'/users')}"
@@ -136,6 +148,30 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"Execute_UATChildpipelineLogs_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -426,6 +462,66 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('Execute_UATChildpipelineLogs_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Capture_WorkSpacelive_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Capture_WorkSpacelive_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Capture_WorkSpacelive_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ls_CapturingWorkspaceusersED_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Ls_CapturingWorkspaceusersED_UAT",
+				"annotations": [],
+				"type": "AmazonRdsForSqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('Ls_CapturingWorkspaceusersED_UAT_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WorkspaceUsers live_insertupdate UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "WorkspaceUsers live_insertupdate UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server')]",
+					"database": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('WorkspaceUsers live_insertupdate UAT_password')]"
 					}
 				}
 			},
@@ -779,96 +875,6 @@
 					"schema": "dbo",
 					"table": "Capacities_Staging"
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_InsertSP')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DS_InsertSP",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_lookupClientInformation')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DS_lookupClientInformation",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getdataflow_refreshes_ls",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"WorkSpaceID": {
-							"value": "@dataset().WorkSpaceID",
-							"type": "Expression"
-						},
-						"DataFlowID": {
-							"value": "@dataset().DataFlowID",
-							"type": "Expression"
-						},
-						"AppTenantId": {
-							"value": "@dataset().AppTenantId",
-							"type": "Expression"
-						},
-						"AppClientId": {
-							"value": "@dataset().AppClientId",
-							"type": "Expression"
-						},
-						"AppClientCode": {
-							"value": "@dataset().AppClientCode",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"WorkSpaceID": {
-						"type": "string"
-					},
-					"DataFlowID": {
-						"type": "string"
-					},
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
 			},
 			"dependsOn": []
 		}

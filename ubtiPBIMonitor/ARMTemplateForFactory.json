@@ -432,6 +432,18 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Execute_UATChildpipelineLogs'"
 		},
+		"Capture_WorkSpacelive_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Capture_WorkSpacelive_UAT'"
+		},
+		"Ls_CapturingWorkspaceusersED_UAT_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ls_CapturingWorkspaceusersED_UAT'"
+		},
+		"WorkspaceUsers live_insertupdate UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'WorkspaceUsers live_insertupdate UAT'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1681,6 +1693,30 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"Execute_UATChildpipelineLogs_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -80148,7 +80184,7 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "WorkSpaces_SQL_Staging",
+								"referenceName": "WorkSpacesStaging_Sql_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -80374,14 +80410,14 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "WorkSpaces_SQL_Staging",
+								"referenceName": "WorkSpacesStaging_Sql_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "WorkSpaces_SQL",
+								"referenceName": "WorkSpaceLive_Sql_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -80607,14 +80643,14 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "WorkSpaces_SQL_Staging",
+								"referenceName": "WorkSpacesStaging_Sql_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "WorkSpaces_SQL_History",
+								"referenceName": "WorkSpaceHistory_Sql_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -81182,9 +81218,9 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/WorkSpaces_API')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaces_SQL_Staging')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaces_SQL')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaces_SQL_History')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpacesStaging_Sql_UAT')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceLive_Sql_UAT')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceHistory_Sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]"
 			]
@@ -81218,7 +81254,7 @@
 								"partitionOption": "None"
 							},
 							"dataset": {
-								"referenceName": "WorkSpaces_SQL",
+								"referenceName": "Capture_WorkSpacelive_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							},
@@ -81388,7 +81424,7 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "WorkSpaceUsers_SQL",
+											"referenceName": "WorkSpaceUsersStaging_sql_UAT",
 											"type": "DatasetReference",
 											"parameters": {}
 										}
@@ -81530,7 +81566,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "LS_Capturing WorkSpaceUsers ED",
+										"referenceName": "Ls_CapturingWorkspaceusersED_UAT",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -81934,7 +81970,7 @@
 						},
 						"userProperties": [],
 						"linkedServiceName": {
-							"referenceName": "InsertUpdate WorkspaceUsers Live table",
+							"referenceName": "WorkspaceUsers live_insertupdate UAT",
 							"type": "LinkedServiceReference"
 						},
 						"typeProperties": {
@@ -82311,14 +82347,14 @@
 				"lastPublishTime": "2023-11-29T06:27:10Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/WorkSpaces_SQL')]",
+				"[concat(variables('factoryId'), '/datasets/Capture_WorkSpacelive_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
-				"[concat(variables('factoryId'), '/linkedServices/InsertUpdate WorkspaceUsers Live table')]",
+				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers live_insertupdate UAT')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_SQL')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_Capturing WorkSpaceUsers ED')]"
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Ls_CapturingWorkspaceusersED_UAT')]"
 			]
 		},
 		{
@@ -82393,7 +82429,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "FT_WorkSpacesUsers",
+											"referenceName": "WorkSpacesUsers_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -82427,8 +82463,6 @@
 					{
 						"name": "WorkSpaceUsers History",
 						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "For Each Batch",
@@ -82627,14 +82661,14 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "WorkSpaceUsers_SQL",
+								"referenceName": "WorkSpaceUsersStaging_sql_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						],
 						"outputs": [
 							{
-								"referenceName": "WorkSpaceUsers_SQL_History",
+								"referenceName": "WorkSpaceUsersHistory_sql_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -82695,8 +82729,6 @@
 					{
 						"name": "Capturing Status in WorkSpaces Users History",
 						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "WorkSpaceUsers History",
@@ -82741,7 +82773,7 @@
 								"partitionOption": "None"
 							},
 							"dataset": {
-								"referenceName": "Execute_ChildPipelineLogs",
+								"referenceName": "Execute_UATChildpipelineLogs",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
@@ -82837,7 +82869,7 @@
 								{
 									"type": "Query",
 									"text": {
-										"value": "@concat('DELETE  [dbo].[WorkSpaces_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
+										"value": "@concat('DELETE  [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
 										"type": "Expression"
 									}
 								}
@@ -83197,11 +83229,12 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_SQL')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_SQL_History')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersHistory_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/getreports_sql_ds')]",
-				"[concat(variables('factoryId'), '/datasets/Execute_ChildPipelineLogs')]",
+				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/pipelines/FT_WorkSpacesUsers')]"
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_UAT')]"
 			]
 		},
 		{
@@ -95097,6 +95130,158 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Execute_UATChildpipelineLogs')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Capture_WorkSpacelive_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Capture_WorkSpacelive_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Capture_WorkSpacelive_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Capture_WorkSpacelive_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Capture_WorkSpacelive_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "WorkSpaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "WorkSpaceSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceName",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceType",
+						"type": "varchar"
+					},
+					{
+						"name": "IsonDedicatedCapacity",
+						"type": "bit"
+					},
+					{
+						"name": "CapacityMigrationStatus",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "IsReadOnly",
+						"type": "bit"
+					},
+					{
+						"name": "HasWorkspaceLevelSetting",
+						"type": "bit"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WorkSpaces"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Capture_WorkSpacelive_UAT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ls_CapturingWorkspaceusersED_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Ls_CapturingWorkspaceusersED_UAT",
+				"annotations": [],
+				"type": "AmazonRdsForSqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('Ls_CapturingWorkspaceusersED_UAT_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WorkspaceUsers live_insertupdate UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "WorkspaceUsers live_insertupdate UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server')]",
+					"database": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('WorkspaceUsers live_insertupdate UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }
