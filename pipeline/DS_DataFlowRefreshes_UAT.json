@@ -1,0 +1,928 @@
+{
+	"name": "DS_DataFlowRefreshes_UAT",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Dataflows",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select DataflowSourcekey,WorkSpaceID from [dbo].[DataFlows_batch] \nwhere BatchNo =',string(pipeline().parameters.BatchNo),\n' AND TenantId = ',string(pipeline().parameters.TenantId))",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DataflowLive_sql_UAT",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Dataflow ID in Loop",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Get Dataflows",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Dataflows').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Get DataflowRefresh_Staging",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"additionalColumns": [
+										{
+											"name": "WorkSpaceID",
+											"value": {
+												"value": "@item().WorkSpaceID",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "DataFlowID",
+											"value": {
+												"value": "@item().DataflowSourceKey",
+												"type": "Expression"
+											}
+										},
+										{
+											"name": "TenantId",
+											"value": {
+												"value": "@pipeline().parameters.TenantId",
+												"type": "Expression"
+											}
+										}
+									],
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"dataIntegrationUnits": 4,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "['id']"
+											},
+											"sink": {
+												"name": "DataflowRefreshesSourcekey",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['refreshType']"
+											},
+											"sink": {
+												"name": "RefreshType",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "['startTime']"
+											},
+											"sink": {
+												"name": "StartTime",
+												"type": "DateTime"
+											}
+										},
+										{
+											"source": {
+												"path": "['endTime']"
+											},
+											"sink": {
+												"name": "EndTime",
+												"type": "DateTime"
+											}
+										},
+										{
+											"source": {
+												"path": "['status']"
+											},
+											"sink": {
+												"name": "Status",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['WorkSpaceID']"
+											},
+											"sink": {
+												"name": "WorkSpaceID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['DataFlowID']"
+											},
+											"sink": {
+												"name": "DataflowID",
+												"type": "String"
+											}
+										},
+										{
+											"source": {
+												"path": "$['TenantId']"
+											},
+											"sink": {
+												"name": "TenantId",
+												"type": "Int32"
+											}
+										}
+									],
+									"collectionReference": "$['value']"
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DataFlowRefreshes_API",
+									"type": "DatasetReference",
+									"parameters": {
+										"WorkSpaceID": {
+											"value": "@item().WorkSpaceID",
+											"type": "Expression"
+										},
+										"DataFlowID": {
+											"value": "@item().DataflowSourceKey",
+											"type": "Expression"
+										},
+										"AppTenantId": {
+											"value": "@pipeline().parameters.AppTenantId",
+											"type": "Expression"
+										},
+										"AppClientId": {
+											"value": "@pipeline().parameters.AppClientId",
+											"type": "Expression"
+										},
+										"AppClientCode": {
+											"value": "@pipeline().parameters.AppClientCode",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DataflowRefreshesStaging_sql_UAT",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "Capturing DataflowRefreshes Staging",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Get DataflowRefresh_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "pipelineReturnValue",
+								"value": [
+									{
+										"key": "DataflowRefreshes Staging Status",
+										"value": {
+											"type": "Expression",
+											"content": "@activity('Get DataflowRefresh_Staging').Status"
+										}
+									}
+								],
+								"setSystemVariable": true
+							}
+						},
+						{
+							"name": "Capturing EM",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Get DataflowRefresh_Staging",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "Sp_DataflowRefreshesED",
+								"storedProcedureParameters": {
+									"AppClientId": {
+										"value": {
+											"value": "@pipeline().parameters.AppClientId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"AppClientSecret": {
+										"value": {
+											"value": "@pipeline().parameters.AppClientCode",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"AppTentantId": {
+										"value": {
+											"value": "@pipeline().parameters.AppTenantId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"DataLoadTrackerId": {
+										"value": "",
+										"type": "String"
+									},
+									"ErrorMessage": {
+										"value": {
+											"value": "@activity('Get DataflowRefresh_Staging').error?.message",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineRunId": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"ProcessEndTime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"ProcessStartTime": {
+										"value": {
+											"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+											"type": "Expression"
+										},
+										"type": "DateTime"
+									},
+									"Status": {
+										"value": {
+											"value": "@activity('Get DataflowRefresh_Staging').Status",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"TenantId": {
+										"value": {
+											"value": "@pipeline().parameters.TenantId",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"PipelineName": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"WorkSpaceID": {
+										"value": {
+											"value": "@item().WorkSpaceID",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"DataFlowID": {
+										"value": {
+											"value": "@item().DataflowSourceKey",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "DataFlowRefreshes_log_UAT",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Sp_TrackProcessSuccess",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"ErrorMessage": {
+							"value": "NA",
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": {
+								"value": "@activity('Get Dataflows').Status",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TenantID": {
+							"value": {
+								"value": "@pipeline().parameters.TenantID",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Sp_TrackProcessFailure",
+				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[usp_LogADF_PipelineExecution]",
+					"storedProcedureParameters": {
+						"EndTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"ErrorMessage": {
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"RunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"StartTime": {
+							"value": {
+								"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": null,
+							"type": "String"
+						},
+						"TriggerName": {
+							"value": {
+								"value": "@pipeline().TriggerName",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@pipeline().TriggerTime",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "@pipeline().TriggerType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Pipeline_Status_Log",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Capturing Get Dataflows Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Dataflows",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "Get Dataflowsrefreshes Status",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('Get Dataflows').Status"
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "Capturing DataflowRefreshes Live Status",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "InserUpdate DataflowRefreshes",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "pipelineReturnValue",
+					"value": [
+						{
+							"key": "DataflowRefreshesLive Status",
+							"value": {
+								"type": "Expression",
+								"content": "@activity('InserUpdate DataflowRefreshes').Status"
+							}
+						}
+					],
+					"setSystemVariable": true
+				}
+			},
+			{
+				"name": "Get DataflowRefresh_Live",
+				"type": "Copy",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"DataflowRefreshesSourcekey"
+							]
+						},
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 4,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "DataflowRefreshesSourcekey",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "DataflowRefreshesSourcekey",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "WorkSpaceID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "DataflowID",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "DataflowID",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "RefreshType",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "RefreshType",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "StartTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "StartTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "EndTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "EndTime",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "Status",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "CreatedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "ModifiedDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "CreatedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								},
+								"sink": {
+									"name": "ModifiedBy",
+									"type": "String",
+									"physicalType": "varchar"
+								}
+							},
+							{
+								"source": {
+									"name": "TenantId",
+									"type": "Int32",
+									"physicalType": "int"
+								},
+								"sink": {
+									"name": "TenantId",
+									"type": "Int32",
+									"physicalType": "int"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SQL_DataFlowRefreshLive_Staging",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "SQL_DataFlowRefeshLive",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "InserUpdate DataflowRefreshes",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Dataflow ID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "InserUpdate_Dataflowrefreshes_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC DataflowRefreshes_InsertUpsert"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"AppTenantId": {
+				"type": "string"
+			},
+			"AppClientId": {
+				"type": "string"
+			},
+			"AppClientCode": {
+				"type": "string"
+			},
+			"TenantId": {
+				"type": "int"
+			},
+			"BatchNo": {
+				"type": "string",
+				"defaultValue": "@item().BatchNo"
+			}
+		},
+		"variables": {
+			"DataFlowRefreshes_Status": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_StartTime": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_EndTime": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_IST": {
+				"type": "String"
+			},
+			"DataFlowRefreshes_IST2": {
+				"type": "String"
+			},
+			"DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"Get Dataflowsrefreshes Status": {
+				"type": "String"
+			},
+			"Get Dataflowsrefreshes Batch": {
+				"type": "String"
+			},
+			"DataflowRefreshes History Status": {
+				"type": "String"
+			},
+			"Master Workspaces Status": {
+				"type": "String"
+			},
+			"Master WorkSpaceUsers Status": {
+				"type": "String"
+			},
+			"Master Report status": {
+				"type": "String"
+			},
+			"Master ReportPages Status": {
+				"type": "String"
+			},
+			"Master Datasets Status": {
+				"type": "String"
+			},
+			"Master Datasetfreshes status": {
+				"type": "String"
+			},
+			"Master Datasetusers Status": {
+				"type": "String"
+			},
+			"Master Viewreports Status": {
+				"type": "String"
+			},
+			"Master Dataflows Status": {
+				"type": "String"
+			},
+			"Master DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"DataflowRefreshesLive Status": {
+				"type": "String"
+			},
+			"Dataflowrefreshes Staging EM": {
+				"type": "String"
+			},
+			"DataflowRefreshes Staging Status": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "DailyScheduleChildPipelines_UAT"
+		},
+		"annotations": []
+	}
+}
