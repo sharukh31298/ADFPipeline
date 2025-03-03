@@ -496,6 +496,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_lokkupClientInformation_UAT'"
 		},
+		"DS_InsertMasterlog_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DS_InsertMasterlog_UAT'"
+		},
+		"DS_updateMasterlog_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DS_updateMasterlog_UAT'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1901,6 +1909,30 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"DS_lokkupClientInformation_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DS_InsertMasterlog_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DS_InsertMasterlog_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DS_InsertMasterlog_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DS_updateMasterlog_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DS_updateMasterlog_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DS_updateMasterlog_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -95748,7 +95780,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DailyScheduleMasterPipeline_V1_copy1')]",
+			"name": "[concat(parameters('factoryName'), '/DailyScheduleMasterPipeline_V1_UAT')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -95820,7 +95852,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_WorkSpaces",
+											"referenceName": "DS_WorkSpaces_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -95885,7 +95917,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_WorkSpacesUsers_Batch",
+											"referenceName": "DS_WorkSpacesUsers_Batch_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -95943,7 +95975,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_Reports",
+											"referenceName": "DS_Reports_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -96008,7 +96040,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_ReportPages_Batch",
+											"referenceName": "DS_ReportPages_Batch_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -96066,7 +96098,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_Datasets",
+											"referenceName": "DS_Datasets_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -96131,7 +96163,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_DatasetUsers_Batch",
+											"referenceName": "DS_DatasetUsers_Batch_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -96196,7 +96228,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_DatasetRefreshes_Batch",
+											"referenceName": "DS_DatasetRefreshes_Batch_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -96254,7 +96286,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_ViewReports",
+											"referenceName": "DS_ViewReports_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": false,
@@ -96312,7 +96344,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_DataFlows",
+											"referenceName": "DS_DataFlows_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -96377,7 +96409,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DS_DataFlowRefreshes_Batch",
+											"referenceName": "DS_DataFlowRefreshes_Batch_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -96537,7 +96569,7 @@
 											"partitionOption": "None"
 										},
 										"dataset": {
-											"referenceName": "DS_InsertSP",
+											"referenceName": "DS_InsertMasterlog_UAT",
 											"type": "DatasetReference",
 											"parameters": {}
 										}
@@ -96637,7 +96669,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "DS_updateLog_SP",
+										"referenceName": "DS_updateMasterlog_UAT",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -96704,19 +96736,19 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_lokkupClientInformation_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpaces')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpacesUsers_Batch')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_Reports')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_ReportPages_Batch')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_Datasets')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DatasetUsers_Batch')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DatasetRefreshes_Batch')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_ViewReports')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DataFlows')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DataFlowRefreshes_Batch')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpaces_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpacesUsers_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_Reports_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_ReportPages_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_Datasets_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DatasetUsers_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DatasetRefreshes_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_ViewReports_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DataFlows_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DataFlowRefreshes_Batch_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Dataloadtracker_SQL')]",
-				"[concat(variables('factoryId'), '/datasets/DS_InsertSP')]",
-				"[concat(variables('factoryId'), '/linkedServices/DS_updateLog_SP')]"
+				"[concat(variables('factoryId'), '/datasets/DS_InsertMasterlog_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/DS_updateMasterlog_UAT')]"
 			]
 		},
 		{
@@ -110322,7 +110354,7 @@
 								"value": "@activity('Get DataFlow Batches').output.value",
 								"type": "Expression"
 							},
-							"isSequential": false,
+							"isSequential": true,
 							"activities": [
 								{
 									"name": "If not max batch",
@@ -111848,6 +111880,70 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/DS_lokkupClientInformation_UAT')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_InsertMasterlog_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DS_InsertMasterlog_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DS_InsertMasterlog_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('DS_InsertMasterlog_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DS_InsertMasterlog_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DS_InsertMasterlog_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_InsertMasterlog_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DS_InsertMasterlog_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DS_InsertMasterlog_UAT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_updateMasterlog_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DS_updateMasterlog_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DS_updateMasterlog_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('DS_updateMasterlog_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DS_updateMasterlog_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DS_updateMasterlog_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }
