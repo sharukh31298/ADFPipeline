@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"DataflowStaging_sql_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DataflowStaging_sql_UAT'"
+		},
+		"DatasetHistory_sql_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DatasetHistory_sql_UAT'"
+		},
 		"DatasetLive_sql_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetLive_sql_UAT'"
@@ -47,6 +55,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Execute_ChildPipelineLogs'"
 		},
+		"Execute_UATChildpipelineLogs_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Execute_UATChildpipelineLogs'"
+		},
 		"InserUpdate Dataflowrefreshes_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'InserUpdate Dataflowrefreshes'"
@@ -75,17 +87,29 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'LS_API_Workspaces'"
 		},
-		"LS_Capturing DatasetUsers ED_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Capturing DatasetUsers ED'"
+		"DataflowStaging_sql_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
 		},
-		"LS_Capturing ReportPages ED_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Capturing ReportPages ED'"
+		"DataflowStaging_sql_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
 		},
-		"LS_Capturing WorkSpaceUsers ED_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Capturing WorkSpaceUsers ED'"
+		"DataflowStaging_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DatasetHistory_sql_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DatasetHistory_sql_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DatasetHistory_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"DatasetLive_sql_UAT_properties_typeProperties_server": {
 			"type": "string",
@@ -207,6 +231,18 @@
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
+		"Execute_UATChildpipelineLogs_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Execute_UATChildpipelineLogs_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Execute_UATChildpipelineLogs_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
 		"InserUpdate Dataflowrefreshes_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -282,48 +318,58 @@
 		"LS_API_Workspaces_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
-		},
-		"LS_Capturing DatasetUsers ED_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_Capturing DatasetUsers ED_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_Capturing DatasetUsers ED_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/DataflowStaging_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DataflowStaging_sql_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DataflowStaging_sql_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('DataflowStaging_sql_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DataflowStaging_sql_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DataflowStaging_sql_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetHistory_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DatasetHistory_sql_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DatasetHistory_sql_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DatasetLive_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -552,6 +598,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Execute_UATChildpipelineLogs')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Execute_UATChildpipelineLogs",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Execute_UATChildpipelineLogs_properties_typeProperties_server')]",
+					"database": "[parameters('Execute_UATChildpipelineLogs_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Execute_UATChildpipelineLogs_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Execute_UATChildpipelineLogs_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/InserUpdate Dataflowrefreshes')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -721,74 +790,6 @@
 					},
 					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTentantId,'/oauth2/v2.0/token')}",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Capturing DatasetUsers ED')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "LS_Capturing DatasetUsers ED",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Capturing DatasetUsers ED_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Capturing ReportPages ED')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "LS_Capturing ReportPages ED",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Capturing ReportPages ED_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Capturing WorkSpaceUsers ED')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Capturing WorkSpaceUsers ED_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Capturing WorkSpaceUsers ED_password')]"
-					}
 				}
 			},
 			"dependsOn": []

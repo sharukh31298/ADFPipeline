@@ -19,6 +19,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Capacities_History'"
 		},
+		"CaptureCI_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'CaptureCI'"
+		},
+		"Capture_WorkSpacelive_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Capture_WorkSpacelive_UAT'"
+		},
 		"Capturing Error Message_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Capturing Error Message'"
@@ -63,14 +71,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DataflowRefreshesStaging_sql_UAT'"
 		},
-		"DataflowStaging_sql_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DataflowStaging_sql_UAT'"
-		},
-		"DatasetHistory_sql_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DatasetHistory_sql_UAT'"
-		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -106,6 +106,30 @@
 		"BaseURl_LS_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
+		},
+		"CaptureCI_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"CaptureCI_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"CaptureCI_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Capture_WorkSpacelive_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"Capturing Error Message_properties_typeProperties_server": {
 			"type": "string",
@@ -238,30 +262,6 @@
 		"DataflowRefreshesStaging_sql_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"DataflowStaging_sql_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DataflowStaging_sql_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DataflowStaging_sql_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"DatasetHistory_sql_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DatasetHistory_sql_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DatasetHistory_sql_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -373,6 +373,52 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('Capacities_History_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CaptureCI')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "CaptureCI",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('CaptureCI_properties_typeProperties_server')]",
+					"database": "[parameters('CaptureCI_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('CaptureCI_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('CaptureCI_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Capture_WorkSpacelive_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Capture_WorkSpacelive_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Capture_WorkSpacelive_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Capture_WorkSpacelive_UAT_password')]"
+					}
 				}
 			},
 			"dependsOn": []
@@ -620,52 +666,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DataflowRefreshesStaging_sql_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataflowStaging_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DataflowStaging_sql_UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DataflowStaging_sql_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('DataflowStaging_sql_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DataflowStaging_sql_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DataflowStaging_sql_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetHistory_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DatasetHistory_sql_UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DatasetHistory_sql_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DatasetHistory_sql_UAT_password')]"
 					}
 				}
 			},
