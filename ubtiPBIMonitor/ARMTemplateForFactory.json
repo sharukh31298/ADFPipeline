@@ -28646,7 +28646,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"UserName",
+													"Identifier"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -29730,9 +29738,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Delete WorkSpaceUsers_Staging",
+								"activity": "Get WorkSpace Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -30173,14 +30181,9 @@
 					{
 						"name": "Delete WorkSpaceUsers_Staging",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get WorkSpace Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -38485,7 +38488,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
@@ -39874,7 +39877,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": []
 			},
@@ -42337,7 +42340,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T05:26:21Z"
@@ -45121,7 +45124,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
@@ -46576,7 +46579,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": []
 			},
@@ -49464,7 +49467,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
@@ -50900,7 +50903,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
@@ -54504,7 +54507,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T05:26:21Z"
@@ -72459,7 +72462,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadchildPipeline"
+					"name": "UAT_FirstTimeLoadMasterPipeline"
 				},
 				"annotations": []
 			},
@@ -77864,7 +77867,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
@@ -79539,7 +79542,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": []
 			},
@@ -83282,7 +83285,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T05:26:21Z"
@@ -90013,7 +90016,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T09:03:18Z"
@@ -95061,7 +95064,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
@@ -96835,7 +96838,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
@@ -99141,7 +99144,7 @@
 					}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadMasterPipeline"
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T05:26:21Z"
