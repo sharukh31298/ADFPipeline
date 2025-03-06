@@ -58,38 +58,6 @@
 					"isSequential": true,
 					"activities": [
 						{
-							"name": "If not max batch",
-							"type": "IfCondition",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
-							"dependsOn": [
-								{
-									"activity": "Execute Pipeline DataflowRefreshes",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"expression": {
-									"value": "@less(item().BatchNo,activity('Get DataFlow Batches').output.count)",
-									"type": "Expression"
-								},
-								"ifTrueActivities": [
-									{
-										"name": "Wait 1 Hour",
-										"type": "Wait",
-										"dependsOn": [],
-										"userProperties": [],
-										"typeProperties": {
-											"waitTimeInSeconds": 3600
-										}
-									}
-								]
-							}
-						},
-						{
 							"name": "Execute Pipeline DataflowRefreshes",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
@@ -99,7 +67,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "DataFlowRefreshes_UAT",
+									"referenceName": "DS_DataFlowRefreshes_UAT",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
