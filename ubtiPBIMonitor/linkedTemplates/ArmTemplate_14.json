@@ -10732,6 +10732,10 @@
 												"AppClientCode": {
 													"value": "@pipeline().parameters.AppClientCode",
 													"type": "Expression"
+												},
+												"BatchNo": {
+													"value": "@item().BatchNo",
+													"type": "Expression"
 												}
 											}
 										}
@@ -11998,7 +12002,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"ReportID",
+													"ReportPageName",
+													"report_order"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},

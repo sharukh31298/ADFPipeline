@@ -13228,6 +13228,10 @@
 												"AppClientCode": {
 													"value": "@pipeline().parameters.AppClientCode",
 													"type": "Expression"
+												},
+												"BatchNo": {
+													"value": "@item().BatchNo",
+													"type": "Expression"
 												}
 											}
 										}
@@ -14350,6 +14354,10 @@
 												},
 												"AppClientCode": {
 													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"BatchNo": {
+													"value": "@item().BatchNo",
 													"type": "Expression"
 												}
 											}
@@ -17783,7 +17791,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DataflowID",
+													"DataflowRefreshesSourcekey"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -21666,7 +21682,14 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DatasetID"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -22650,7 +22673,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DatasetID",
+													"Identifier"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
