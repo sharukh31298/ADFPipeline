@@ -43,7 +43,13 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "Truncate Table dbo.Reports_Staging;",
-						"writeBehavior": "insert",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"ReportSourceKey"
+							]
+						},
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
