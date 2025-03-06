@@ -5219,38 +5219,6 @@
 							"isSequential": true,
 							"activities": [
 								{
-									"name": "If not max batch",
-									"type": "IfCondition",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
-									"dependsOn": [
-										{
-											"activity": "Execute Pipeline DataflowRefreshes",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@less(item().BatchNo,activity('Get DataFlow Batches').output.count)",
-											"type": "Expression"
-										},
-										"ifTrueActivities": [
-											{
-												"name": "Wait 1 Hour",
-												"type": "Wait",
-												"dependsOn": [],
-												"userProperties": [],
-												"typeProperties": {
-													"waitTimeInSeconds": 3600
-												}
-											}
-										]
-									}
-								},
-								{
 									"name": "Execute Pipeline DataflowRefreshes",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
@@ -5260,7 +5228,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DataFlowRefreshes_UAT",
+											"referenceName": "DS_DataFlowRefreshes_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -5747,7 +5715,7 @@
 				"[concat(variables('factoryId'), '/datasets/DataflowRefreshesHistory_sql_UAT')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
-				"[concat(variables('factoryId'), '/pipelines/DataFlowRefreshes_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_DataFlowRefreshes_UAT')]"
 			]
 		},
 		{
@@ -10132,7 +10100,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DatasetRefreshes_UAT",
+											"referenceName": "DS_DatasetRefreshes_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -10670,7 +10638,7 @@
 				"[concat(variables('factoryId'), '/datasets/DatasetRefreshesHistory_sql_UAT')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
-				"[concat(variables('factoryId'), '/pipelines/DatasetRefreshes_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_DatasetRefreshes_UAT')]"
 			]
 		},
 		{
@@ -13389,7 +13357,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "DatasetUsers_UAT",
+											"referenceName": "DS_DatasetUsers_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -13924,7 +13892,7 @@
 				"[concat(variables('factoryId'), '/datasets/DatasetUsersHistory_sql_UAT')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
-				"[concat(variables('factoryId'), '/pipelines/DatasetUsers_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_DatasetUsers_UAT')]"
 			]
 		},
 		{
@@ -19261,7 +19229,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "ReportPages_UAT",
+											"referenceName": "DS_ReportPages_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -19793,7 +19761,7 @@
 				"[concat(variables('factoryId'), '/datasets/ReportPagesHistory_sql_UAT')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
-				"[concat(variables('factoryId'), '/pipelines/ReportPages_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_ReportPages_UAT')]"
 			]
 		},
 		{
@@ -30675,7 +30643,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "WorkSpacesUsers_UAT",
+											"referenceName": "DS_WorkSpacesUsers_UAT",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -31476,7 +31444,7 @@
 				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/Sql_DeleteQuery_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpacesUsers_UAT')]"
 			]
 		},
 		{
@@ -107990,7 +107958,7 @@
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "WorkSpaceUsers_Staging"
+					"table": "WorkSpaces"
 				}
 			},
 			"dependsOn": [
