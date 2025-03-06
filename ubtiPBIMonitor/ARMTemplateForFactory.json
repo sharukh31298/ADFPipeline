@@ -5204,9 +5204,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Truncate Dataflow Refreshes",
+								"activity": "Get DataFlow Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -5294,14 +5294,9 @@
 					{
 						"name": "Truncate Dataflow Refreshes",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get DataFlow Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -5857,7 +5852,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DataflowID",
+													"DataflowRefreshesSourcekey"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -7624,7 +7627,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate table Dataflows_Staging",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"DataflowSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -10099,9 +10108,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Truncate Dataset Refreshes",
+								"activity": "Get Dataset Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -10157,14 +10166,9 @@
 					{
 						"name": "Truncate Dataset Refreshes",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get Dataset Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -10772,7 +10776,14 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DatasetID"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -13354,9 +13365,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Truncate Dataset Users",
+								"activity": "Get Dataset Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -13412,14 +13423,9 @@
 					{
 						"name": "Truncate Dataset Users",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get Dataset Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -14024,7 +14030,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DatasetID",
+													"Identifier"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -16232,7 +16246,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table [dbo].Datasets_Staging;",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"DatasetSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -19217,9 +19237,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Delete ReportPages",
+								"activity": "Get ReportPages in Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -19275,14 +19295,9 @@
 					{
 						"name": "Delete ReportPages",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get ReportPages in Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -19884,7 +19899,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"ReportID",
+													"ReportPageName",
+													"report_order"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -22123,7 +22146,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table dbo.Reports_Staging;",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ReportSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -26666,7 +26695,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ViewReportSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -30620,9 +30655,9 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Delete WorkSpaceUsers_Staging",
+								"activity": "Get WorkSpace Batches",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -31059,14 +31094,9 @@
 					{
 						"name": "Delete WorkSpaceUsers_Staging",
 						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get WorkSpace Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -31549,7 +31579,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkspaceID ",
+													"Username",
+													"Identifier"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -32636,10 +32674,16 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "@concat('DELETE [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))",
+									"value": "@{concat('DELETE [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))}",
 									"type": "Expression"
 								},
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"WorkSpaceSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -45716,14 +45760,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"DatasetID"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -78575,15 +78612,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"ReportID",
-													"ReportPageName",
-													"report_order"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -89399,13 +89428,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"ViewReportSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -95858,15 +95881,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"UserName",
-													"Identifier"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -98043,13 +98058,7 @@
 									"value": "@{concat('DELETE [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))}",
 									"type": "Expression"
 								},
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},

@@ -1099,7 +1099,14 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DatasetID"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -2083,7 +2090,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DatasetID",
+													"Identifier"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -4275,7 +4290,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table [dbo].Datasets_Staging;",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"DatasetSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -5583,7 +5604,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"ReportID",
+													"ReportPageName",
+													"report_order"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -6630,7 +6659,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table dbo.Reports_Staging;",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ReportSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -11158,7 +11193,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ViewReportSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -14258,7 +14299,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkspaceID ",
+													"Username",
+													"Identifier"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -15336,10 +15385,16 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "@concat('DELETE [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))",
+									"value": "@{concat('DELETE [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))}",
 									"type": "Expression"
 								},
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"WorkSpaceSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -21688,14 +21743,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"DatasetID"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},

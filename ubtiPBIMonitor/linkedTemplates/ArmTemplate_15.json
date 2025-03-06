@@ -2151,15 +2151,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"UserName",
-													"Identifier"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -3240,13 +3232,7 @@
 									"value": "@{concat('DELETE [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))}",
 									"type": "Expression"
 								},
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},

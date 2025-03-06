@@ -2744,7 +2744,15 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DataflowID",
+													"DataflowRefreshesSourcekey"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -4495,7 +4503,13 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate table Dataflows_Staging",
-								"writeBehavior": "insert",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"DataflowSourceKey"
+									]
+								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
