@@ -13,6 +13,82 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Reports_SQL_Staging')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getreports_sql_ds",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ReportID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ReportSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceID",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetID",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportType",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportName",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportWebUrl",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ReportEmbedUrl",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Reports_Staging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ViewReportsAPI')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -694,7 +770,9 @@
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T05:26:21Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Reports_SQL_Staging')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_DataFlowRefreshes_Batch')]",
@@ -7518,7 +7596,9 @@
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T05:26:21Z"
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Reports_SQL_Staging')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_WorkSpacesUsers_Batch')]",
@@ -11573,602 +11653,6 @@
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T05:26:21Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetRefreshes_Batch')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get Dataset Batches",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Execute ChildPipelineLogs",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT DISTINCT BatchNo \nFROM [dbo].[Dataset_batch] \nORDER BY 1",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DatasetRefreshes_SQL",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "For Each Batch",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Truncate Dataset Refreshes",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get Dataset Batches').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "Execute Pipeline DatasetRefreshes",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DatasetRefreshes",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@pipeline().parameters.AppTenantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@pipeline().parameters.AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@pipeline().parameters.AppClientCode",
-												"type": "Expression"
-											},
-											"TenantID": {
-												"value": "@pipeline().parameters.TenantId",
-												"type": "Expression"
-											},
-											"BatchNo": {
-												"value": "@item().BatchNo",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Truncate Dataset Refreshes",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get Dataset Batches",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "getgroups_sql_ls",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE [dbo].[DatasetRefreshes_Staging];"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "DatasetRefreshes History",
-						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [
-							{
-								"activity": "For Each Batch",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"dataIntegrationUnits": 4,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "DatasetRefreshesSourceKey",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "DatasetRefreshesSourceKey",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "WorkSpaceID",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "WorkSpaceID",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DatasetID",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "DatasetID",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "RefreshType",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "RefreshType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "StartTime",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "StartTime",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "EndTime",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "EndTime",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "RequestId",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "RequestId",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Status",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "Status",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "ModifiedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "CreatedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "ModifiedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TenantId",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "TenantId",
-											"type": "Int32",
-											"physicalType": "int"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DatasetRefreshes_SQL",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DatasetRefreshes_SQL_History",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "Capturing Get DatasetRefreshes Batches",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Get Dataset Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "Get DatasetsRefreshes Status",
-							"value": {
-								"value": "@activity('Get Dataset Batches').Status",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Capturing DatasetRefreshes History status",
-						"type": "SetVariable",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [
-							{
-								"activity": "DatasetRefreshes History",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "DatasetRefreshes History Status",
-							"value": {
-								"value": "@activity('DatasetRefreshes History').Status",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Execute ChildPipelineLogs",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "Execute_ChildPipelineLogs",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "Sp_TrackProcessSuccess",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Capturing DatasetRefreshes History status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "For Each Batch",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "DatasetRefreshes History",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
-							"storedProcedureParameters": {
-								"EndTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"LogTrackerID": {
-									"value": {
-										"value": "@activity('Execute ChildPipelineLogs').output.firstRow.LogTrackerID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"Status": {
-									"value": {
-										"value": "@if(and(and(and(and(\nequals(variables('Get DatasetRefreshe Status'),'Succeeded'),\nequals(variables('Dataset Refreshes Staging Status'),'Succeeded')),\nequals(variables('DatasetRefreshes Live Status'),'Succeeded')),\nequals(variables('Get DatasetsRefreshes Status'),'Succeeded')),\nequals(variables('DatasetRefreshes History Status'),'Succeeded')),\n'Succeeded','Failed')",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "ADF_Pipeline_Status_Log",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					},
-					"TenantId": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"CountWorkspace": {
-						"type": "Integer"
-					},
-					"Get DatasetsRefreshes Batch Status": {
-						"type": "String"
-					},
-					"DatasetRefreshes History Status": {
-						"type": "String"
-					},
-					"Dataflows Staging Status": {
-						"type": "String"
-					},
-					"Dataflows Live Status": {
-						"type": "String"
-					},
-					"Dataflows History Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Status": {
-						"type": "String"
-					},
-					"Get Dataflowsrefreshes Status": {
-						"type": "String"
-					},
-					"Get Dataflowsrefreshes Batch": {
-						"type": "String"
-					},
-					"DataflowRefreshes History Status": {
-						"type": "String"
-					},
-					"Master Workspaces Status": {
-						"type": "String"
-					},
-					"Master WorkSpaceUsers Status": {
-						"type": "String"
-					},
-					"Master Report status": {
-						"type": "String"
-					},
-					"Master ReportPages Status": {
-						"type": "String"
-					},
-					"Master Datasets Status": {
-						"type": "String"
-					},
-					"Master Datasetfreshes status": {
-						"type": "String"
-					},
-					"Master Datasetusers Status": {
-						"type": "String"
-					},
-					"Master Viewreports Status": {
-						"type": "String"
-					},
-					"Master Dataflows Status": {
-						"type": "String"
-					},
-					"Master DataflowRefreshes Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshes_ Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshe Status": {
-						"type": "String"
-					},
-					"Dataset Refreshes Staging Status": {
-						"type": "String"
-					},
-					"DatasetRefreshes Live Status": {
-						"type": "String"
-					},
-					"Get DatasetsRefreshes Status": {
-						"type": "String"
-					},
-					"DataflowRefreshesLive Status": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "UBTI_Dev"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-11-29T06:27:10Z"
 			},
 			"dependsOn": []
 		}

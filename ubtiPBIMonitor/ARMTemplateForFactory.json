@@ -55004,6 +55004,7 @@
 								"value": "@activity('Lookup1').output.value",
 								"type": "Expression"
 							},
+							"isSequential": false,
 							"activities": [
 								{
 									"name": "DS_WorkSpaces",
@@ -55037,14 +55038,16 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"method": "POST",
-										"headers": {},
+										"method": "GET",
+										"headers": {
+											"Content-Type": "application/x-www-form-urlencoded\"\n"
+										},
 										"url": {
-											"value": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',pipeline().parameters.WorkspaceID_,'/users')}",
+											"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 											"type": "Expression"
 										},
 										"body": {
-											"value": "{\n            \"identifier\": \"6077f1b3-2daf-4b4f-9dc7-f6126cf209be\",\n            \"groupUserAccessRight\": \"Admin\",\n            \"principalType\": \"groups\"\n        }",
+											"value": "client_id= 6077f1b3-2daf-4b4f-9dc7-f6126cf209be\nclient_secret=HVO8Q~H8ZKMvJ9R3L7eW_E338ewpMR5WvDS4-dww\ngrant_type=client_credentials\nscope=https://graph.microsoft.com/.default",
 											"type": "Expression"
 										}
 									}
@@ -55055,11 +55058,6 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WorkspaceID_": {
-						"type": "string"
-					}
 				},
 				"annotations": []
 			},
@@ -112159,6 +112157,82 @@
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"url": {
+								"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff//oauth2/v2.0/token",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "grant_type= client_credentials&\nclient_id= 6077f1b3-2daf-4b4f-9dc7-f6126cf209be&\nclient_secret= &\nscope= https://analysis.windows.net/powerbi/api/.default\n",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Web2",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": "\"Bearer @activity('Web1').output.access_token\"",
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "https://api.powerbi.com/v1.0/myorg/groups/0f6dbb96-2f58-432d-bab4-153ac2247497/users",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "{\n  \"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n  \"groupUserAccessRight\": \"Admin\",\n  \"principalType\": \"Group\"\n}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
 		}
 	]
 }

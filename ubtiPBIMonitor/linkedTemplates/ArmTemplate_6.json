@@ -354,6 +354,82 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"url": {
+								"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff//oauth2/v2.0/token",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "grant_type= client_credentials&\nclient_id= 6077f1b3-2daf-4b4f-9dc7-f6126cf209be&\nclient_secret= &\nscope= https://analysis.windows.net/powerbi/api/.default\n",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Web2",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": "\"Bearer @activity('Web1').output.access_token\"",
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "https://api.powerbi.com/v1.0/myorg/groups/0f6dbb96-2f58-432d-bab4-153ac2247497/users",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "{\n  \"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n  \"groupUserAccessRight\": \"Admin\",\n  \"principalType\": \"Group\"\n}",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/APIs_Datasets')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -833,22 +909,6 @@
 			"properties": {
 				"linkedServiceName": {
 					"referenceName": "DS_InsertMasterlog_UAT",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_InsertSP')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DS_InsertSP",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
