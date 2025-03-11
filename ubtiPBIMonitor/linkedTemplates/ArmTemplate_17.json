@@ -4470,7 +4470,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select AppTentantId,AppClientId,AppClientSecret,TentantId from [dbo].[DataLoadTracker]",
+								"sqlReaderQuery": "Select WorkSpaceSourceKey from dbo.Workspaces\nWhere TenantId = '99' \n           and WorkspaceType = 'Workspace'",
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -4499,7 +4499,6 @@
 								"value": "@activity('Lookup1').output.value",
 								"type": "Expression"
 							},
-							"batchCount": 10,
 							"activities": [
 								{
 									"name": "DS_WorkSpaces",
@@ -4519,6 +4518,31 @@
 										"waitOnCompletion": true,
 										"parameters": {}
 									}
+								},
+								{
+									"name": "Web1",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {},
+										"url": {
+											"value": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',pipeline().parameters.WorkspaceID_,'/users')}",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "{\n            \"identifier\": \"6077f1b3-2daf-4b4f-9dc7-f6126cf209be\",\n            \"groupUserAccessRight\": \"Admin\",\n            \"principalType\": \"groups\"\n        }",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -4526,6 +4550,11 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"WorkspaceID_": {
+						"type": "string"
+					}
 				},
 				"annotations": []
 			},
