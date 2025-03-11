@@ -12682,7 +12682,7 @@
 								"partitionOption": "None"
 							},
 							"dataset": {
-								"referenceName": "Dataset_SQL",
+								"referenceName": "Dataset_SQL_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							},
@@ -12822,14 +12822,14 @@
 								"mappings": [
 									{
 										"source": {
-											"name": "DatasetUserSourceKey",
-											"type": "String",
-											"physicalType": "varchar"
+											"name": "DatasetUserID",
+											"type": "Int32",
+											"physicalType": "int"
 										},
 										"sink": {
-											"name": "DatasetUserSourceKey",
-											"type": "String",
-											"physicalType": "varchar"
+											"name": "DatasetUserID",
+											"type": "Int32",
+											"physicalType": "int"
 										}
 									},
 									{
@@ -12858,48 +12858,12 @@
 									},
 									{
 										"source": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "UserName",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "UserName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
 											"name": "Identifier",
 											"type": "String",
 											"physicalType": "varchar"
 										},
 										"sink": {
 											"name": "Identifier",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "UserType",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "UserType",
 											"type": "String",
 											"physicalType": "varchar"
 										}
@@ -12986,6 +12950,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -13276,7 +13252,7 @@
 				"lastPublishTime": "2023-11-29T06:27:10Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Dataset_SQL')]",
+				"[concat(variables('factoryId'), '/datasets/Dataset_SQL_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetUsers_sql')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetUserHistory_sql')]",
@@ -103475,6 +103451,105 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "Datasets_Staging"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/getgroups_sql_ls')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dataset_SQL_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Datasets_UAT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "varchar"
+					},
+					{
+						"name": "name",
+						"type": "varchar"
+					},
+					{
+						"name": "webUrl",
+						"type": "varchar"
+					},
+					{
+						"name": "addRowsAPIEnabled",
+						"type": "varchar"
+					},
+					{
+						"name": "configuredBy",
+						"type": "varchar"
+					},
+					{
+						"name": "isRefreshable",
+						"type": "varchar"
+					},
+					{
+						"name": "isEffectiveIdentityRequired",
+						"type": "varchar"
+					},
+					{
+						"name": "isEffectiveIdentityRolesRequired",
+						"type": "varchar"
+					},
+					{
+						"name": "targetStorageMode",
+						"type": "varchar"
+					},
+					{
+						"name": "createdDate",
+						"type": "varchar"
+					},
+					{
+						"name": "contentProviderType",
+						"type": "varchar"
+					},
+					{
+						"name": "createReportEmbedURL",
+						"type": "varchar"
+					},
+					{
+						"name": "qnaEmbedURL",
+						"type": "varchar"
+					},
+					{
+						"name": "isInPlaceSharingEnabled",
+						"type": "varchar"
+					},
+					{
+						"name": "workspaceId",
+						"type": "varchar"
+					},
+					{
+						"name": "autoSyncReadOnlyReplicas",
+						"type": "varchar"
+					},
+					{
+						"name": "maxReadOnlyReplicas",
+						"type": "varchar"
+					},
+					{
+						"name": "updatedtime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Datasets"
 				}
 			},
 			"dependsOn": [
