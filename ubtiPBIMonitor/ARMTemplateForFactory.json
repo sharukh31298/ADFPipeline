@@ -39033,15 +39033,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"DataflowID",
-													"DataflowRefreshesSourcekey"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -41520,13 +41512,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate table Dataflows_Staging",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"DataflowSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -50007,15 +49993,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"DatasetID",
-													"Identifier"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -53306,14 +53284,7 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "Truncate Table [dbo].Datasets_Staging;",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"DatasetSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -82188,7 +82159,6 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "Truncate Table dbo.Reports_Staging;",
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -89389,7 +89359,6 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -98008,10 +97977,6 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": {
-									"value": "@{concat('DELETE [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))}",
-									"type": "Expression"
-								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -112185,7 +112150,7 @@
 								"Content-Type": "application/x-www-form-urlencoded"
 							},
 							"url": {
-								"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff//oauth2/v2.0/token",
+								"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
 								"type": "Expression"
 							},
 							"body": {
@@ -112227,7 +112192,7 @@
 								"type": "Expression"
 							},
 							"body": {
-								"value": "{\n\"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n\"groupUserAccessRight\": \"Admin\",\n\"principalType\": \"Group\"\n}",
+								"value": "{\"groupUserAccessRight\": \"Admin\",\n\"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n\"principalType\": \"Group\"\n}",
 								"type": "Expression"
 							}
 						}
