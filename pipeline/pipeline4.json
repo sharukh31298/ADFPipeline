@@ -34,9 +34,9 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "Web1",
+						"activity": "Set variable1",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -51,7 +51,10 @@
 				"typeProperties": {
 					"method": "POST",
 					"headers": {
-						"Authorization": "'Bearer @activity('Web1').output.access_token',",
+						"Authorization": {
+							"value": "@variables('Access_Token')",
+							"type": "Expression"
+						},
 						"Content-Type": "application/json"
 					},
 					"url": {
@@ -59,12 +62,41 @@
 						"type": "Expression"
 					},
 					"body": {
-						"value": "{\n  \"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n  \"groupUserAccessRight\": \"Admin\",\n  \"principalType\": \"Group\"\n}",
+						"value": "{\n\"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n\"groupUserAccessRight\": \"Admin\",\n\"principalType\": \"Group\"\n}",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Web1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Access_Token",
+					"value": {
+						"value": "@activity('Web1').output.access_token",
 						"type": "Expression"
 					}
 				}
 			}
 		],
+		"variables": {
+			"Access_Token": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
