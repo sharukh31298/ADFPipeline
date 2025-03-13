@@ -464,7 +464,7 @@
 						},
 						"Status": {
 							"value": {
-								"value": "@if(and(and(and(and(\nequals(variables('Get WorkSpaces Batch Status'),'Succeeded'),\nequals(Variables('WorkspaceUsers Staging Status'),'Succeeded')),\nequals(Variables('WorkSpaceUserLive Status'),'Succeeded')),\nequals(variables('WorkSpaces Batch'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
+								"value": "if (Get Workspaces Status ==''Succeeded' and\n    WorkspaceUsers Staging Staus == 'Succeeded' and\n    WorkSpaceUserLive Status == 'Succeeded' and\n    WorkSpaces Batch == 'Succeeded' and\n    WorkSpacesUsers History Status == 'Succeeded'):\n    final_status = 'Succeeded'\nelse:\n    final_status = 'Failed'",
 								"type": "Expression"
 							},
 							"type": "String"
