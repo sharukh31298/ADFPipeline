@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"getgroups_sql_ls_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'getgroups_sql_ls'"
+		},
 		"getgroupsusers_api_ls_clientSecret": {
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'getgroupsusers_api_ls'"
@@ -112,6 +116,19 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/getgroups_sql_ls')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('getgroups_sql_ls_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/getgroupsusers_api_ls')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -350,114 +367,6 @@
 					"scope": "https://analysis.windows.net/powerbi/api/.default",
 					"dataFactoryName": "UsageMetricsDF"
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Web1",
-						"type": "WebActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"method": "POST",
-							"headers": {
-								"Content-Type": "application/x-www-form-urlencoded"
-							},
-							"url": {
-								"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
-								"type": "Expression"
-							},
-							"body": {
-								"value": "grant_type= client_credentials&\nclient_id= 6077f1b3-2daf-4b4f-9dc7-f6126cf209be&\nclient_secret= &\nscope= https://analysis.windows.net/powerbi/api/.default\n",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Web2",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "Set variable1",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"method": "POST",
-							"headers": {
-								"Authorization": {
-									"value": "@variables('Access_Token')",
-									"type": "Expression"
-								},
-								"Content-Type": "application/json"
-							},
-							"url": {
-								"value": "https://api.powerbi.com/v1.0/myorg/groups/0f6dbb96-2f58-432d-bab4-153ac2247497/users",
-								"type": "Expression"
-							},
-							"body": {
-								"value": "{\"groupUserAccessRight\": \"Admin\",\n\"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n\"principalType\": \"Group\"\n}",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set variable1",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Web1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "Access_Token",
-							"value": {
-								"value": "@activity('Web1').output.access_token",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"Access_Token": {
-						"type": "String"
-					}
-				},
-				"annotations": []
 			},
 			"dependsOn": []
 		},

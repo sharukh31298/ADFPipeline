@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"Execute_UATChildpipelineLogs_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Execute_UATChildpipelineLogs'"
+		},
 		"InserUpdate Dataflowrefreshes_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'InserUpdate Dataflowrefreshes'"
@@ -83,9 +87,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_SQL_DataFlowRefreshLive'"
 		},
-		"LS_SQL_DatasetRefreshesLive_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_SQL_DatasetRefreshesLive'"
+		"Execute_UATChildpipelineLogs_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Execute_UATChildpipelineLogs_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Execute_UATChildpipelineLogs_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"InserUpdate Dataflowrefreshes_properties_typeProperties_server": {
 			"type": "string",
@@ -306,24 +318,35 @@
 		"LS_SQL_DataFlowRefreshLive_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"LS_SQL_DatasetRefreshesLive_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_SQL_DatasetRefreshesLive_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_SQL_DatasetRefreshesLive_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Execute_UATChildpipelineLogs')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Execute_UATChildpipelineLogs",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Execute_UATChildpipelineLogs_properties_typeProperties_server')]",
+					"database": "[parameters('Execute_UATChildpipelineLogs_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Execute_UATChildpipelineLogs_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Execute_UATChildpipelineLogs_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/InserUpdate Dataflowrefreshes')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -762,28 +785,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS_SQL_DataFlowRefreshLive_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SQL_DatasetRefreshesLive')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_SQL_DatasetRefreshesLive_properties_typeProperties_server')]",
-					"database": "[parameters('LS_SQL_DatasetRefreshesLive_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_SQL_DatasetRefreshesLive_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_SQL_DatasetRefreshesLive_password')]"
 					}
 				}
 			},

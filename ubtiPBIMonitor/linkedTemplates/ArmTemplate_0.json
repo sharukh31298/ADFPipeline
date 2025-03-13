@@ -67,10 +67,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_updateMasterlog_UAT'"
 		},
-		"DataFlowRefreshes_log_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DataFlowRefreshes_log_UAT'"
-		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -250,24 +246,120 @@
 		"DS_updateMasterlog_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"DataFlowRefreshes_log_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DataFlowRefreshes_log_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DataFlowRefreshes_log_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Content-Type": "application/x-www-form-urlencoded"
+							},
+							"url": {
+								"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "grant_type= client_credentials&\nclient_id= 6077f1b3-2daf-4b4f-9dc7-f6126cf209be&\nclient_secret= &\nscope= https://analysis.windows.net/powerbi/api/.default\n",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Web2",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Set variable1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"Authorization": {
+									"value": "@variables('Access_Token')",
+									"type": "Expression"
+								},
+								"Content-Type": "application/json"
+							},
+							"url": {
+								"value": "https://api.powerbi.com/v1.0/myorg/groups/0f6dbb96-2f58-432d-bab4-153ac2247497/users",
+								"type": "Expression"
+							},
+							"body": {
+								"value": "{\"groupUserAccessRight\": \"Admin\",\n\"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n\"principalType\": \"Group\"\n}",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Access_Token",
+							"value": {
+								"value": "@activity('Web1').output.access_token",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"Access_Token": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ADF_Pipeline_Status_Log')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -643,29 +735,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DS_updateMasterlog_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_log_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DataFlowRefreshes_log_UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DataFlowRefreshes_log_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('DataFlowRefreshes_log_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DataFlowRefreshes_log_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DataFlowRefreshes_log_UAT_password')]"
 					}
 				}
 			},
