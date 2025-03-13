@@ -35707,6 +35707,9 @@
 					},
 					"DataflowRefreshes Status": {
 						"type": "String"
+					},
+					"ViewReports Failed Status": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -89298,7 +89301,7 @@
 								},
 								"Status": {
 									"value": {
-										"value": "@if(and(and(\nequals(variables('ViewReportStaging Status'),'Succeeded'),\nequals(variables('ViewReport Live Status'),'Succeeded')),\nequals(variables('ViewReport Live Status'),'Succeeded')),\n    'Succeeded','Succeeded')\n",
+										"value": "@if(and(and(\nequals(variables('ViewReportStaging Status'),'Succeeded'),\nequals(variables('ViewReport Live Status'),'Succeeded')),\nequals(variables('ViewReport Live Status'),'Succeeded')),\n    'Succeeded','Failed')\n",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -89742,7 +89745,7 @@
 							{
 								"activity": "View Activity Staging",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
@@ -89805,6 +89808,80 @@
 								"value": "@activity('View Activity History').Status",
 								"type": "Expression"
 							}
+						}
+					},
+					{
+						"name": "Capture No data",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "View Activity Staging",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "ViewReports Failed Status",
+							"value": {
+								"value": "@activity('View Activity Staging').error?.message",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "sp_TrackProcessFailure_copy1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Capture No data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogTrackerID": {
+									"value": {
+										"value": "@activity('Execute ChildpipelineLogs').output.firstRow.LogTrackerID",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"Status": {
+									"value": {
+										"value": "@if(\nequals(variables('ViewReportStaging Status'),'Succeeded'),\n\n    'Data Unavailable',' Data Unavailable')\n",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "Update_UATChildpipelineLogs",
+							"type": "LinkedServiceReference"
 						}
 					}
 				],
@@ -89998,6 +90075,9 @@
 						"type": "String"
 					},
 					"DataflowRefreshesLive Status": {
+						"type": "String"
+					},
+					"ViewReports Failed Status": {
 						"type": "String"
 					}
 				},
@@ -95045,6 +95125,9 @@
 					},
 					"Workspace Staging Status": {
 						"type": "String"
+					},
+					"ViewReports Failed Status": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -96803,6 +96886,9 @@
 						"type": "String"
 					},
 					"WorkspaceUsers Staging Status": {
+						"type": "String"
+					},
+					"ViewReports Failed Status": {
 						"type": "String"
 					}
 				},
@@ -99105,6 +99191,9 @@
 						"type": "String"
 					},
 					"WorkSpacesEndTime": {
+						"type": "String"
+					},
+					"ViewReports Failed Status": {
 						"type": "String"
 					}
 				},
