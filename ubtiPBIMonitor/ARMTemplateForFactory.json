@@ -35818,6 +35818,30 @@
 											}
 										}
 									}
+								},
+								{
+									"name": "Execute PowerBIDatasetRefreshes",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_SP_Call_UpdateStatus",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_PowerBI_DataserRefreshes_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": false,
+										"parameters": {}
+									}
 								}
 							]
 						}
@@ -35895,7 +35919,8 @@
 				"[concat(variables('factoryId'), '/linkedServices/LS_Dataloadtracker_SQL')]",
 				"[concat(variables('factoryId'), '/datasets/DS_InsertMasterlog_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/DS_updateMasterlog_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_Refreshing User Permissions_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_Refreshing User Permissions_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_PowerBI_DataserRefreshes_UAT')]"
 			]
 		},
 		{
@@ -72562,6 +72587,31 @@
 								"type": "Expression"
 							}
 						}
+					},
+					{
+						"name": "Execute PowerBI DatasetRefreshes",
+						"description": "We are Refreshing PowerBI report Dataset",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "SP_Call_UpdateStatus",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "PowerBI_DataserRefreshes_UAT",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": false,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -72645,7 +72695,8 @@
 				"[concat(variables('factoryId'), '/pipelines/ViewReports_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_Batch_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/LS_Dataloadtracker_Sql_UAT')]",
-				"[concat(variables('factoryId'), '/datasets/LS_ExecuteSP_UAT')]"
+				"[concat(variables('factoryId'), '/datasets/LS_ExecuteSP_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/PowerBI_DataserRefreshes_UAT')]"
 			]
 		},
 		{
@@ -74716,7 +74767,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/PowerBI_DataserRefreshes')]",
+			"name": "[concat(parameters('factoryName'), '/PowerBI_DataserRefreshes_UAT')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -74840,6 +74891,9 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "UAT_FirstTimeLoadchildPipelines"
 				},
 				"annotations": []
 			},
@@ -112337,6 +112391,141 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_PowerBI_DataserRefreshes_UAT')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "PowerBI_DataserRefreshes",
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "select AppTenantId,AppClientId,AppClientCode from PowerBI_DatasetRefreshes",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Capturing_ClientInfromation",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Getting Access_token",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Content-Type": {
+												"value": "application/x-www-form-urlencoded",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "@{concat('https://login.microsoftonline.com/',item().AppTenantId,'/oauth2/v2.0/token')}",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "grant_type=client_credentials&client_id=6077f1b3-2daf-4b4f-9dc7-f6126cf209be&client_secret=@{item().AppClientCode}&scope=https://analysis.windows.net/powerbi/api/.default",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Dataset Refreshes",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "Getting Access_token",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Authorization": {
+												"value": "@concat('Bearer ', activity('Getting Access_token').output.access_token)",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/e15b0c51-411b-4340-946f-cec8f5a2b424/refreshes",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "{}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "UAT_DailyScheduleChildPipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Capturing_ClientInfromation')]"
 			]
 		}
 	]
