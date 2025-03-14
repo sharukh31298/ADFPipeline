@@ -35,6 +35,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Capturing Error Message'"
 		},
+		"Capturing_ClientInfromation_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Capturing_ClientInfromation'"
+		},
 		"Capturing_Report_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Capturing_Report_UAT'"
@@ -62,10 +66,6 @@
 		"DS_lookupClientInformation_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_lookupClientInformation'"
-		},
-		"DS_updateLog_SP_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DS_updateLog_SP'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -148,6 +148,18 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"Capturing Error Message_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Capturing_ClientInfromation_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Capturing_ClientInfromation_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Capturing_ClientInfromation_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -234,18 +246,6 @@
 		"DS_lookupClientInformation_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"DS_updateLog_SP_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DS_updateLog_SP_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"DS_updateLog_SP_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -316,7 +316,10 @@
 								"value": "https://api.powerbi.com/v1.0/myorg/RefreshUserPermissions",
 								"type": "Expression"
 							},
-							"body": {}
+							"body": {
+								"value": "{}",
+								"type": "Expression"
+							}
 						}
 					}
 				],
@@ -548,6 +551,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Capturing_ClientInfromation')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Capturing_ClientInfromation",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Capturing_ClientInfromation_properties_typeProperties_server')]",
+					"database": "[parameters('Capturing_ClientInfromation_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Capturing_ClientInfromation_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Capturing_ClientInfromation_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Capturing_Report_UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -699,28 +725,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DS_lookupClientInformation_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_updateLog_SP')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DS_updateLog_SP_properties_typeProperties_server')]",
-					"database": "[parameters('DS_updateLog_SP_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DS_updateLog_SP_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DS_updateLog_SP_password')]"
 					}
 				}
 			},

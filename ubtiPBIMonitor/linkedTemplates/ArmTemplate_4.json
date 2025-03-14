@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"ReportPagesStaging_sql_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ReportPagesStaging_sql_UAT'"
+		},
 		"ReportPages_SQL_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'ReportPages_SQL'"
@@ -79,9 +83,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'ViewReportLive_sql_UAT'"
 		},
-		"ViewReportsHistory_sql_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'ViewReportsHistory_sql_UAT'"
+		"ReportPagesStaging_sql_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"ReportPagesStaging_sql_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"ReportPagesStaging_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"ReportPages_SQL_properties_typeProperties_server": {
 			"type": "string",
@@ -274,24 +286,34 @@
 		"ViewReportLive_sql_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"ViewReportsHistory_sql_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"ViewReportsHistory_sql_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"ViewReportsHistory_sql_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ReportPagesStaging_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ReportPagesStaging_sql_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('ReportPagesStaging_sql_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ReportPagesStaging_sql_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ReportPagesStaging_sql_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/ReportPages_SQL')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -691,28 +713,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('ViewReportLive_sql_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ViewReportsHistory_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('ViewReportsHistory_sql_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('ViewReportsHistory_sql_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('ViewReportsHistory_sql_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('ViewReportsHistory_sql_UAT_password')]"
 					}
 				}
 			},
