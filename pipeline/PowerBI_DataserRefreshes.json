@@ -48,7 +48,7 @@
 					},
 					"activities": [
 						{
-							"name": "Web1",
+							"name": "Getting Access_token",
 							"type": "WebActivity",
 							"dependsOn": [],
 							"policy": {
@@ -58,14 +58,31 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"method": "POST",
+								"headers": {
+									"Content-Type": {
+										"value": "application/x-www-form-urlencoded",
+										"type": "Expression"
+									}
+								},
+								"url": {
+									"value": "@{concat('https://login.microsoftonline.com/',item().AppTenantId,'/oauth2/v2.0/token')}",
+									"type": "Expression"
+								},
+								"body": {
+									"value": "grant_type=client_credentials&client_id=@item()AppClientId}&client_secret=@item().AppClientCode}&scope=https://analysis.windows.net/powerbi/api/.default",
+									"type": "Expression"
+								}
+							}
 						},
 						{
-							"name": "Web2",
+							"name": "Dataset Refreshes",
 							"type": "WebActivity",
 							"dependsOn": [
 								{
-									"activity": "Web1",
+									"activity": "Getting Access_token",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -78,7 +95,20 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"method": "POST",
+								"headers": {
+									"Authorization": {
+										"value": "@concat('Bearer ', activity('Getting Access_token').output.output.access_token)",
+										"type": "Expression"
+									}
+								},
+								"url": {
+									"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/e15b0c51-411b-4340-946f-cec8f5a2b424/refreshes",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
