@@ -6521,9 +6521,6 @@
 					},
 					"Workspace Staging Status": {
 						"type": "String"
-					},
-					"ViewReports Failed Status": {
-						"type": "String"
 					}
 				},
 				"folder": {
@@ -9379,7 +9376,7 @@
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
-											"activity": "DS_Workspaces_Master",
+											"activity": "DS_Refreshes UserPermissions Master",
 											"dependencyConditions": [
 												"Completed"
 											]
@@ -10146,6 +10143,43 @@
 										"referenceName": "DS_updateMasterlog_UAT",
 										"type": "LinkedServiceReference"
 									}
+								},
+								{
+									"name": "DS_Refreshes UserPermissions Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Workspaces_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_Refreshing User Permissions_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientCode",
+												"type": "Expression"
+											}
+										}
+									}
 								}
 							]
 						}
@@ -10200,9 +10234,6 @@
 						"type": "String"
 					},
 					"DataflowRefreshes Status": {
-						"type": "String"
-					},
-					"ViewReports Failed Status": {
 						"type": "String"
 					}
 				},

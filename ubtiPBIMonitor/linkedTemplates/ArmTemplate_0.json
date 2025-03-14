@@ -253,13 +253,13 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"name": "[concat(parameters('factoryName'), '/DS_Refreshing User Permissions_UAT')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Web1",
+						"name": "Capturing Access_token",
 						"type": "WebActivity",
 						"dependsOn": [],
 						"policy": {
@@ -276,23 +276,23 @@
 								"Content-Type": "application/x-www-form-urlencoded"
 							},
 							"url": {
-								"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+								"value": "@{concat('https://login.microsoftonline.com/',pipeline().parameters.AppTenantId,'/oauth2/v2.0/token')}",
 								"type": "Expression"
 							},
 							"body": {
-								"value": "grant_type= client_credentials&\nclient_id= 6077f1b3-2daf-4b4f-9dc7-f6126cf209be&\nclient_secret= &\nscope= https://analysis.windows.net/powerbi/api/.default\n",
+								"value": "grant_type=client_credentials&client_id=@{pipeline().parameters.AppClientId}&client_secret=@{pipeline().parameters.AppClientCode}&scope=https://analysis.windows.net/powerbi/api/.default",
 								"type": "Expression"
 							}
 						}
 					},
 					{
-						"name": "Web2",
+						"name": "Refresh UserPermissions",
 						"type": "WebActivity",
 						"dependsOn": [
 							{
-								"activity": "Set variable1",
+								"activity": "Capturing Access_token",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
@@ -308,53 +308,39 @@
 							"method": "POST",
 							"headers": {
 								"Authorization": {
-									"value": "@variables('Access_Token')",
+									"value": "@concat('Bearer ', activity('Capturing Access_token').output.access_token)",
 									"type": "Expression"
-								},
-								"Content-Type": "application/json"
+								}
 							},
 							"url": {
-								"value": "https://api.powerbi.com/v1.0/myorg/groups/0f6dbb96-2f58-432d-bab4-153ac2247497/users",
+								"value": "https://api.powerbi.com/v1.0/myorg/RefreshUserPermissions",
 								"type": "Expression"
 							},
-							"body": {
-								"value": "{\"groupUserAccessRight\": \"Admin\",\n\"identifier\": \"ec8b82dc-807b-4b8c-b66f-0d9d347ecb78\",\n\"principalType\": \"Group\"\n}",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Set variable1",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Web1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "Access_Token",
-							"value": {
-								"value": "@activity('Web1').output.access_token",
-								"type": "Expression"
-							}
+							"body": {}
 						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
 				"variables": {
 					"Access_Token": {
 						"type": "String"
 					}
+				},
+				"folder": {
+					"name": "UAT_DailyScheduleChildPipelines"
 				},
 				"annotations": []
 			},
