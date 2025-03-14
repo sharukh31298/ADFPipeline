@@ -924,6 +924,29 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "Execute PowerBIDatasetRefreshes",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_SP_Call_UpdateStatus",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_PowerBI_DataserRefreshes_UAT",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false
+							}
 						}
 					]
 				}

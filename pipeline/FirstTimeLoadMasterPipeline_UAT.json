@@ -932,6 +932,30 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Execute PowerBI DatasetRefreshes",
+				"description": "We are Refreshing PowerBI report Dataset",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "SP_Call_UpdateStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "PowerBI_DataserRefreshes_UAT",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": false
+				}
 			}
 		],
 		"parameters": {
