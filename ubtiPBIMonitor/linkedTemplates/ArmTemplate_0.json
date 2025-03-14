@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'CaptureCI'"
 		},
+		"Capture_ClientInformation_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Capture_ClientInformation'"
+		},
 		"Capture_WorkSpacelive_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Capture_WorkSpacelive_UAT'"
@@ -62,10 +66,6 @@
 		"DS_updateLog_SP_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_updateLog_SP'"
-		},
-		"DS_updateMasterlog_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DS_updateMasterlog_UAT'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -112,6 +112,18 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"CaptureCI_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Capture_ClientInformation_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Capture_ClientInformation_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Capture_ClientInformation_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -232,18 +244,6 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"DS_updateLog_SP_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"DS_updateMasterlog_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DS_updateMasterlog_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DS_updateMasterlog_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -479,6 +479,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Capture_ClientInformation')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Capture_ClientInformation",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Capture_ClientInformation_properties_typeProperties_server')]",
+					"database": "[parameters('Capture_ClientInformation_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Capture_ClientInformation_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Capture_ClientInformation_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Capture_WorkSpacelive_UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -698,29 +721,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DS_updateLog_SP_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_updateMasterlog_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DS_updateMasterlog_UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DS_updateMasterlog_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('DS_updateMasterlog_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DS_updateMasterlog_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DS_updateMasterlog_UAT_password')]"
 					}
 				}
 			},
