@@ -6882,7 +6882,85 @@
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false
 							},
-							"enableStaging": false
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['id']"
+										},
+										"sink": {
+											"name": "WorkSpaceSourceKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isReadOnly']"
+										},
+										"sink": {
+											"name": "IsReadOnly",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isOnDedicatedCapacity']"
+										},
+										"sink": {
+											"name": "IsonDedicatedCapacity",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['capacityMigrationStatus']"
+										},
+										"sink": {
+											"name": "CapacityMigrationStatus",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['type']"
+										},
+										"sink": {
+											"name": "WorkSpaceType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['state']"
+										},
+										"sink": {
+											"name": "Status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['hasWorkspaceLevelSettings ']"
+										},
+										"sink": {
+											"name": "HasWorkspaceLevelSetting",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['name']"
+										},
+										"sink": {
+											"name": "WorkSpaceName",
+											"type": "String"
+										}
+									}
+								],
+								"collectionReference": "$['value']"
+							}
 						},
 						"inputs": [
 							{
@@ -6928,7 +7006,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"expression": {
-								"value": "@activity('Validating Credentials').output",
+								"value": "@equals(activity('Validating Credentials').output.firstRow['Status'],'1')",
 								"type": "Expression"
 							},
 							"ifTrueActivities": [
