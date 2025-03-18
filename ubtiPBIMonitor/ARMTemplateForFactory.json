@@ -17595,6 +17595,14 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"variables": {
+					"Validate Success": {
+						"type": "String"
+					},
+					"Validate Failure": {
+						"type": "String"
+					}
+				},
 				"folder": {
 					"name": "UAT_DailyScheduleChildPipelines"
 				},
@@ -31696,6 +31704,12 @@
 					},
 					"DataflowRefreshesLive Status": {
 						"type": "String"
+					},
+					"Validate Success": {
+						"type": "String"
+					},
+					"Validate Failure": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -35027,6 +35041,12 @@
 					},
 					"DataflowRefreshes Status": {
 						"type": "String"
+					},
+					"Validate Success": {
+						"type": "String"
+					},
+					"Validate Failure": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -36087,6 +36107,12 @@
 						"type": "String"
 					},
 					"DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Validate Success": {
+						"type": "String"
+					},
+					"Validate Failure": {
 						"type": "String"
 					}
 				},
@@ -55315,104 +55341,12 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
+						"name": "Wait1",
+						"type": "Wait",
 						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "Select WorkSpaceSourceKey from dbo.Workspaces\nWhere TenantId = '99' \n           and WorkspaceType = 'Workspace'",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "CaptureCI",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"activities": [
-								{
-									"name": "DS_WorkSpaces",
-									"type": "ExecutePipeline",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_WorkSpaces",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {}
-									}
-								},
-								{
-									"name": "Web1",
-									"type": "WebActivity",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"headers": {
-											"Content-Type": "application/x-www-form-urlencoded\"\n"
-										},
-										"url": {
-											"value": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
-											"type": "Expression"
-										},
-										"body": {
-											"value": "client_id= 6077f1b3-2daf-4b4f-9dc7-f6126cf209be\nclient_secret=HVO8Q~H8ZKMvJ9R3L7eW_E338ewpMR5WvDS4-dww\ngrant_type=client_credentials\nscope=https://graph.microsoft.com/.default",
-											"type": "Expression"
-										}
-									}
-								}
-							]
+							"waitTimeInSeconds": 15
 						}
 					}
 				],
@@ -55421,10 +55355,7 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/CaptureCI')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpaces')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DemoWorkSpaceUsers')]",
@@ -72866,6 +72797,12 @@
 						"type": "String"
 					},
 					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Validate Success": {
+						"type": "String"
+					},
+					"Validate Failure": {
 						"type": "String"
 					}
 				},
@@ -90433,6 +90370,12 @@
 					},
 					"ViewReports Failed Status": {
 						"type": "String"
+					},
+					"Validate Success": {
+						"type": "String"
+					},
+					"Validate Failure": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -99545,6 +99488,12 @@
 						"type": "String"
 					},
 					"WorkSpacesEndTime": {
+						"type": "String"
+					},
+					"Validate Success": {
+						"type": "String"
+					},
+					"Validate Failure": {
 						"type": "String"
 					}
 				},
@@ -112737,43 +112686,81 @@
 						]
 					},
 					{
-						"name": "Validating AppCredentials",
-						"description": "Validating AppCredentials",
-						"type": "IfCondition",
+						"name": "Set variable1",
+						"type": "SetVariable",
 						"dependsOn": [
 							{
 								"activity": "Validating Credentials",
 								"dependencyConditions": [
-									"Failed",
 									"Succeeded"
 								]
 							}
 						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
-							"expression": {
-								"value": "@equals(activity('Validating Credentials').output.firstRow['Status'],'1')",
+							"variableName": "Validate Success",
+							"value": {
+								"value": "@activity('Validating Credentials').Status",
 								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set variable2",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Validating Credentials",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Validate Failure",
+							"value": {
+								"value": "@activity('Validating Credentials').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Demo",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Set variable1",
+								"dependencyConditions": [
+									"Skipped"
+								]
 							},
-							"ifTrueActivities": [
-								{
-									"name": "Demo",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "Demo",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {}
-									}
-								}
-							]
+							{
+								"activity": "Set variable2",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Demo",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
 						}
 					}
 				],
@@ -112782,13 +112769,23 @@
 				},
 				"parameters": {
 					"AppTenantId": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "7c2fe1f1-bf7e-45a5-912a-d0510ebed93f"
 					},
 					"AppClientId": {
-						"type": "string"
+						"type": "string",
+						"defaultValue": "6bfae08c-b1a7-4761-adce-2f0a3dcca52f"
 					},
 					"AppClientCode": {
 						"type": "string"
+					}
+				},
+				"variables": {
+					"Validate Success": {
+						"type": "String"
+					},
+					"Validate Failure": {
+						"type": "String"
 					}
 				},
 				"annotations": []

@@ -13,6 +13,82 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Capacities_SQL_Live')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "get_Capacities",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Sample Datasets"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "CapacitiesID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CapacitiesSourceskey",
+						"type": "varchar"
+					},
+					{
+						"name": "DisplayName",
+						"type": "varchar"
+					},
+					{
+						"name": "Admins",
+						"type": "varchar"
+					},
+					{
+						"name": "Sku",
+						"type": "varchar"
+					},
+					{
+						"name": "State",
+						"type": "varchar"
+					},
+					{
+						"name": "CapacityUserAccessRight",
+						"type": "varchar"
+					},
+					{
+						"name": "Region",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Capacities_Staging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/CaptureCI')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -836,95 +912,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "DataflowRefreshesHistory"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataflowRefreshesLive_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DataflowRefreshesLive_sql_UAT",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Datasets_UAT"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "DataflowRefreshesID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataflowRefreshesSourcekey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "DataflowID",
-						"type": "varchar"
-					},
-					{
-						"name": "RefreshType",
-						"type": "varchar"
-					},
-					{
-						"name": "StartTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "EndTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Status",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataLoadTrackerID",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DataflowRefreshes"
 				}
 			},
 			"dependsOn": []
