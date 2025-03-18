@@ -512,6 +512,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
+		"Validating_Credentials_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Validating_Credentials'"
+		},
+		"Test_Workspace_SQl_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Test_Workspace_SQl'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1967,6 +1975,26 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
+		},
+		"Validating_Credentials_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=1"
+		},
+		"Validating_Credentials_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().AppClientId}"
+		},
+		"Test_Workspace_SQl_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Test_Workspace_SQl_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Test_Workspace_SQl_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -17439,6 +17467,141 @@
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_PowerBI_DataserRefreshes_UAT')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "PowerBI_DataserRefreshes",
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "select AppTenantId,AppClientId,AppClientCode from PowerBI_DatasetRefreshes",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Capturing_ClientInfromation",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Getting Access_token",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Content-Type": {
+												"value": "application/x-www-form-urlencoded",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "@{concat('https://login.microsoftonline.com/',item().AppTenantId,'/oauth2/v2.0/token')}",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "grant_type=client_credentials&client_id=6077f1b3-2daf-4b4f-9dc7-f6126cf209be&client_secret=@{item().AppClientCode}&scope=https://analysis.windows.net/powerbi/api/.default",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Dataset Refreshes",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "Getting Access_token",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Authorization": {
+												"value": "@concat('Bearer ', activity('Getting Access_token').output.access_token)",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/65731ac8-b5e9-411f-99d8-d2f0066907dc/refreshes",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "{}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "UAT_DailyScheduleChildPipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Capturing_ClientInfromation')]"
 			]
 		},
 		{
@@ -34910,7 +35073,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "select AppTentantId,AppClientId,AppClientSecret,TentantId from [dbo].[DataLoadTracker]",
+									"value": "select AppTenantId,AppClientId,AppClientSecret,TenantId from [dbo].[DataLoadTracker]",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -34949,7 +35112,7 @@
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
-											"activity": "DS_Insert Log",
+											"activity": "DS_Refreshes UserPermissions Master",
 											"dependencyConditions": [
 												"Completed"
 											]
@@ -34967,7 +35130,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -34979,7 +35142,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35014,7 +35177,7 @@
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
-											"activity": "DS_Refreshes UserPermissions Master",
+											"activity": "DS_Workspaces_Master",
 											"dependencyConditions": [
 												"Completed"
 											]
@@ -35032,7 +35195,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35044,7 +35207,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35077,7 +35240,14 @@
 								{
 									"name": "DS_Reports_Master",
 									"type": "ExecutePipeline",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
 									"policy": {
 										"secureInput": false
 									},
@@ -35090,7 +35260,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35102,7 +35272,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35155,7 +35325,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35167,7 +35337,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35200,7 +35370,14 @@
 								{
 									"name": "DS_Datasets_Master",
 									"type": "ExecutePipeline",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
 									"policy": {
 										"secureInput": false
 									},
@@ -35213,7 +35390,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35225,7 +35402,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35278,7 +35455,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35290,7 +35467,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35343,7 +35520,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35355,7 +35532,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35388,7 +35565,14 @@
 								{
 									"name": "DS_ViewReports_Master",
 									"type": "ExecutePipeline",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
 									"policy": {
 										"secureInput": false
 									},
@@ -35401,7 +35585,7 @@
 										"waitOnCompletion": false,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35413,7 +35597,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35446,7 +35630,14 @@
 								{
 									"name": "DS_Dataflows_Master",
 									"type": "ExecutePipeline",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
 									"policy": {
 										"secureInput": false
 									},
@@ -35459,7 +35650,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35471,7 +35662,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35524,7 +35715,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"AppTenantId": {
-												"value": "@item().AppTentantId",
+												"value": "@item().AppTenantId",
 												"type": "Expression"
 											},
 											"AppClientId": {
@@ -35536,7 +35727,7 @@
 												"type": "Expression"
 											},
 											"TenantId": {
-												"value": "@item().TentantId",
+												"value": "@item().TenantId",
 												"type": "Expression"
 											}
 										}
@@ -35671,7 +35862,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@concat('EXEC [dbo].[DS_DataLoadTrackInsert] ','''',item().AppTentantId,''',''',item().AppClientId,''',''',item().AppClientSecret,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(item().TentantId),''','' ''')",
+												"value": "@concat('EXEC [dbo].[DS_DataLoadTrackInsert] ','''',item().AppTenantId,''',''',item().AppClientId,''',''',item().AppClientSecret,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(item().TenantId),''','' ''')",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
@@ -35787,7 +35978,7 @@
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
-											"activity": "DS_Workspaces_Master",
+											"activity": "DS_Insert Log",
 											"dependencyConditions": [
 												"Completed"
 											]
@@ -94888,7 +95079,7 @@
 								},
 								"Status": {
 									"value": {
-										"value": "@if(and(and(and(and(\nequals(variables('Get Workspaces Status'),'Succeeded'),\nequals(variables('WorkspaceUsers Staging Status'),'Succeeded')),\nequals(variables('WorkSpaceUserLive Status'),'Succeeded')),\nequals(variables('Get WorkSpaces Batch Status'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n\n'Succeeded','Succeeded')\n\n\n",
+										"value": "\nvariables('Get Workspaces Status')",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -96304,7 +96495,6 @@
 									"type": "DateTime"
 								},
 								"LogTrackerID": {
-									"value": "",
 									"type": "String"
 								},
 								"Status": {
@@ -96317,7 +96507,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "ADF_Pipeline_Status_Log",
+							"referenceName": "Update_UATChildpipelineLogs",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -96419,11 +96609,17 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"variableName": "WorkSpaceUsers_Status",
-							"value": {
-								"value": "@activity('Get WorkSpaces').Status",
-								"type": "Expression"
-							}
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "WorkSpaceUsers_Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get WorkSpaces').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
 						}
 					},
 					{
@@ -97045,6 +97241,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Capture_WorkSpacelive_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
@@ -112386,15 +112583,15 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DS_PowerBI_DataserRefreshes_UAT')]",
+			"name": "[concat(parameters('factoryName'), '/Validating Credentials')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "PowerBI_DataserRefreshes",
+				"description": "Validating AppCredentials",
 				"activities": [
 					{
-						"name": "Lookup1",
-						"type": "Lookup",
+						"name": "Validating Credentials",
+						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -112406,118 +112603,189 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select AppTenantId,AppClientId,AppClientCode from PowerBI_DatasetRefreshes",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
 							},
-							"dataset": {
-								"referenceName": "Capturing_ClientInfromation",
-								"type": "DatasetReference",
-								"parameters": {}
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
 							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
+							"enableStaging": false
+						},
+						"inputs": [
 							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Getting Access_token",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
+								"referenceName": "Validating_Credentials",
+								"type": "DatasetReference",
+								"parameters": {
+									"AppTenantId": {
+										"value": "@pipeline().parameters.AppTenantId",
+										"type": "Expression"
 									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "POST",
-										"headers": {
-											"Content-Type": {
-												"value": "application/x-www-form-urlencoded",
-												"type": "Expression"
-											}
-										},
-										"url": {
-											"value": "@{concat('https://login.microsoftonline.com/',item().AppTenantId,'/oauth2/v2.0/token')}",
-											"type": "Expression"
-										},
-										"body": {
-											"value": "grant_type=client_credentials&client_id=6077f1b3-2daf-4b4f-9dc7-f6126cf209be&client_secret=@{item().AppClientCode}&scope=https://analysis.windows.net/powerbi/api/.default",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Dataset Refreshes",
-									"type": "WebActivity",
-									"dependsOn": [
-										{
-											"activity": "Getting Access_token",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
+									"AppClientId": {
+										"value": "@pipeline().parameters.AppClientId",
+										"type": "Expression"
 									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "POST",
-										"headers": {
-											"Authorization": {
-												"value": "@concat('Bearer ', activity('Getting Access_token').output.access_token)",
-												"type": "Expression"
-											}
-										},
-										"url": {
-											"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/65731ac8-b5e9-411f-99d8-d2f0066907dc/refreshes",
-											"type": "Expression"
-										},
-										"body": {
-											"value": "{}",
-											"type": "Expression"
-										}
+									"AppClientCode": {
+										"value": "@pipeline().parameters.AppClientCode",
+										"type": "Expression"
 									}
 								}
-							]
-						}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Test_Workspace_SQl",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
-				"folder": {
-					"name": "UAT_DailyScheduleChildPipelines"
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
 				},
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Capturing_ClientInfromation')]"
+				"[concat(variables('factoryId'), '/datasets/Validating_Credentials')]",
+				"[concat(variables('factoryId'), '/datasets/Test_Workspace_SQl')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Validating_Credentials')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Validating_Credentials",
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Validating_Credentials_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('Validating_Credentials_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Validating_Credentials_clientSecret')]"
+					},
+					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Validating_Credentials')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Validating_Credentials",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"AppTenantId": {
+							"value": "@dataset().AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@dataset().AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@dataset().AppClientCode",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Validating_Credentials')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test_Workspace_SQl')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Test_Workspace_SQl",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Test_Workspace_SQl_properties_typeProperties_server')]",
+					"database": "[parameters('Test_Workspace_SQl_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Test_Workspace_SQl_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Test_Workspace_SQl_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test_Workspace_SQl')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Test_Workspace_SQl",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WorkSpaces"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Test_Workspace_SQl')]"
 			]
 		}
 	]
