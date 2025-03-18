@@ -55317,6 +55317,8 @@
 					{
 						"name": "Lookup1",
 						"type": "Lookup",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -55344,6 +55346,8 @@
 					{
 						"name": "ForEach1",
 						"type": "ForEach",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Lookup1",
@@ -55382,6 +55386,8 @@
 								{
 									"name": "Web1",
 									"type": "WebActivity",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
@@ -72271,7 +72277,7 @@
 							{
 								"activity": "Execute_SP",
 								"dependencyConditions": [
-									"Completed"
+									"Succeeded"
 								]
 							}
 						],
@@ -112645,6 +112651,46 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Validating AppCredentials",
+						"description": "Validating AppCredentials",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Validating Credentials",
+								"dependencyConditions": [
+									"Failed",
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@activity('Validating Credentials').output",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Demo",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Demo",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							]
+						}
 					}
 				],
 				"policy": {
@@ -112665,7 +112711,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/Validating_Credentials')]",
-				"[concat(variables('factoryId'), '/datasets/Test_Workspace_SQl')]"
+				"[concat(variables('factoryId'), '/datasets/Test_Workspace_SQl')]",
+				"[concat(variables('factoryId'), '/pipelines/Demo')]"
 			]
 		},
 		{
@@ -112781,7 +112828,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "WorkSpaces"
+					"table": "Testcredentials_WorkSpaces"
 				}
 			},
 			"dependsOn": [
