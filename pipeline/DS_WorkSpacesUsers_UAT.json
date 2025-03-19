@@ -36,7 +36,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get WorkSpaces",
+						"activity": "Delete StagingTable",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -91,10 +91,6 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"preCopyScript": {
-										"value": "@concat('DELETE from [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId = ',string(pipeline().parameters.TenantId))",
-										"type": "Expression"
-									},
 									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false,
 									"disableMetricsCollection": false
@@ -749,6 +745,42 @@
 						{
 							"type": "Query",
 							"text": "EXEC WorkSpaceUsers_InsertUpsert"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Delete StagingTable",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Get WorkSpaces",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "Delete_WorkspaceUsersStaging",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "@concat('DELETE from [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId = ',string(pipeline().parameters.TenantId))",
+								"type": "Expression"
+							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
