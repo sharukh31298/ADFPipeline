@@ -13,6 +13,103 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Dataset_SQL_History')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "varchar"
+					},
+					{
+						"name": "name",
+						"type": "varchar"
+					},
+					{
+						"name": "webUrl",
+						"type": "varchar"
+					},
+					{
+						"name": "addRowsAPIEnabled",
+						"type": "varchar"
+					},
+					{
+						"name": "configuredBy",
+						"type": "varchar"
+					},
+					{
+						"name": "isRefreshable",
+						"type": "varchar"
+					},
+					{
+						"name": "isEffectiveIdentityRequired",
+						"type": "varchar"
+					},
+					{
+						"name": "isEffectiveIdentityRolesRequired",
+						"type": "varchar"
+					},
+					{
+						"name": "targetStorageMode",
+						"type": "varchar"
+					},
+					{
+						"name": "createdDate",
+						"type": "varchar"
+					},
+					{
+						"name": "contentProviderType",
+						"type": "varchar"
+					},
+					{
+						"name": "createReportEmbedURL",
+						"type": "varchar"
+					},
+					{
+						"name": "qnaEmbedURL",
+						"type": "varchar"
+					},
+					{
+						"name": "isInPlaceSharingEnabled",
+						"type": "varchar"
+					},
+					{
+						"name": "workspaceId",
+						"type": "varchar"
+					},
+					{
+						"name": "autoSyncReadOnlyReplicas",
+						"type": "varchar"
+					},
+					{
+						"name": "maxReadOnlyReplicas",
+						"type": "varchar"
+					},
+					{
+						"name": "updatedtime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DatasetsHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Dataset_SQL_Staging')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1225,25 +1322,6 @@
 					"schema": "dbo",
 					"table": "RefreshSchedules"
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Refreshables_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getrefreshables_api_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
 			},
 			"dependsOn": []
 		}

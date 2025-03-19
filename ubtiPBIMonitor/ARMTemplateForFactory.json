@@ -524,6 +524,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Delete_WorkspaceUsersStaging'"
 		},
+		"Execute_WorkspaceLive_sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Execute_WorkspaceLive_sql'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -2009,6 +2013,18 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"Delete_WorkspaceUsersStaging_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Execute_WorkspaceLive_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Execute_WorkspaceLive_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Execute_WorkspaceLive_sql_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -22533,7 +22549,7 @@
 							{
 								"activity": "Reports Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -22742,7 +22758,7 @@
 							{
 								"activity": "Reports Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -33105,14 +33121,9 @@
 					{
 						"name": "WorkSpace Live Data",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "WorkSpace Staging",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -33585,12 +33596,6 @@
 								]
 							},
 							{
-								"activity": "WorkSpace Live Data",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
 								"activity": "Capture the StartTime",
 								"dependencyConditions": [
 									"Completed"
@@ -33760,7 +33765,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "WorkSpace Live Data",
+								"activity": "Execute WorkspaceLive",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -33774,7 +33779,7 @@
 						"typeProperties": {
 							"variableName": "WorkSpaceLive Status",
 							"value": {
-								"value": "@activity('WorkSpace Live Data').Status",
+								"value": "@activity('Execute WorkspaceLive').Status",
 								"type": "Expression"
 							}
 						}
@@ -33873,6 +33878,39 @@
 								"type": "DatasetReference",
 								"parameters": {}
 							}
+						}
+					},
+					{
+						"name": "Execute WorkspaceLive",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "WorkSpace Staging",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Execute_WorkspaceLive_sql",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC [dbo].[WorkSpaces_InsertUpsert]"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -34135,7 +34173,8 @@
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceHistory_Sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]"
+				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
+				"[concat(variables('factoryId'), '/linkedServices/Execute_WorkspaceLive_sql')]"
 			]
 		},
 		{
@@ -112980,6 +113019,29 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('Delete_WorkspaceUsersStaging_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Execute_WorkspaceLive_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Execute_WorkspaceLive_sql",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Execute_WorkspaceLive_sql_properties_typeProperties_server')]",
+					"database": "[parameters('Execute_WorkspaceLive_sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Execute_WorkspaceLive_sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Execute_WorkspaceLive_sql_password')]"
 					}
 				}
 			},
