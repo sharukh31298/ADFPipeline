@@ -186,14 +186,9 @@
 			{
 				"name": "WorkSpace Live Data",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "WorkSpace Staging",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -662,12 +657,6 @@
 						]
 					},
 					{
-						"activity": "WorkSpace Live Data",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
 						"activity": "Capture the StartTime",
 						"dependencyConditions": [
 							"Completed"
@@ -837,7 +826,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "WorkSpace Live Data",
+						"activity": "Execute WorkspaceLive",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -851,7 +840,7 @@
 				"typeProperties": {
 					"variableName": "WorkSpaceLive Status",
 					"value": {
-						"value": "@activity('WorkSpace Live Data').Status",
+						"value": "@activity('Execute WorkspaceLive').Status",
 						"type": "Expression"
 					}
 				}
@@ -949,6 +938,38 @@
 						"referenceName": "Execute_UATChildpipelineLogs",
 						"type": "DatasetReference"
 					}
+				}
+			},
+			{
+				"name": "Execute WorkspaceLive",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "WorkSpace Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "Execute_WorkspaceLive_sql",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
