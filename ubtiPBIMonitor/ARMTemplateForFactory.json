@@ -520,6 +520,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Test_Workspace_SQl'"
 		},
+		"Delete_WorkspaceUsersStaging_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Delete_WorkspaceUsersStaging'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -1993,6 +1997,18 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"Test_Workspace_SQl_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Delete_WorkspaceUsersStaging_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Delete_WorkspaceUsersStaging_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": " PowerPulseDB-Stage"
+		},
+		"Delete_WorkspaceUsersStaging_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -31770,7 +31786,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get WorkSpaces",
+								"activity": "Delete StagingTable",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -31825,10 +31841,6 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"preCopyScript": {
-												"value": "@concat('DELETE from [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId = ',string(pipeline().parameters.TenantId))",
-												"type": "Expression"
-											},
 											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
@@ -32490,6 +32502,42 @@
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
 						}
+					},
+					{
+						"name": "Delete StagingTable",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Get WorkSpaces",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Delete_WorkspaceUsersStaging",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('DELETE from [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId = ',string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
@@ -32860,6 +32908,7 @@
 				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
 				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers live_insertupdate UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Delete_WorkspaceUsersStaging')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers_log_UAT')]"
@@ -112912,6 +112961,29 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Test_Workspace_SQl')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Delete_WorkspaceUsersStaging')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Delete_WorkspaceUsersStaging",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Delete_WorkspaceUsersStaging_properties_typeProperties_server')]",
+					"database": "[parameters('Delete_WorkspaceUsersStaging_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Delete_WorkspaceUsersStaging_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Delete_WorkspaceUsersStaging_password')]"
+					}
+				}
+			},
+			"dependsOn": []
 		}
 	]
 }
