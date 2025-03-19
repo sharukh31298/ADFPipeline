@@ -91,15 +91,11 @@
 								},
 								"sink": {
 									"type": "AzureSqlSink",
-									"writeBehavior": "upsert",
-									"upsertSettings": {
-										"useTempDB": true,
-										"keys": [
-											"WorkspaceID ",
-											"UserName",
-											"Identifier"
-										]
+									"preCopyScript": {
+										"value": "Delete [dbo].[WorkSpaces_Staging]\nwhere TenantId = pipeline().parameters.TenantId",
+										"type": "Expression"
 									},
+									"writeBehavior": "insert",
 									"sqlWriterUseTableLock": false,
 									"disableMetricsCollection": false
 								},
