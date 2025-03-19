@@ -4485,7 +4485,7 @@
 										"sink": {
 											"type": "AzureSqlSink",
 											"preCopyScript": {
-												"value": "Delete [dbo].[WorkSpaceUsers_Staging]\nwhere TenantId = pipeline().parameters.TenantId",
+												"value": "@concat('DELETE from [dbo].[Workspaces_batch] \nWHERE TenantId = ',string(pipeline().parameters.TenantId))",
 												"type": "Expression"
 											},
 											"writeBehavior": "insert",
