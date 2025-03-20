@@ -23,6 +23,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DataFlowRefreshes_log_UAT'"
 		},
+		"DataFlows_InsertUpdate_sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DataFlows_InsertUpdate_sql'"
+		},
 		"DataflowHistory_sql_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DataflowHistory_sql_UAT'"
@@ -83,10 +87,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetUsersHistory_sql_UAT'"
 		},
-		"DatasetUsersLive_sql_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DatasetUsersLive_sql_UAT'"
-		},
 		"DS_lookupClientInformation_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -132,6 +132,18 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"DataFlowRefreshes_log_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DataFlows_InsertUpdate_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DataFlows_InsertUpdate_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DataFlows_InsertUpdate_sql_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -302,18 +314,6 @@
 		"DatasetUsersHistory_sql_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"DatasetUsersLive_sql_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DatasetUsersLive_sql_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DatasetUsersLive_sql_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -405,6 +405,29 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DataFlowRefreshes_log_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlows_InsertUpdate_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DataFlows_InsertUpdate_sql",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DataFlows_InsertUpdate_sql_properties_typeProperties_server')]",
+					"database": "[parameters('DataFlows_InsertUpdate_sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DataFlows_InsertUpdate_sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DataFlows_InsertUpdate_sql_password')]"
 					}
 				}
 			},
@@ -739,29 +762,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DatasetUsersHistory_sql_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetUsersLive_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DatasetUsersLive_sql_UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DatasetUsersLive_sql_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('DatasetUsersLive_sql_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DatasetUsersLive_sql_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DatasetUsersLive_sql_UAT_password')]"
 					}
 				}
 			},
