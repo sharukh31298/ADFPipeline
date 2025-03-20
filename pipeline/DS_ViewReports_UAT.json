@@ -5,14 +5,9 @@
 			{
 				"name": "View Activity Live Data",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "View Activity Staging",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -588,7 +583,7 @@
 					{
 						"activity": "View Activity Staging",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -1252,12 +1247,6 @@
 						]
 					},
 					{
-						"activity": "View Activity Live Data",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
 						"activity": "Capturing status ViewActivity Statging",
 						"dependencyConditions": [
 							"Completed"
@@ -1362,13 +1351,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"ViewReportSourceKey"
-							]
-						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -1780,7 +1763,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "View Activity Live Data",
+						"activity": "ViewReport_InsertUpdate",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -1794,7 +1777,7 @@
 				"typeProperties": {
 					"variableName": "ViewReport Live Status",
 					"value": {
-						"value": "@activity('View Activity Live Data').Status",
+						"value": "@activity('ViewReport_InsertUpdate').Status",
 						"type": "Expression"
 					}
 				}
@@ -1821,6 +1804,38 @@
 						"value": "@activity('View Activity History').Status",
 						"type": "Expression"
 					}
+				}
+			},
+			{
+				"name": "ViewReport_InsertUpdate",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "View Activity Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ViewReports_InserUpdate",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],

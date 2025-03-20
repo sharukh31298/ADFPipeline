@@ -146,14 +146,9 @@
 			{
 				"name": "DataFlow Live Data",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "DataFlow Staging",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -333,7 +328,7 @@
 					{
 						"activity": "DataFlow Staging",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -519,12 +514,6 @@
 						]
 					},
 					{
-						"activity": "DataFlow Live Data",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
 						"activity": "Capturing Dataflows Live Status",
 						"dependencyConditions": [
 							"Completed"
@@ -696,7 +685,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "DataFlow Live Data",
+						"activity": "Dataflows_InsertUpdate",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -710,7 +699,7 @@
 				"typeProperties": {
 					"variableName": "Dataflows Live Status",
 					"value": {
-						"value": "@activity('DataFlow Live Data').Status",
+						"value": "@activity('Dataflows_InsertUpdate').Status",
 						"type": "Expression"
 					}
 				}
@@ -765,6 +754,39 @@
 						"referenceName": "Execute_UATChildpipelineLogs",
 						"type": "DatasetReference"
 					}
+				}
+			},
+			{
+				"name": "Dataflows_InsertUpdate",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "DataFlow Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "DataFlows_InsertUpdate_sql",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC [dbo].[Dataflows_InsertUpsert]"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],

@@ -43,13 +43,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": "Truncate Table dbo.Reports_Staging;",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"ReportSourceKey"
-							]
-						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -165,14 +159,9 @@
 			{
 				"name": "Report Live Data",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Reports Staging",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -586,12 +575,6 @@
 						]
 					},
 					{
-						"activity": "Report Live Data",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
 						"activity": "Capturing Reports Live Status",
 						"dependencyConditions": [
 							"Completed"
@@ -787,7 +770,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Report Live Data",
+						"activity": "Reports_updateDelete",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -801,7 +784,7 @@
 				"typeProperties": {
 					"variableName": "Report Live Status",
 					"value": {
-						"value": "@activity('Report Live Data').Status",
+						"value": "@activity('Reports_updateDelete').Status",
 						"type": "Expression"
 					}
 				}
@@ -833,6 +816,39 @@
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "Reports_updateDelete",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Reports Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "Reports_UpsertInsert",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC [dbo].[Reports_InsertUpsert]"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],

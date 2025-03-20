@@ -254,14 +254,9 @@
 			{
 				"name": "Dataset Live Data",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "Dataset Staging",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -573,7 +568,7 @@
 					{
 						"activity": "Dataset Staging",
 						"dependencyConditions": [
-							"Succeeded"
+							"Completed"
 						]
 					}
 				],
@@ -1056,7 +1051,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Dataset Live Data",
+						"activity": "Datasets_InsertUpsert",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -1070,7 +1065,7 @@
 				"typeProperties": {
 					"variableName": "Dataset Live Status",
 					"value": {
-						"value": "@activity('Dataset Live Data').Status",
+						"value": "@activity('Datasets_InsertUpsert').Status",
 						"type": "Expression"
 					}
 				}
@@ -1125,6 +1120,39 @@
 						"referenceName": "Execute_UATChildpipelineLogs",
 						"type": "DatasetReference"
 					}
+				}
+			},
+			{
+				"name": "Datasets_InsertUpsert",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Dataset Staging",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "Datasets_InserUpsert_Sql",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "EXEC [dbo].[Datasets_InsertUpsert]"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
 				}
 			}
 		],
