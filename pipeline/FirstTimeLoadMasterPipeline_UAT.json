@@ -937,9 +937,14 @@
 				"name": "Execute PowerBI DatasetRefreshes",
 				"description": "We are Refreshing PowerBI report Dataset",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "SP_Call_UpdateStatus",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"secureInput": false
 				},
@@ -1010,6 +1015,12 @@
 				"type": "String"
 			},
 			"Master DataflowRefreshes Status": {
+				"type": "String"
+			},
+			"Validate Success": {
+				"type": "String"
+			},
+			"Validate Failure": {
 				"type": "String"
 			}
 		},
