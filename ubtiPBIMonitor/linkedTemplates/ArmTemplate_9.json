@@ -13,6 +13,298 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUsersStaging_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DatasetUsersStaging_sql_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Datasets_UAT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DatasetUserID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DatasetUserSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceID",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetID",
+						"type": "varchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "varchar"
+					},
+					{
+						"name": "UserName",
+						"type": "varchar"
+					},
+					{
+						"name": "Identifier",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetUserAccessRight",
+						"type": "varchar"
+					},
+					{
+						"name": "PrincipalType",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DatasetUsers_Staging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUsers_API')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getdatasetusers_api_ls",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"DatasetID": {
+							"value": "@dataset().DatasetID",
+							"type": "Expression"
+						},
+						"AppTenantId": {
+							"value": "@dataset().AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@dataset().AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@dataset().AppClientCode",
+							"type": "Expression"
+						},
+						"WorkspaceID": {
+							"value": "@dataset().WorkspaceID",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DatasetID": {
+						"type": "string"
+					},
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"WorkspaceID": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dataset_API')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getdataset_api_ls",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"AppTenantId": {
+							"value": "@dataset().AppTenantId",
+							"type": "Expression"
+						},
+						"AppClientId": {
+							"value": "@dataset().AppClientId",
+							"type": "Expression"
+						},
+						"AppClientCode": {
+							"value": "@dataset().AppClientCode",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Dataset_SQL')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getgroups_sql_ls",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "id",
+						"type": "varchar"
+					},
+					{
+						"name": "name",
+						"type": "varchar"
+					},
+					{
+						"name": "webUrl",
+						"type": "varchar"
+					},
+					{
+						"name": "addRowsAPIEnabled",
+						"type": "varchar"
+					},
+					{
+						"name": "configuredBy",
+						"type": "varchar"
+					},
+					{
+						"name": "isRefreshable",
+						"type": "varchar"
+					},
+					{
+						"name": "isEffectiveIdentityRequired",
+						"type": "varchar"
+					},
+					{
+						"name": "isEffectiveIdentityRolesRequired",
+						"type": "varchar"
+					},
+					{
+						"name": "targetStorageMode",
+						"type": "varchar"
+					},
+					{
+						"name": "createdDate",
+						"type": "varchar"
+					},
+					{
+						"name": "contentProviderType",
+						"type": "varchar"
+					},
+					{
+						"name": "createReportEmbedURL",
+						"type": "varchar"
+					},
+					{
+						"name": "qnaEmbedURL",
+						"type": "varchar"
+					},
+					{
+						"name": "isInPlaceSharingEnabled",
+						"type": "varchar"
+					},
+					{
+						"name": "workspaceId",
+						"type": "varchar"
+					},
+					{
+						"name": "autoSyncReadOnlyReplicas",
+						"type": "varchar"
+					},
+					{
+						"name": "maxReadOnlyReplicas",
+						"type": "varchar"
+					},
+					{
+						"name": "updatedtime",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "Datasets"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Dataset_SQL_History')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -976,351 +1268,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "WorkSpaceUsers_Staging"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_API_Workspaces')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_API_Workspaces",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"AppTentantId": {
-							"value": "@dataset().AppTentantId",
-							"type": "Expression"
-						},
-						"AppClientId": {
-							"value": "@dataset().AppClientId",
-							"type": "Expression"
-						},
-						"AppClientCode": {
-							"value": "@dataset().AppClientCode",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"AppTentantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "String"
-					}
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_ds_ViewRports_staging')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Ls_Ds_SQL_ViewReports_Staging",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ViewReportID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ViewReportSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "RecordType",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CreationTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Operation",
-						"type": "varchar"
-					},
-					{
-						"name": "OrganizationID",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "varchar"
-					},
-					{
-						"name": "UserKey",
-						"type": "varchar"
-					},
-					{
-						"name": "Workload",
-						"type": "varchar"
-					},
-					{
-						"name": "UserID",
-						"type": "varchar"
-					},
-					{
-						"name": "ClientIP",
-						"type": "varchar"
-					},
-					{
-						"name": "UserAgent",
-						"type": "varchar"
-					},
-					{
-						"name": "Activity",
-						"type": "varchar"
-					},
-					{
-						"name": "ItemName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceName",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetName",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportName",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityID",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkspaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "AppName",
-						"type": "varchar"
-					},
-					{
-						"name": "ObjectID",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetID",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportID",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactId",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactName",
-						"type": "varchar"
-					},
-					{
-						"name": "IsSucess",
-						"type": "bit"
-					},
-					{
-						"name": "ReportType",
-						"type": "varchar"
-					},
-					{
-						"name": "RequestID",
-						"type": "varchar"
-					},
-					{
-						"name": "ActivityID",
-						"type": "varchar"
-					},
-					{
-						"name": "AppReportID",
-						"type": "varchar"
-					},
-					{
-						"name": "DistributionMethod",
-						"type": "varchar"
-					},
-					{
-						"name": "ConsumptionMethod",
-						"type": "varchar"
-					},
-					{
-						"name": "AppID",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactKind",
-						"type": "varchar"
-					},
-					{
-						"name": "RefreshEnforcementPolicy",
-						"type": "bit"
-					},
-					{
-						"name": "ContinuationURL",
-						"type": "varchar"
-					},
-					{
-						"name": "ContinuationToken",
-						"type": "varchar"
-					},
-					{
-						"name": "lastResultSet",
-						"type": "bit"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ViewReports_Staging"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RefreshSchedules_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "get_refresh_schedules_api_ls",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"WorkSpaceID": {
-							"value": "@dataset().WorkSpaceID",
-							"type": "Expression"
-						},
-						"DatasetID": {
-							"value": "@dataset().DatasetID",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"WorkSpaceID": {
-						"type": "string"
-					},
-					"DatasetID": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/RefreshSchedules_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "index_no",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "dataset_id",
-						"type": "varchar"
-					},
-					{
-						"name": "workspace_id",
-						"type": "varchar"
-					},
-					{
-						"name": "days",
-						"type": "varchar"
-					},
-					{
-						"name": "times",
-						"type": "varchar"
-					},
-					{
-						"name": "enabled",
-						"type": "varchar"
-					},
-					{
-						"name": "localTimeZoneId",
-						"type": "varchar"
-					},
-					{
-						"name": "notifyOption",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "RefreshSchedules"
 				}
 			},
 			"dependsOn": []

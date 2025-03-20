@@ -528,6 +528,22 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Execute_WorkspaceLive_sql'"
 		},
+		"Reports_UpsertInsert_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Reports_UpsertInsert'"
+		},
+		"Datasets_InserUpsert_Sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Datasets_InserUpsert_Sql'"
+		},
+		"DataFlows_InsertUpdate_sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DataFlows_InsertUpdate_sql'"
+		},
+		"ViewReports_InserUpdate_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ViewReports_InserUpdate'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -2025,6 +2041,54 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"Execute_WorkspaceLive_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Reports_UpsertInsert_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Reports_UpsertInsert_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Reports_UpsertInsert_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Datasets_InserUpsert_Sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Datasets_InserUpsert_Sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Datasets_InserUpsert_Sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DataFlows_InsertUpdate_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DataFlows_InsertUpdate_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DataFlows_InsertUpdate_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"ViewReports_InserUpdate_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"ViewReports_InserUpdate_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"ViewReports_InserUpdate_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -5296,7 +5360,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get DataFlow Batches",
+								"activity": "Truncate Dataflow Refreshes",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -5354,9 +5418,14 @@
 					{
 						"name": "Truncate Dataflow Refreshes",
 						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Get DataFlow Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -5682,6 +5751,12 @@
 								"dependencyConditions": [
 									"Completed"
 								]
+							},
+							{
+								"activity": "Capturing DataflowRefreshes Batches Status",
+								"dependencyConditions": [
+									"Completed"
+								]
 							}
 						],
 						"policy": {
@@ -5912,15 +5987,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"DataflowID",
-													"DataflowRefreshesSourcekey"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -7791,14 +7858,9 @@
 					{
 						"name": "DataFlow Live Data",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "DataFlow Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -7980,7 +8042,7 @@
 							{
 								"activity": "DataFlow Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -8168,12 +8230,6 @@
 								]
 							},
 							{
-								"activity": "DataFlow Live Data",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
 								"activity": "Capturing Dataflows Live Status",
 								"dependencyConditions": [
 									"Completed"
@@ -8345,7 +8401,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "DataFlow Live Data",
+								"activity": "Dataflows_InsertUpdate",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -8359,7 +8415,7 @@
 						"typeProperties": {
 							"variableName": "Dataflows Live Status",
 							"value": {
-								"value": "@activity('DataFlow Live Data').Status",
+								"value": "@activity('Dataflows_InsertUpdate').Status",
 								"type": "Expression"
 							}
 						}
@@ -8415,6 +8471,39 @@
 								"type": "DatasetReference",
 								"parameters": {}
 							}
+						}
+					},
+					{
+						"name": "Dataflows_InsertUpdate",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DataFlow Staging",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "DataFlows_InsertUpdate_sql",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC [dbo].[Dataflows_InsertUpsert]"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -8519,7 +8608,8 @@
 				"[concat(variables('factoryId'), '/datasets/DataflowHistory_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]"
+				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
+				"[concat(variables('factoryId'), '/linkedServices/DataFlows_InsertUpdate_sql')]"
 			]
 		},
 		{
@@ -10168,7 +10258,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get Dataset Batches",
+								"activity": "Truncate Dataset Refreshes",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -10226,9 +10316,14 @@
 					{
 						"name": "Truncate Dataset Refreshes",
 						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Get Dataset Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -10836,14 +10931,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"DatasetID"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -13401,7 +13489,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get Dataset Batches",
+								"activity": "Truncate Dataset Users",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -13459,9 +13547,14 @@
 					{
 						"name": "Truncate Dataset Users",
 						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Get Dataset Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -14066,15 +14159,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"WorkSpaceID",
-													"DatasetID",
-													"Identifier"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -16494,14 +16579,9 @@
 					{
 						"name": "Dataset Live Data",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Dataset Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -16815,7 +16895,7 @@
 							{
 								"activity": "Dataset Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -17300,7 +17380,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "Dataset Live Data",
+								"activity": "Datasets_InsertUpsert",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -17314,7 +17394,7 @@
 						"typeProperties": {
 							"variableName": "Dataset Live Status",
 							"value": {
-								"value": "@activity('Dataset Live Data').Status",
+								"value": "@activity('Datasets_InsertUpsert').Status",
 								"type": "Expression"
 							}
 						}
@@ -17370,6 +17450,39 @@
 								"type": "DatasetReference",
 								"parameters": {}
 							}
+						}
+					},
+					{
+						"name": "Datasets_InsertUpsert",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Dataset Staging",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Datasets_InserUpsert_Sql",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC [dbo].[Datasets_InsertUpsert]"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -17498,7 +17611,8 @@
 				"[concat(variables('factoryId'), '/datasets/DatasetHistory_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]"
+				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
+				"[concat(variables('factoryId'), '/linkedServices/Datasets_InserUpsert_Sql')]"
 			]
 		},
 		{
@@ -19513,7 +19627,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Get ReportPages in Batches",
+								"activity": "Delete ReportPages",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -19571,9 +19685,14 @@
 					{
 						"name": "Delete ReportPages",
 						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Get ReportPages in Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -20175,15 +20294,7 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "upsert",
-											"upsertSettings": {
-												"useTempDB": true,
-												"keys": [
-													"ReportID",
-													"ReportPageName",
-													"report_order"
-												]
-											},
+											"writeBehavior": "insert",
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -22422,13 +22533,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table dbo.Reports_Staging;",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"ReportSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -22545,14 +22650,9 @@
 					{
 						"name": "Report Live Data",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "Reports Staging",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -22970,12 +23070,6 @@
 								]
 							},
 							{
-								"activity": "Report Live Data",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
 								"activity": "Capturing Reports Live Status",
 								"dependencyConditions": [
 									"Completed"
@@ -23171,7 +23265,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "Report Live Data",
+								"activity": "Reports_updateDelete",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -23185,7 +23279,7 @@
 						"typeProperties": {
 							"variableName": "Report Live Status",
 							"value": {
-								"value": "@activity('Report Live Data').Status",
+								"value": "@activity('Reports_updateDelete').Status",
 								"type": "Expression"
 							}
 						}
@@ -23218,6 +23312,39 @@
 								"parameters": {}
 							},
 							"firstRowOnly": true
+						}
+					},
+					{
+						"name": "Reports_updateDelete",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Reports Staging",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Reports_UpsertInsert",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC [dbo].[Reports_InsertUpsert]"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -23562,7 +23689,8 @@
 				"[concat(variables('factoryId'), '/datasets/ReportsHistory_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]"
+				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
+				"[concat(variables('factoryId'), '/linkedServices/Reports_UpsertInsert')]"
 			]
 		},
 		{
@@ -25610,14 +25738,9 @@
 					{
 						"name": "View Activity Live Data",
 						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "View Activity Staging",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -26195,7 +26318,7 @@
 							{
 								"activity": "View Activity Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -26861,12 +26984,6 @@
 								]
 							},
 							{
-								"activity": "View Activity Live Data",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
 								"activity": "Capturing status ViewActivity Statging",
 								"dependencyConditions": [
 									"Completed"
@@ -26971,13 +27088,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "Truncate Table dbo.ViewReports_Staging",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"ViewReportSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -27391,7 +27502,7 @@
 						"type": "SetVariable",
 						"dependsOn": [
 							{
-								"activity": "View Activity Live Data",
+								"activity": "ViewReport_InsertUpdate",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -27405,7 +27516,7 @@
 						"typeProperties": {
 							"variableName": "ViewReport Live Status",
 							"value": {
-								"value": "@activity('View Activity Live Data').Status",
+								"value": "@activity('ViewReport_InsertUpdate').Status",
 								"type": "Expression"
 							}
 						}
@@ -27432,6 +27543,39 @@
 								"value": "@activity('View Activity History').Status",
 								"type": "Expression"
 							}
+						}
+					},
+					{
+						"name": "ViewReport_InsertUpdate",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "View Activity Staging",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ViewReports_InserUpdate",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC [dbo].[ViewReports_InsertUpsert]"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
 						}
 					}
 				],
@@ -27641,7 +27785,8 @@
 				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
 				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
 				"[concat(variables('factoryId'), '/datasets/ViewReports_API')]",
-				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]"
+				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
+				"[concat(variables('factoryId'), '/linkedServices/ViewReports_InserUpdate')]"
 			]
 		},
 		{
@@ -33596,7 +33741,7 @@
 								]
 							},
 							{
-								"activity": "Capture the StartTime",
+								"activity": "Capturing Status of WorkSpaceLive",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -33804,30 +33949,6 @@
 							"variableName": "WorkSpaceHistory Status",
 							"value": {
 								"value": "@activity('WorkSpace History').Status",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Capture the StartTime",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "WorkSpace Staging",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "WorkSpaceStartTime",
-							"value": {
-								"value": "@activity('WorkSpace Staging').ExecutionStartTime",
 								"type": "Expression"
 							}
 						}
@@ -113042,6 +113163,98 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('Execute_WorkspaceLive_sql_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Reports_UpsertInsert')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Reports_UpsertInsert",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Reports_UpsertInsert_properties_typeProperties_server')]",
+					"database": "[parameters('Reports_UpsertInsert_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Reports_UpsertInsert_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Reports_UpsertInsert_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Datasets_InserUpsert_Sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Datasets_InserUpsert_Sql",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Datasets_InserUpsert_Sql_properties_typeProperties_server')]",
+					"database": "[parameters('Datasets_InserUpsert_Sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Datasets_InserUpsert_Sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Datasets_InserUpsert_Sql_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataFlows_InsertUpdate_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DataFlows_InsertUpdate_sql",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DataFlows_InsertUpdate_sql_properties_typeProperties_server')]",
+					"database": "[parameters('DataFlows_InsertUpdate_sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DataFlows_InsertUpdate_sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DataFlows_InsertUpdate_sql_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ViewReports_InserUpdate')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "ViewReports_InserUpdate",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ViewReports_InserUpdate_properties_typeProperties_server')]",
+					"database": "[parameters('ViewReports_InserUpdate_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ViewReports_InserUpdate_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ViewReports_InserUpdate_password')]"
 					}
 				}
 			},
