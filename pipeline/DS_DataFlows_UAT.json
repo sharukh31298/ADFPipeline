@@ -42,14 +42,11 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "Truncate table Dataflows_Staging",
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true,
-							"keys": [
-								"DataflowSourceKey"
-							]
+						"preCopyScript": {
+							"value": "@concat('DELETE  [dbo].[Dataflows_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))\n",
+							"type": "Expression"
 						},
+						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},

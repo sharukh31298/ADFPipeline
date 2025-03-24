@@ -42,7 +42,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "Truncate Table dbo.Reports_Staging;",
+						"preCopyScript": {
+							"value": "@concat('DELETE  [dbo].[Reports_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))\n",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
