@@ -31485,7 +31485,7 @@
 								},
 								"Status": {
 									"value": {
-										"value": "@if(and(\n\nequals(variables('WorkSpaces Batch'),'Succeeded'),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
+										"value": "@if(and(\nequals(variables('Get WorkSpaces Batch Status'),'Succeeded'),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -33111,16 +33111,10 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "@{concat('DELETE [dbo].[WorkSpaces] where TenantId = ', string(pipeline().parameters.TenantId))}",
+									"value": "@{concat('DELETE [dbo].[WorkSpaces_Staging] where TenantId = ', string(pipeline().parameters.TenantId))}",
 									"type": "Expression"
 								},
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -36172,6 +36166,10 @@
 													"value": "@if(and(and(and(and(and(and(and(and(and(\nequals(variables('Master Workspaces Status'),'Succeeded'),\nequals(variables('Master WorkSpaceUsers Status'),'Succeeded')),\nequals(variables('Master Report status'),'Succeeded')),\nequals(variables('Master ReportPages Status'),'Succeeded')),\nequals(variables('Master Datasets Status'),'Succeeded')),\nequals(variables('Master Datasetusers Status'),'Succeeded')),\nequals(variables('Master Datasetfreshes status'),'Succeeded')),\nequals(variables('Master Dataflows Status'),'Succeeded')),\nequals(variables('Master DataflowRefreshes Status'),'Succeeded')),\nequals(variables('Master Viewreports Status'),'Succeeded')),\n'Succeeded','Failed')",
 													"type": "Expression"
 												},
+												"type": "String"
+											},
+											"CurrentStatus": {
+												"value": "Completed",
 												"type": "String"
 											}
 										}
