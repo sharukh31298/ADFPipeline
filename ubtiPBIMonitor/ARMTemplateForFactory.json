@@ -72085,7 +72085,7 @@
 								"referenceName": "ReportPages_Batch_UAT",
 								"type": "PipelineReference"
 							},
-							"waitOnCompletion": false,
+							"waitOnCompletion": true,
 							"parameters": {
 								"AppTenantId": {
 									"value": "@pipeline().parameters.AppTenantId",
@@ -72167,7 +72167,7 @@
 								"referenceName": "DatasetUsers_Batch_UAT",
 								"type": "PipelineReference"
 							},
-							"waitOnCompletion": false,
+							"waitOnCompletion": true,
 							"parameters": {
 								"AppTenantId": {
 									"value": "@pipeline().parameters.AppTenantId",
@@ -72290,7 +72290,7 @@
 								"referenceName": "DataFlowRefreshes_Batch_UAT",
 								"type": "PipelineReference"
 							},
-							"waitOnCompletion": false,
+							"waitOnCompletion": true,
 							"parameters": {
 								"AppTenantId": {
 									"value": "@pipeline().parameters.AppTenantId",
@@ -72461,7 +72461,7 @@
 								"referenceName": "WorkSpacesUsers_Batch_UAT",
 								"type": "PipelineReference"
 							},
-							"waitOnCompletion": false,
+							"waitOnCompletion": true,
 							"parameters": {
 								"AppTenantId": {
 									"value": "@pipeline().parameters.AppTenantId",
@@ -72607,97 +72607,19 @@
 						"type": "SqlServerStoredProcedure",
 						"dependsOn": [
 							{
-								"activity": "Capturing Workspaces_Master status",
+								"activity": "Capturing PowerBI Dataset Refreshes status",
 								"dependencyConditions": [
 									"Completed"
 								]
 							},
 							{
-								"activity": "Workspaces_Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "ViewReports_Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Reports_Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "ReportPages_Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Capturing ReportsMaster status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Datasets_Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Datasetusers_Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Capturing Datasets Master Status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Dataflows_Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "WorkspaceUsers__Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Capturing Dataflows Master Status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Datasetrefresh_Master",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Capturing Viewreports Master Status",
+								"activity": "Execute PowerBI DatasetRefreshes",
 								"dependencyConditions": [
 									"Completed"
 								]
 							},
 							{
 								"activity": "Capturing DataflowsRefreshes Master Status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "DataflowRefreshes_Master",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -72715,7 +72637,31 @@
 								]
 							},
 							{
-								"activity": "Capturing ReportPagesMaster Status",
+								"activity": "Capturing Viewreports Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Dataflows Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Datasets Master Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing ReportsMaster status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Workspaces_Master status",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -72765,7 +72711,7 @@
 								},
 								"DatasetrefreshesStatus": {
 									"value": {
-										"value": "@variables('PowerBI Datasetrefreshes status')",
+										"value": "@variables('PowerBI Datasetrefreshes status').Status",
 										"type": "Expression"
 									},
 									"type": "String"
@@ -72932,7 +72878,31 @@
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "SP_Call_UpdateStatus",
+								"activity": "WorkspaceUsers__Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "ReportPages_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasetusers_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Datasetrefresh_Master",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "DataflowRefreshes_Master",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -72947,7 +72917,7 @@
 								"referenceName": "PowerBI_DataserRefreshes_UAT",
 								"type": "PipelineReference"
 							},
-							"waitOnCompletion": false,
+							"waitOnCompletion": true,
 							"parameters": {}
 						}
 					},
