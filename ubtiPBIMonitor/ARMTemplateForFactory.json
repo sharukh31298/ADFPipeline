@@ -27759,6 +27759,9 @@
 					},
 					"DataflowRefreshesLive Status": {
 						"type": "String"
+					},
+					"PowerBI Datasetrefreshes status": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -33502,7 +33505,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "@TenantId = pipeline().parameters.TenantId",
+									"value": "@TenantId = ', string(pipeline().parameters.TenantId",
 									"type": "Expression"
 								},
 								"writeBehavior": "insert",
@@ -34259,6 +34262,9 @@
 						"type": "String"
 					},
 					"WorkSpacesEndTime": {
+						"type": "String"
+					},
+					"PowerBI Datasetrefreshes status": {
 						"type": "String"
 					}
 				},
@@ -36297,6 +36303,9 @@
 						"type": "String"
 					},
 					"Validate Failure": {
+						"type": "String"
+					},
+					"PowerBI Datasetrefreshes status": {
 						"type": "String"
 					}
 				},
@@ -72753,6 +72762,13 @@
 								"CurrentStatus": {
 									"value": "Completed",
 									"type": "String"
+								},
+								"DatasetrefreshesStatus": {
+									"value": {
+										"value": "@variables('PowerBI Datasetrefreshes status')",
+										"type": "Expression"
+									},
+									"type": "String"
 								}
 							}
 						},
@@ -72918,7 +72934,7 @@
 							{
 								"activity": "SP_Call_UpdateStatus",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -72933,6 +72949,30 @@
 							},
 							"waitOnCompletion": false,
 							"parameters": {}
+						}
+					},
+					{
+						"name": "Capturing PowerBI Dataset Refreshes status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Execute PowerBI DatasetRefreshes",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "PowerBI Datasetrefreshes status",
+							"value": {
+								"value": "@activity('Execute PowerBI DatasetRefreshes').Status",
+								"type": "Expression"
+							}
 						}
 					}
 				],
@@ -73002,6 +73042,9 @@
 						"type": "String"
 					},
 					"Validate Failure": {
+						"type": "String"
+					},
+					"PowerBI Datasetrefreshes status": {
 						"type": "String"
 					}
 				},
