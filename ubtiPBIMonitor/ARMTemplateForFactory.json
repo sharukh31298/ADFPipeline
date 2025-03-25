@@ -33501,13 +33501,11 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceSourceKey"
-									]
+								"preCopyScript": {
+									"value": "@TenantId = pipeline().parameters.TenantId",
+									"type": "Expression"
 								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
