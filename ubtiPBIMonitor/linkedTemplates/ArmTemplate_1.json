@@ -7,10 +7,6 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
-		"DS_lookupClientInformation_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DS_lookupClientInformation'"
-		},
 		"DS_updateLog_SP_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_updateLog_SP'"
@@ -87,17 +83,9 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DatasetUsersHistory_sql_UAT'"
 		},
-		"DS_lookupClientInformation_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DS_lookupClientInformation_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DS_lookupClientInformation_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
+		"DatasetUsersLive_sql_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DatasetUsersLive_sql_UAT'"
 		},
 		"DS_updateLog_SP_properties_typeProperties_server": {
 			"type": "string",
@@ -314,34 +302,24 @@
 		"DatasetUsersHistory_sql_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
+		},
+		"DatasetUsersLive_sql_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DatasetUsersLive_sql_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DatasetUsersLive_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_lookupClientInformation')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DS_lookupClientInformation_properties_typeProperties_server')]",
-					"database": "[parameters('DS_lookupClientInformation_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DS_lookupClientInformation_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DS_lookupClientInformation_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DS_updateLog_SP')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -762,6 +740,29 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DatasetUsersHistory_sql_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUsersLive_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DatasetUsersLive_sql_UAT",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DatasetUsersLive_sql_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('DatasetUsersLive_sql_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DatasetUsersLive_sql_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DatasetUsersLive_sql_UAT_password')]"
 					}
 				}
 			},

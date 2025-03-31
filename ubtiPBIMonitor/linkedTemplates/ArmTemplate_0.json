@@ -63,6 +63,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_lokkupClientInformation_UAT'"
 		},
+		"DS_lookupClientInformation_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DS_lookupClientInformation'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -230,6 +234,18 @@
 		"DS_lokkupClientInformation_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
+		},
+		"DS_lookupClientInformation_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DS_lookupClientInformation_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DS_lookupClientInformation_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -328,29 +344,6 @@
 				},
 				"folder": {
 					"name": "UAT_DailyScheduleChildPipelines"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Demo')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Wait1",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 15
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
 				},
 				"annotations": []
 			},
@@ -710,6 +703,28 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DS_lokkupClientInformation_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_lookupClientInformation')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DS_lookupClientInformation_properties_typeProperties_server')]",
+					"database": "[parameters('DS_lookupClientInformation_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DS_lookupClientInformation_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DS_lookupClientInformation_password')]"
 					}
 				}
 			},
