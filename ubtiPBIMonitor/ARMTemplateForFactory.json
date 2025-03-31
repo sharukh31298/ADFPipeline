@@ -100706,6 +100706,170 @@
 											}
 										}
 									}
+								},
+								{
+									"name": "DS_WorkspaceUsers__Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Workspaces_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_WorkSpacesUsers_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_ReportPages_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Reports_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_ReportPages_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Datasetusers_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Datasets_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_DatasetUsers_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Datasetrefresh_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Datasets_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_DatasetRefreshes_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
 								}
 							]
 						}
@@ -100732,7 +100896,11 @@
 				"[concat(variables('factoryId'), '/pipelines/DS_Reports_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_Datasets_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_ViewReports_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DataFlows_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_DataFlows_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpacesUsers_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_ReportPages_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DatasetUsers_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DatasetRefreshes_Batch_UAT')]"
 			]
 		},
 		{
