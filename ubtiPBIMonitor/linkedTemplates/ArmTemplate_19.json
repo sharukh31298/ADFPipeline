@@ -4996,7 +4996,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "select TenantId,AppTenantId,AppClientId,AppClientSecret from [dbo].[DailyLoadTracker_batch] ",
+									"value": "@concat('SELECT TenantId,AppTenantId,AppClientId,AppClientSecret FROM [dbo].[DailyLoadTracker_batch] \nWHERE BatchNo = ', string(pipeline().parameters.BatchNo))",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -5028,7 +5028,6 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
-							"batchCount": 50,
 							"activities": [
 								{
 									"name": "DS_Workspaces_Master",
@@ -5967,6 +5966,11 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"BatchNo": {
+						"type": "string"
+					}
 				},
 				"variables": {
 					"InProgress Status": {
