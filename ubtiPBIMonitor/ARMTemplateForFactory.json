@@ -100501,6 +100501,47 @@
 											}
 										}
 									}
+								},
+								{
+									"name": "DS_Workspaces_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_WorkSpaces_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
 								}
 							]
 						}
@@ -100522,7 +100563,8 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_lookupClientInformation')]",
 				"[concat(variables('factoryId'), '/datasets/DS_InsertMasterlog_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_Refreshing User Permissions_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_Refreshing User Permissions_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpaces_UAT')]"
 			]
 		},
 		{
