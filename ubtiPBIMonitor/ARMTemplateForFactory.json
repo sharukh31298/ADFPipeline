@@ -100450,9 +100450,9 @@
 									"type": "ExecutePipeline",
 									"dependsOn": [
 										{
-											"activity": "DS_Insert Log",
+											"activity": "Wait1",
 											"dependencyConditions": [
-												"Completed"
+												"Succeeded"
 											]
 										}
 									],
@@ -101248,6 +101248,22 @@
 									"linkedServiceName": {
 										"referenceName": "DS_updateMasterlog_UAT",
 										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Wait1",
+									"type": "Wait",
+									"dependsOn": [
+										{
+											"activity": "DS_Insert Log",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 23
 									}
 								}
 							]
