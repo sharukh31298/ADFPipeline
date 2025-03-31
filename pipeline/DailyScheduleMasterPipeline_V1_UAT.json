@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "select TenantId,AppTenantId,AppClientId,AppClientSecret from [dbo].[DailyLoadTracker_batch] ",
+							"value": "@concat('SELECT TenantId,AppTenantId,AppClientId,AppClientSecret FROM [dbo].[DailyLoadTracker_batch] \nWHERE BatchNo = ', string(pipeline().parameters.BatchNo))",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -984,6 +984,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"BatchNo": {
+				"type": "string"
+			}
+		},
 		"variables": {
 			"InProgress Status": {
 				"type": "String",
