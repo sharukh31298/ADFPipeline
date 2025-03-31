@@ -4453,6 +4453,43 @@
 											"parameters": {}
 										}
 									}
+								},
+								{
+									"name": "DS_Refreshes UserPermissions Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Insert Log",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_Refreshing User Permissions_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											}
+										}
+									}
 								}
 							]
 						}
