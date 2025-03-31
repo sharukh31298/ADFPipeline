@@ -81,14 +81,7 @@
 						{
 							"name": "DS_Refreshes UserPermissions Master",
 							"type": "ExecutePipeline",
-							"dependsOn": [
-								{
-									"activity": "Wait1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"dependsOn": [],
 							"policy": {
 								"secureInput": false
 							},
@@ -886,14 +879,9 @@
 						{
 							"name": "Wait1",
 							"type": "Wait",
-							"dependsOn": [
-								{
-									"activity": "DS_Insert Log",
-									"dependencyConditions": [
-										"Completed"
-									]
-								}
-							],
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
 								"waitTimeInSeconds": 23
