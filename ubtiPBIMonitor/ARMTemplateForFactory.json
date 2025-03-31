@@ -35227,6 +35227,9 @@
 					},
 					"DataflowRefreshes Status": {
 						"type": "String"
+					},
+					"DS_Master_Workspace": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -36147,6 +36150,30 @@
 										"waitOnCompletion": false,
 										"parameters": {}
 									}
+								},
+								{
+									"name": "DS_Capturing ReportPagesMaster Status_copy1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "DS_ReportPages_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master ReportPages Status",
+										"value": {
+											"value": "@activity('DS_ReportPages_Master').Status",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
@@ -36207,6 +36234,9 @@
 						"type": "String"
 					},
 					"Validate Failure": {
+						"type": "String"
+					},
+					"DS_Master_Workspace": {
 						"type": "String"
 					}
 				},
@@ -55772,6 +55802,11 @@
 						"type": "String"
 					}
 				},
+				"variables": {
+					"DS_Master_Workspace": {
+						"type": "String"
+					}
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -72916,6 +72951,9 @@
 					},
 					"PowerBI Datasetrefreshes status": {
 						"type": "String"
+					},
+					"DS_Master_Workspace": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -84856,6 +84894,9 @@
 					},
 					"Validate Failure": {
 						"type": "String"
+					},
+					"DS_Master_Workspace": {
+						"type": "String"
 					}
 				},
 				"annotations": []
@@ -95787,6 +95828,9 @@
 					},
 					"Workspace Staging Status": {
 						"type": "String"
+					},
+					"DS_Master_Workspace": {
+						"type": "String"
 					}
 				},
 				"folder": {
@@ -97550,6 +97594,9 @@
 						"type": "String"
 					},
 					"WorkspaceUsers Staging Status": {
+						"type": "String"
+					},
+					"DS_Master_Workspace": {
 						"type": "String"
 					}
 				},
@@ -100434,6 +100481,774 @@
 											}
 										}
 									}
+								},
+								{
+									"name": "DS_Workspaces_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_WorkSpaces_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing Workspaces_Master status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_Workspaces_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "DS_Master_Workspace",
+										"value": {
+											"value": "@activity('DS_Workspaces_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_WorkspaceUsers__Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_WorkSpacesUsers_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing WorkSpaceUsers Master Status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_WorkspaceUsers__Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master WorkSpaceUsers Status",
+										"value": {
+											"value": "@activity('DS_WorkspaceUsers__Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_Reports_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_Reports_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing ReportsMaster status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_Reports_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master Report status",
+										"value": {
+											"value": "@activity('DS_Reports_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_ReportPages_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Reports_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_ReportPages_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing ReportPagesMaster Status_copy1",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_ReportPages_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master ReportPages Status",
+										"value": {
+											"value": "@activity('DS_ReportPages_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_Datasets_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_Datasets_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing Datasets Master Status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_Datasets_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master Datasets Status",
+										"value": {
+											"value": "@activity('DS_Datasets_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_Datasetusers_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Datasets_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_DatasetUsers_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing DatasetUsersMaster Status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_Datasetusers_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master Datasetusers Status",
+										"value": {
+											"value": "@activity('DS_Datasetusers_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_Datasetrefresh_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Datasets_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_DatasetRefreshes_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing Datasetsrefresh Master Status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_Datasetrefresh_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master Datasetfreshes status",
+										"value": {
+											"value": "@activity('DS_Datasetrefresh_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_ViewReports_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_ViewReports_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": false,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing Viewreports Master Status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_ViewReports_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master Viewreports Status",
+										"value": {
+											"value": "@activity('DS_ViewReports_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_Dataflows_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Refreshes UserPermissions Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_DataFlows_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing Dataflows Master Status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_Dataflows_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master Dataflows Status",
+										"value": {
+											"value": "@activity('DS_Dataflows_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_DataflowRefreshes_Master",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Dataflows_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_DataFlowRefreshes_Batch_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@item().AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@item().AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@item().AppClientSecret",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@item().TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "DS_Capturing DataflowsRefreshes Master Status",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_DataflowRefreshes_Master",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Master DataflowRefreshes Status",
+										"value": {
+											"value": "@activity('DS_DataflowRefreshes_Master').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "DS_SP_Call_UpdateStatus",
+									"type": "SqlServerStoredProcedure",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "DS_Capturing Viewreports Master Status",
+											"dependencyConditions": [
+												"Completed"
+											]
+										},
+										{
+											"activity": "DS_Capturing DataflowsRefreshes Master Status",
+											"dependencyConditions": [
+												"Completed"
+											]
+										},
+										{
+											"activity": "DS_Capturing DatasetUsersMaster Status",
+											"dependencyConditions": [
+												"Completed"
+											]
+										},
+										{
+											"activity": "DS_Capturing Datasets Master Status",
+											"dependencyConditions": [
+												"Completed"
+											]
+										},
+										{
+											"activity": "DS_Capturing ReportPagesMaster Status_copy1",
+											"dependencyConditions": [
+												"Completed"
+											]
+										},
+										{
+											"activity": "DS_Capturing ReportsMaster status",
+											"dependencyConditions": [
+												"Completed"
+											]
+										},
+										{
+											"activity": "DS_Capturing WorkSpaceUsers Master Status",
+											"dependencyConditions": [
+												"Completed"
+											]
+										},
+										{
+											"activity": "DS_Capturing Workspaces_Master status",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[DS_DataLoadTrack_Update]",
+										"storedProcedureParameters": {
+											"DataLoadTrackerID": {
+												"value": {
+													"value": "@activity('DS_Insert Log').output.firstRow.DataLoadTrackerId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ProcessEndTime": {
+												"value": {
+													"value": "@utcNow()",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": {
+													"value": "@if(and(and(and(and(and(and(and(and(and(\nequals(variables('Master Workspaces Status'),'Succeeded'),\nequals(variables('Master WorkSpaceUsers Status'),'Succeeded')),\nequals(variables('Master Report status'),'Succeeded')),\nequals(variables('Master ReportPages Status'),'Succeeded')),\nequals(variables('Master Datasets Status'),'Succeeded')),\nequals(variables('Master Datasetusers Status'),'Succeeded')),\nequals(variables('Master Datasetfreshes status'),'Succeeded')),\nequals(variables('Master Dataflows Status'),'Succeeded')),\nequals(variables('Master DataflowRefreshes Status'),'Succeeded')),\nequals(variables('Master Viewreports Status'),'Succeeded')),\n'Succeeded','Failed')",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"CurrentStatus": {
+												"value": "Completed",
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "DS_updateMasterlog_UAT",
+										"type": "LinkedServiceReference"
+									}
 								}
 							]
 						}
@@ -100445,6 +101260,9 @@
 				"variables": {
 					"a": {
 						"type": "String"
+					},
+					"DS_Master_Workspace": {
+						"type": "String"
 					}
 				},
 				"annotations": []
@@ -100452,7 +101270,18 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_lookupClientInformation')]",
 				"[concat(variables('factoryId'), '/datasets/DS_InsertMasterlog_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_Refreshing User Permissions_UAT')]"
+				"[concat(variables('factoryId'), '/pipelines/DS_Refreshing User Permissions_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpaces_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpacesUsers_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_Reports_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_ReportPages_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_Datasets_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DatasetUsers_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DatasetRefreshes_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_ViewReports_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DataFlows_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_DataFlowRefreshes_Batch_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/DS_updateMasterlog_UAT')]"
 			]
 		},
 		{
