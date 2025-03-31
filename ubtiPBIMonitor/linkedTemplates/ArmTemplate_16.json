@@ -4426,12 +4426,32 @@
 							"isSequential": false,
 							"activities": [
 								{
-									"name": "Wait1",
-									"type": "Wait",
+									"name": "DS_Insert Log",
+									"type": "Lookup",
 									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
 									"userProperties": [],
 									"typeProperties": {
-										"waitTimeInSeconds": 1
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat('EXEC [dbo].[DS_DataLoadTrackInsert] ','''',item().AppTenantId,''',''',item().AppClientId,''',''',item().AppClientSecret,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(item().TenantId),''','' ''')",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DS_InsertMasterlog_UAT",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
 									}
 								}
 							]
