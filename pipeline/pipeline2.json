@@ -156,6 +156,170 @@
 									}
 								}
 							}
+						},
+						{
+							"name": "DS_Reports_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Refreshes UserPermissions Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_Reports_UAT",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTenantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TenantId",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "DS_Datasets_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Refreshes UserPermissions Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_Datasets_UAT",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTenantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TenantId",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "DS_ViewReports_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Refreshes UserPermissions Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_ViewReports_UAT",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTenantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TenantId",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						{
+							"name": "DS_Dataflows_Master",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Refreshes UserPermissions Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_DataFlows_UAT",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@item().AppTenantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@item().AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@item().AppClientSecret",
+										"type": "Expression"
+									},
+									"TenantId": {
+										"value": "@item().TenantId",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
