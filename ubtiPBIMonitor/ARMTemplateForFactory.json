@@ -100383,7 +100383,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "First 50 rows\nSELECT TenantId, AppTenantId, AppClientId, AppClientSecret\nFROM [dbo].[DailyLoadTracker_batch]\nORDER BY DailyLoadTrackerId\nOFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY;\n\n-- Next 50 rows (increment OFFSET value for subsequent batches)\nSELECT TenantId, AppTenantId, AppClientId, AppClientSecret\nFROM [dbo].[DailyLoadTracker_batch]\nORDER BY DailyLoadTrackerId\nOFFSET 50 ROWS FETCH NEXT 50 ROWS ONLY;",
+									"value": "SELECT TenantId,AppTenantId,AppClientId,AppClientSecret FROM [dbo].[DailyLoadTracker_batch]",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -100415,11 +100415,19 @@
 								"type": "Expression"
 							},
 							"isSequential": false,
+							"batchCount": 50,
 							"activities": [
 								{
 									"name": "DS_Insert Log",
 									"type": "Lookup",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Script1",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -100448,7 +100456,14 @@
 								{
 									"name": "DS_Refreshes UserPermissions Master",
 									"type": "ExecutePipeline",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "DS_Insert Log",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
 									"policy": {
 										"secureInput": false
 									},
@@ -101253,6 +101268,32 @@
 									"typeProperties": {
 										"waitTimeInSeconds": 23
 									}
+								},
+								{
+									"name": "Script1",
+									"type": "Script",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"linkedServiceName": {
+										"referenceName": "DS_lookupClientInformation",
+										"type": "LinkedServiceReference"
+									},
+									"typeProperties": {
+										"scripts": [
+											{
+												"type": "Query",
+												"text": "SELECT TenantId,AppTenantId,AppClientId,AppClientSecret FROM [dbo].[DailyLoadTracker_batch]"
+											}
+										],
+										"scriptBlockExecutionTimeout": "02:00:00"
+									}
 								}
 							]
 						}
@@ -101285,7 +101326,8 @@
 				"[concat(variables('factoryId'), '/pipelines/DS_ViewReports_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_DataFlows_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_DataFlowRefreshes_Batch_UAT')]",
-				"[concat(variables('factoryId'), '/linkedServices/DS_updateMasterlog_UAT')]"
+				"[concat(variables('factoryId'), '/linkedServices/DS_updateMasterlog_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/DS_lookupClientInformation')]"
 			]
 		},
 		{
