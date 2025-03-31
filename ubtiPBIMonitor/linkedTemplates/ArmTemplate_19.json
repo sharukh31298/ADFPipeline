@@ -10222,7 +10222,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "SELECT TenantId,AppTenantId,AppClientId,AppClientSecret FROM [dbo].[DailyLoadTracker_batch] ",
+									"value": "First 50 rows\nSELECT TenantId, AppTenantId, AppClientId, AppClientSecret\nFROM [dbo].[DailyLoadTracker_batch]\nORDER BY DailyLoadTrackerId\nOFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY;\n\n-- Next 50 rows (increment OFFSET value for subsequent batches)\nSELECT TenantId, AppTenantId, AppClientId, AppClientSecret\nFROM [dbo].[DailyLoadTracker_batch]\nORDER BY DailyLoadTrackerId\nOFFSET 50 ROWS FETCH NEXT 50 ROWS ONLY;",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
