@@ -785,6 +785,12 @@
 									"dependencyConditions": [
 										"Completed"
 									]
+								},
+								{
+									"activity": "Execute PowerBIDatasetRefreshes",
+									"dependencyConditions": [
+										"Completed"
+									]
 								}
 							],
 							"policy": {
@@ -821,6 +827,13 @@
 									},
 									"CurrentStatus": {
 										"value": "Completed",
+										"type": "String"
+									},
+									"DatasetRefreshesStatus": {
+										"value": {
+											"value": "@activity('Execute PowerBIDatasetRefreshes').Status",
+											"type": "Expression"
+										},
 										"type": "String"
 									}
 								}
@@ -872,9 +885,33 @@
 							"type": "ExecutePipeline",
 							"dependsOn": [
 								{
-									"activity": "DS_SP_Call_UpdateStatus",
+									"activity": "DS_DataflowRefreshes_Master",
 									"dependencyConditions": [
-										"Succeeded"
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Datasetrefresh_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_Datasetusers_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_ReportPages_Master",
+									"dependencyConditions": [
+										"Completed"
+									]
+								},
+								{
+									"activity": "DS_WorkspaceUsers__Master",
+									"dependencyConditions": [
+										"Completed"
 									]
 								}
 							],
@@ -887,7 +924,7 @@
 									"referenceName": "DS_PowerBI_DataserRefreshes_UAT",
 									"type": "PipelineReference"
 								},
-								"waitOnCompletion": false
+								"waitOnCompletion": true
 							}
 						},
 						{
