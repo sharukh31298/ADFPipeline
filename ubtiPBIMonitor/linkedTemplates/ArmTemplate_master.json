@@ -544,6 +544,14 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
+		"Rest_Worksapces_API_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Rest_Worksapces_API'"
+		},
+		"Workspace_sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Workspace_sql'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -2092,6 +2100,26 @@
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
 		},
+		"Rest_Worksapces_API_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$top=5000"
+		},
+		"Rest_Worksapces_API_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().ClientId}"
+		},
+		"Workspace_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Workspace_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Workspace_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -3602,6 +3630,9 @@
 					"view_report_api_ls_clientSecret": {
 						"value": "[parameters('view_report_api_ls_clientSecret')]"
 					},
+					"Rest_Worksapces_API_clientSecret": {
+						"value": "[parameters('Rest_Worksapces_API_clientSecret')]"
+					},
 					"get_dataset_refrehses_api_ls_properties_typeProperties_url": {
 						"value": "[parameters('get_dataset_refrehses_api_ls_properties_typeProperties_url')]"
 					},
@@ -3706,6 +3737,12 @@
 					},
 					"view_report_api_ls_properties_typeProperties_clientId": {
 						"value": "[parameters('view_report_api_ls_properties_typeProperties_clientId')]"
+					},
+					"Rest_Worksapces_API_properties_typeProperties_url": {
+						"value": "[parameters('Rest_Worksapces_API_properties_typeProperties_url')]"
+					},
+					"Rest_Worksapces_API_properties_typeProperties_clientId": {
+						"value": "[parameters('Rest_Worksapces_API_properties_typeProperties_clientId')]"
 					}
 				}
 			},
@@ -3726,6 +3763,18 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"Workspace_sql_password": {
+						"value": "[parameters('Workspace_sql_password')]"
+					},
+					"Workspace_sql_properties_typeProperties_server": {
+						"value": "[parameters('Workspace_sql_properties_typeProperties_server')]"
+					},
+					"Workspace_sql_properties_typeProperties_database": {
+						"value": "[parameters('Workspace_sql_properties_typeProperties_database')]"
+					},
+					"Workspace_sql_properties_typeProperties_userName": {
+						"value": "[parameters('Workspace_sql_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -3826,24 +3875,6 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
-					},
-					"AzureSqlDatabaseLS_properties_typeProperties_server": {
-						"value": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_server')]"
-					},
-					"AzureSqlDatabaseLS_properties_typeProperties_database": {
-						"value": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_database')]"
-					},
-					"AzureSqlDatabaseLS_properties_typeProperties_userName": {
-						"value": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_userName')]"
-					},
-					"Azure_SQL_properties_typeProperties_server": {
-						"value": "[parameters('Azure_SQL_properties_typeProperties_server')]"
-					},
-					"Azure_SQL_properties_typeProperties_database": {
-						"value": "[parameters('Azure_SQL_properties_typeProperties_database')]"
-					},
-					"Azure_SQL_properties_typeProperties_userName": {
-						"value": "[parameters('Azure_SQL_properties_typeProperties_userName')]"
 					}
 				}
 			},
@@ -3867,6 +3898,24 @@
 					},
 					"getreports_sql_ds_connectionString": {
 						"value": "[parameters('getreports_sql_ds_connectionString')]"
+					},
+					"AzureSqlDatabaseLS_properties_typeProperties_server": {
+						"value": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_server')]"
+					},
+					"AzureSqlDatabaseLS_properties_typeProperties_database": {
+						"value": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_database')]"
+					},
+					"AzureSqlDatabaseLS_properties_typeProperties_userName": {
+						"value": "[parameters('AzureSqlDatabaseLS_properties_typeProperties_userName')]"
+					},
+					"Azure_SQL_properties_typeProperties_server": {
+						"value": "[parameters('Azure_SQL_properties_typeProperties_server')]"
+					},
+					"Azure_SQL_properties_typeProperties_database": {
+						"value": "[parameters('Azure_SQL_properties_typeProperties_database')]"
+					},
+					"Azure_SQL_properties_typeProperties_userName": {
+						"value": "[parameters('Azure_SQL_properties_typeProperties_userName')]"
 					},
 					"DatasetUsers_sql_properties_typeProperties_server": {
 						"value": "[parameters('DatasetUsers_sql_properties_typeProperties_server')]"

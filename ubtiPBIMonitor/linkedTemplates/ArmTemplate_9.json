@@ -13,6 +13,192 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUsersHistory_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DatasetUsersHistory_sql_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Datasets_UAT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DatasetUserID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DatasetUserSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceID",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetID",
+						"type": "varchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "varchar"
+					},
+					{
+						"name": "UserName",
+						"type": "varchar"
+					},
+					{
+						"name": "Identifier",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetUserAccessRight",
+						"type": "varchar"
+					},
+					{
+						"name": "PrincipalType",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DatasetUsersHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUsersLive_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DatasetUsersLive_sql_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Datasets_UAT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DatasetUserID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DatasetUserSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceID",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetID",
+						"type": "varchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "varchar"
+					},
+					{
+						"name": "UserName",
+						"type": "varchar"
+					},
+					{
+						"name": "Identifier",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetUserAccessRight",
+						"type": "varchar"
+					},
+					{
+						"name": "PrincipalType",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DatasetUsers_Staging"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DatasetUsersStaging_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1101,174 +1287,6 @@
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SQL_Workspaces')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_SQL_DemoWorkspaces",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "WorkSpaceId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "WorkSpaceSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceDescription",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceType",
-						"type": "varchar"
-					},
-					{
-						"name": "IsonDedicatedCapacity",
-						"type": "bit"
-					},
-					{
-						"name": "CapacityMigrationStatus",
-						"type": "varchar"
-					},
-					{
-						"name": "Status",
-						"type": "varchar"
-					},
-					{
-						"name": "IsReadOnly",
-						"type": "bit"
-					},
-					{
-						"name": "HasWorkspaceLevelSetting",
-						"type": "bit"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DemoWorkSpaces"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_SQL_WorkspacesUsers_Live')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "LS_SQL_WorkSpacesStaging",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "WorkSpaceUserId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "WorkSpaceUserSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "EmailAddress",
-						"type": "varchar"
-					},
-					{
-						"name": "UserName",
-						"type": "varchar"
-					},
-					{
-						"name": "Identifier",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "varchar"
-					},
-					{
-						"name": "GroupUserAccessRight",
-						"type": "varchar"
-					},
-					{
-						"name": "PrincipalType",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "WorkSpaceUsers_Staging"
-				}
 			},
 			"dependsOn": []
 		}
