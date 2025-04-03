@@ -11,6 +11,18 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Workspace_sql'"
 		},
+		"WorkspaceUsersId_sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'WorkspaceUsersId_sql'"
+		},
+		"Get_WorksapceUsers_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Get_WorksapceUsers'"
+		},
+		"WorksapcesUsers_sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'WorksapcesUsers_sql'"
+		},
 		"Workspace_sql_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -20,6 +32,38 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"Workspace_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"WorkspaceUsersId_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"WorkspaceUsersId_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"WorkspaceUsersId_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Get_WorksapceUsers_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkspaceID,'/users')}\n"
+		},
+		"Get_WorksapceUsers_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6bfae08c-b1a7-4761-adce-2f0a3dcca52f"
+		},
+		"WorksapcesUsers_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"WorksapcesUsers_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"WorksapcesUsers_sql_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -45,6 +89,80 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('Workspace_sql_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WorkspaceUsersId_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "WorkspaceUsersId_sql",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('WorkspaceUsersId_sql_properties_typeProperties_server')]",
+					"database": "[parameters('WorkspaceUsersId_sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('WorkspaceUsersId_sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('WorkspaceUsersId_sql_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Get_WorksapceUsers')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Get_WorksapceUsers",
+				"parameters": {
+					"WorkspaceID": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Get_WorksapceUsers_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('Get_WorksapceUsers_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Get_WorksapceUsers_clientSecret')]"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/7c2fe1f1-bf7e-45a5-912a-d0510ebed93f/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WorksapcesUsers_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "WorksapcesUsers_sql",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('WorksapcesUsers_sql_properties_typeProperties_server')]",
+					"database": "[parameters('WorksapcesUsers_sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('WorksapcesUsers_sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('WorksapcesUsers_sql_password')]"
 					}
 				}
 			},
@@ -638,139 +756,6 @@
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_lookupClientInformation')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DS_lookupClientInformation",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_API')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getdataflow_refreshes_ls",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"WorkSpaceID": {
-							"value": "@dataset().WorkSpaceID",
-							"type": "Expression"
-						},
-						"DataFlowID": {
-							"value": "@dataset().DataFlowID",
-							"type": "Expression"
-						},
-						"AppTenantId": {
-							"value": "@dataset().AppTenantId",
-							"type": "Expression"
-						},
-						"AppClientId": {
-							"value": "@dataset().AppClientId",
-							"type": "Expression"
-						},
-						"AppClientCode": {
-							"value": "@dataset().AppClientCode",
-							"type": "Expression"
-						}
-					}
-				},
-				"parameters": {
-					"WorkSpaceID": {
-						"type": "string"
-					},
-					"DataFlowID": {
-						"type": "string"
-					},
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {},
-				"schema": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes_SQL')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "getgroups_sql_ls",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "UBTI Datasets_Dev"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "workspace_id",
-						"type": "varchar"
-					},
-					{
-						"name": "dataflow_id",
-						"type": "varchar"
-					},
-					{
-						"name": "id",
-						"type": "varchar"
-					},
-					{
-						"name": "refreshType",
-						"type": "varchar"
-					},
-					{
-						"name": "startTime",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "endTime",
-						"type": "datetime2",
-						"scale": 7
-					},
-					{
-						"name": "status",
-						"type": "varchar"
-					},
-					{
-						"name": "updated_time",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DataflowRefreshes_Staging"
-				}
 			},
 			"dependsOn": []
 		}
