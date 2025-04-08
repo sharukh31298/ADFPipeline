@@ -13,6 +13,124 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/DatasetRefreshesAPI')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_API_Datasetrefreshes",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"WorkSpaceID": {
+							"value": "@dataset().WorkSpaceID",
+							"type": "Expression"
+						},
+						"DatasetID": {
+							"value": "@dataset().DatasetID",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"WorkSpaceID": {
+						"type": "String"
+					},
+					"DatasetID": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatasetUserHistory_sql')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "DatasetuserHistory_sql",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "DatasetUserID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DatasetUserSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceID",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetID",
+						"type": "varchar"
+					},
+					{
+						"name": "EmailAddress",
+						"type": "varchar"
+					},
+					{
+						"name": "UserName",
+						"type": "varchar"
+					},
+					{
+						"name": "Identifier",
+						"type": "varchar"
+					},
+					{
+						"name": "UserType",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetUserAccessRight",
+						"type": "varchar"
+					},
+					{
+						"name": "PrincipalType",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DatasetUsersHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DatasetUsersAPI')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -454,325 +572,6 @@
 						"     )) ~> sink1"
 					]
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Demo_Worksapce')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Demo_Worksapce",
-				"activities": [
-					{
-						"name": "Get Workspaces",
-						"description": "Get Workspaces",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "GET",
-								"paginationRules": {
-									"supportRFC5988": "true"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"path": "[['id']"
-										},
-										"sink": {
-											"name": "WorkSpaceSourceKey",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['isReadOnly']"
-										},
-										"sink": {
-											"name": "IsReadOnly",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['isOnDedicatedCapacity']"
-										},
-										"sink": {
-											"name": "IsonDedicatedCapacity",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['capacityMigrationStatus']"
-										},
-										"sink": {
-											"name": "CapacityMigrationStatus",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['type']"
-										},
-										"sink": {
-											"name": "WorkSpaceType",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['state']"
-										},
-										"sink": {
-											"name": "Status",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['hasWorkspaceLevelSettings ']"
-										},
-										"sink": {
-											"name": "HasWorkspaceLevelSetting",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['name']"
-										},
-										"sink": {
-											"name": "WorkSpaceName",
-											"type": "String"
-										}
-									}
-								],
-								"collectionReference": "$['value']"
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "Rest_Worksapces_API",
-								"type": "DatasetReference",
-								"parameters": {
-									"TenantId": {
-										"value": "@pipeline().parameters.TenantId",
-										"type": "Expression"
-									},
-									"ClientId": {
-										"value": "@pipeline().parameters.ClientId",
-										"type": "Expression"
-									},
-									"ClientCode": {
-										"value": "@pipeline().parameters.ClientCode",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "Workspace_sql",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"TenantId": {
-						"type": "string"
-					},
-					"ClientId": {
-						"type": "string"
-					},
-					"ClientCode": {
-						"type": "string"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WorkspacesUsers_demo')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "Select WorkSpaceSourceKey from DemoWorkSpaces where WorkSpaceType ='WorkSpace'",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "WorkspaceUsersId_sql",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Get WorkspaceUsers",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"mappings": [
-												{
-													"source": {
-														"path": "[['groupUserAccessRight']"
-													},
-													"sink": {
-														"name": "GroupUserAccessRight",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['displayName']"
-													},
-													"sink": {
-														"name": "UserName",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['identifier']"
-													},
-													"sink": {
-														"name": "Identifier",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['principalType']"
-													},
-													"sink": {
-														"name": "PrincipalType",
-														"type": "String"
-													}
-												}
-											],
-											"collectionReference": "$['value']"
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "Get_WorksapceUsers",
-											"type": "DatasetReference",
-											"parameters": {
-												"WorkspaceID": {
-													"value": "@item().WorkSpaceSourceKey",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "WorksapcesUsers_sql",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
 			},
 			"dependsOn": []
 		},

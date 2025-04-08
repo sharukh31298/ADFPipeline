@@ -35,6 +35,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Execute_WorkspaceLive_sql'"
 		},
+		"Get_WorksapceUsers_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Get_WorksapceUsers'"
+		},
 		"InserUpdate Dataflowrefreshes_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'InserUpdate Dataflowrefreshes'"
@@ -82,10 +86,6 @@
 		"LS_Capturing DatasetUsers ED_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Capturing DatasetUsers ED'"
-		},
-		"LS_Capturing ReportPages ED_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'LS_Capturing ReportPages ED'"
 		},
 		"DatasetUsersStaging_sql_UAT_properties_typeProperties_server": {
 			"type": "string",
@@ -170,6 +170,14 @@
 		"Execute_WorkspaceLive_sql_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
+		},
+		"Get_WorksapceUsers_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://api.powerbi.com/v1.0/myorg/groups/',linkedService().WorkspaceID,'/users')}\n"
+		},
+		"Get_WorksapceUsers_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6bfae08c-b1a7-4761-adce-2f0a3dcca52f"
 		},
 		"InserUpdate Dataflowrefreshes_properties_typeProperties_server": {
 			"type": "string",
@@ -304,18 +312,6 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"LS_Capturing DatasetUsers ED_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"LS_Capturing ReportPages ED_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -480,6 +476,34 @@
 						"type": "SecureString",
 						"value": "[parameters('Execute_WorkspaceLive_sql_password')]"
 					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Get_WorksapceUsers')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Get_WorksapceUsers",
+				"parameters": {
+					"WorkspaceID": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Get_WorksapceUsers_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('Get_WorksapceUsers_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Get_WorksapceUsers_clientSecret')]"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/7c2fe1f1-bf7e-45a5-912a-d0510ebed93f/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
 				}
 			},
 			"dependsOn": []
@@ -765,29 +789,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('LS_Capturing DatasetUsers ED_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LS_Capturing ReportPages ED')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "LS_Capturing ReportPages ED",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_server')]",
-					"database": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('LS_Capturing ReportPages ED_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('LS_Capturing ReportPages ED_password')]"
 					}
 				}
 			},

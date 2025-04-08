@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"Test_Workspace_SQl_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Test_Workspace_SQl'"
+		},
+		"Test_Workspaces_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Test_Workspaces'"
+		},
 		"Test_WorkspacesSQL_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Test_WorkspacesSQL'"
@@ -67,21 +75,33 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'WorkSpaceUsersStaging_sql_UAT'"
 		},
+		"WorksapcesUsers_sql_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'WorksapcesUsers_sql'"
+		},
 		"WorkspaceUsers live_insertupdate UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'WorkspaceUsers live_insertupdate UAT'"
 		},
-		"WorkspaceUsers_log_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'WorkspaceUsers_log_UAT'"
+		"Test_Workspace_SQl_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
 		},
-		"getCapacities_clientSecret": {
-			"type": "secureString",
-			"metadata": "Secure string for 'clientSecret' of 'getCapacities'"
+		"Test_Workspace_SQl_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
 		},
-		"getCapacities__connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'getCapacities_'"
+		"Test_Workspace_SQl_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Test_Workspaces_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/groups?$expand=reports,datasets,dataflows,users&$top=5000"
+		},
+		"Test_Workspaces_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		},
 		"Test_WorkspacesSQL_properties_typeProperties_server": {
 			"type": "string",
@@ -251,6 +271,18 @@
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
+		"WorksapcesUsers_sql_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"WorksapcesUsers_sql_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"WorksapcesUsers_sql_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
 		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -262,32 +294,57 @@
 		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"WorkspaceUsers_log_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"WorkspaceUsers_log_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"WorkspaceUsers_log_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"getCapacities_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/capacities"
-		},
-		"getCapacities_properties_typeProperties_clientId": {
-			"type": "string",
-			"defaultValue": "6077f1b3-2daf-4b4f-9dc7-f6126cf209be"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Test_Workspace_SQl')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Test_Workspace_SQl",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Test_Workspace_SQl_properties_typeProperties_server')]",
+					"database": "[parameters('Test_Workspace_SQl_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Test_Workspace_SQl_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Test_Workspace_SQl_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test_Workspaces')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Test_Workspaces_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('Test_Workspaces_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Test_Workspaces_clientSecret')]"
+					},
+					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Test_WorkspacesSQL')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -638,6 +695,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/WorksapcesUsers_sql')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "WorksapcesUsers_sql",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('WorksapcesUsers_sql_properties_typeProperties_server')]",
+					"database": "[parameters('WorksapcesUsers_sql_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('WorksapcesUsers_sql_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('WorksapcesUsers_sql_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/WorkspaceUsers live_insertupdate UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -656,64 +736,6 @@
 						"type": "SecureString",
 						"value": "[parameters('WorkspaceUsers live_insertupdate UAT_password')]"
 					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WorkspaceUsers_log_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "WorkspaceUsers_log_UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('WorkspaceUsers_log_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('WorkspaceUsers_log_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('WorkspaceUsers_log_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('WorkspaceUsers_log_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/getCapacities')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('getCapacities_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "OAuth2ClientCredential",
-					"clientId": "[parameters('getCapacities_properties_typeProperties_clientId')]",
-					"clientSecret": {
-						"type": "SecureString",
-						"value": "[parameters('getCapacities_clientSecret')]"
-					},
-					"tokenEndpoint": "https://login.microsoftonline.com/008502d6-3f79-46f0-ab37-9354e3fe80ff/oauth2/v2.0/token",
-					"scope": "https://analysis.windows.net/powerbi/api/.default"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/getCapacities_')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('getCapacities__connectionString')]"
 				}
 			},
 			"dependsOn": []
