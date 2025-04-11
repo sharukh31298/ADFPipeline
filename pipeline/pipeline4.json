@@ -80,7 +80,7 @@
 								{
 									"activity": "Web1",
 									"dependencyConditions": [
-										"Completed"
+										"Succeeded"
 									]
 								}
 							],
@@ -95,6 +95,36 @@
 									"value": "@activity('Web1').output.SubscriptionStatus",
 									"type": "Expression"
 								}
+							}
+						},
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "\"@and(equals(activity('Web1').output.SubscriptionStatus, 'Subscribed'), not(equals(activity('Web1').output.SubscriptionStatus, 'Unsubscribed')))\"",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "WorkSpaces_UAT",
+										"type": "ExecutePipeline",
+										"dependsOn": [],
+										"policy": {
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "WorkSpaces_UAT",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true
+										}
+									}
+								]
 							}
 						}
 					]
