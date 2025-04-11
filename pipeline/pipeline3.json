@@ -45,19 +45,52 @@
 				"typeProperties": {
 					"variableName": "Subscribe Value",
 					"value": {
-						"value": "@equals(activity('Web1').output.SubscriptionStatus,'Subscribed')",
+						"value": "@activity('Web1').output.SubscriptionStatus",
 						"type": "Expression"
 					}
+				}
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "\"@equals(activity('Web1').output.SubscriptionStatus, 'UnSubscribed')\"",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Wait1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
 				}
 			}
 		],
 		"parameters": {
 			"TenantId": {
-				"type": "string"
+				"type": "int"
 			}
 		},
 		"variables": {
 			"Subscribe Value": {
+				"type": "String"
+			},
+			"Testing": {
 				"type": "String"
 			}
 		},

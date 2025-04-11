@@ -48,83 +48,28 @@
 						"value": "@activity('Lookup1').output.value",
 						"type": "Expression"
 					},
+					"isSequential": false,
 					"activities": [
 						{
-							"name": "Web1",
-							"type": "WebActivity",
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
 							"dependsOn": [],
 							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"method": "POST",
-								"headers": {
-									"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
+								"pipeline": {
+									"referenceName": "pipeline3",
+									"type": "PipelineReference"
 								},
-								"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
-								"body": {
-									"value": "{\n    \"TenantId\": \"@{item().TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "Set variable1",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Web1",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "Testing",
-								"value": {
-									"value": "@activity('Web1').output.SubscriptionStatus",
-									"type": "Expression"
-								}
-							}
-						},
-						{
-							"name": "If Condition1",
-							"type": "IfCondition",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"expression": {
-									"value": "\"@and(equals(activity('Web1').output.SubscriptionStatus, 'Subscribed'), not(equals(activity('Web1').output.SubscriptionStatus, 'Unsubscribed')))\"",
-									"type": "Expression"
-								},
-								"ifTrueActivities": [
-									{
-										"name": "WorkSpaces_UAT",
-										"type": "ExecutePipeline",
-										"dependsOn": [],
-										"policy": {
-											"secureInput": false
-										},
-										"userProperties": [],
-										"typeProperties": {
-											"pipeline": {
-												"referenceName": "WorkSpaces_UAT",
-												"type": "PipelineReference"
-											},
-											"waitOnCompletion": true
-										}
+								"waitOnCompletion": true,
+								"parameters": {
+									"TenantId": {
+										"value": "@item().TenantId",
+										"type": "Expression"
 									}
-								]
+								}
 							}
 						}
 					]
