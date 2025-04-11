@@ -95,6 +95,43 @@
 									"type": "DatasetReference"
 								}
 							}
+						},
+						{
+							"name": "DS_Refreshes UserPermissions Master_copy1",
+							"type": "ExecutePipeline",
+							"dependsOn": [
+								{
+									"activity": "DS_Insert Log_copy1",
+									"dependencyConditions": [
+										"Completed"
+									]
+								}
+							],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "DS_Refreshing User Permissions_UAT",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"AppTenantId": {
+										"value": "@pipeline().parameters.AppTenantId",
+										"type": "Expression"
+									},
+									"AppClientId": {
+										"value": "@pipeline().parameters.AppClientId",
+										"type": "Expression"
+									},
+									"AppClientCode": {
+										"value": "@pipeline().parameters.AppClientSecret",
+										"type": "Expression"
+									}
+								}
+							}
 						}
 					]
 				}
