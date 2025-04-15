@@ -30,6 +30,37 @@
 					},
 					"firstRowOnly": false
 				}
+			},
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Capturing TenantId for Subscription Status",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
+					},
+					"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
+					"body": {
+						"value": "\n{\n    \"TenantId\": \"@{activity('Capturing TenantId for Subscription Status').output.TenantId}\"\n}\n",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"variables": {
