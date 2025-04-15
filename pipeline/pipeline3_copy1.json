@@ -1,0 +1,88 @@
+{
+	"name": "pipeline3_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Web1",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "POST",
+					"headers": {
+						"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
+					},
+					"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
+					"body": {
+						"value": "{\n    \"TenantId\": \"@{pipeline().parameters.TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Web1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[Sp_DailyLoadTracker]",
+					"storedProcedureParameters": {
+						"SubscriptionStatus": {
+							"value": {
+								"value": "@if(equals(activity('Web1').output.SubscriptionStatus, 'UnSubscribed'), false, true)\n",
+								"type": "Expression"
+							},
+							"type": "Boolean"
+						},
+						"Tenantid": {
+							"value": {
+								"value": "@pipeline().parameters.TenantId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "CaptureCI",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"TenantId": {
+				"type": "int"
+			}
+		},
+		"variables": {
+			"Subscribe Value": {
+				"type": "String"
+			},
+			"Testing": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
