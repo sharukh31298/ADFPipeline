@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup1",
+				"name": "Capturing TenantId for Subscription Status",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -36,7 +36,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Lookup1",
+						"activity": "Capturing TenantId for Subscription Status",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -70,7 +70,7 @@
 								},
 								"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
 								"body": {
-									"value": "{\n    \"TenantId\": \"@{item().parameters.TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
+									"value": "{\n    \"TenantId\": \"@{item().TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
 									"type": "Expression"
 								}
 							}
@@ -106,7 +106,7 @@
 									},
 									"Tenantid": {
 										"value": {
-											"value": "@item().parameters.TenantId",
+											"value": "@item().TenantId",
 											"type": "Expression"
 										},
 										"type": "Int32"
