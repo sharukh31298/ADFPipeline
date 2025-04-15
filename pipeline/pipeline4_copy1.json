@@ -1,0 +1,42 @@
+{
+	"name": "pipeline4_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "Capturing TenantId for Subscription Status",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT TenantId \nFROM [dbo].[DailyLoadTracker]\n",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Test_Workspace_SQl",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"variables": {
+			"Testing": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
