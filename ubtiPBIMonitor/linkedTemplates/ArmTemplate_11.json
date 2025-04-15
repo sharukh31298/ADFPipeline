@@ -13,6 +13,91 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ReportsHistory_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ReportsHistory_sql_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Datasets_UAT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ReportID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ReportSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceID",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetID",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportType",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ReportWebUrl",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportEmbedUrl",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ReportsHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ReportsLive_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -923,7 +1008,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "Testcredentials_WorkSpaces"
+					"table": "DailyLoadTracker"
 				}
 			},
 			"dependsOn": []
@@ -1267,218 +1352,6 @@
 					{
 						"name": "ModifiedBy",
 						"type": "varchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ViewReports"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/ViewReportLive_Sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ViewReportLive_sql_UAT",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Datasets_UAT"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ViewReportID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ViewReportSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "RecordType",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CreationTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Operation",
-						"type": "varchar"
-					},
-					{
-						"name": "OrganizationID",
-						"type": "varchar"
-					},
-					{
-						"name": "UserType",
-						"type": "varchar"
-					},
-					{
-						"name": "UserKey",
-						"type": "varchar"
-					},
-					{
-						"name": "Workload",
-						"type": "varchar"
-					},
-					{
-						"name": "UserID",
-						"type": "varchar"
-					},
-					{
-						"name": "ClientIP",
-						"type": "varchar"
-					},
-					{
-						"name": "UserAgent",
-						"type": "varchar"
-					},
-					{
-						"name": "Activity",
-						"type": "varchar"
-					},
-					{
-						"name": "ItemName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceName",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetName",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportName",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityID",
-						"type": "varchar"
-					},
-					{
-						"name": "CapacityName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkspaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "AppName",
-						"type": "varchar"
-					},
-					{
-						"name": "ObjectID",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetID",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportID",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactId",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactName",
-						"type": "varchar"
-					},
-					{
-						"name": "IsSucess",
-						"type": "bit"
-					},
-					{
-						"name": "ReportType",
-						"type": "varchar"
-					},
-					{
-						"name": "RequestID",
-						"type": "varchar"
-					},
-					{
-						"name": "ActivityID",
-						"type": "varchar"
-					},
-					{
-						"name": "AppReportID",
-						"type": "varchar"
-					},
-					{
-						"name": "DistributionMethod",
-						"type": "varchar"
-					},
-					{
-						"name": "ConsumptionMethod",
-						"type": "varchar"
-					},
-					{
-						"name": "AppID",
-						"type": "varchar"
-					},
-					{
-						"name": "ArtifactKind",
-						"type": "varchar"
-					},
-					{
-						"name": "RefreshEnforcementPolicy",
-						"type": "bit"
-					},
-					{
-						"name": "ContinuationURL",
-						"type": "varchar"
-					},
-					{
-						"name": "ContinuationToken",
-						"type": "varchar"
-					},
-					{
-						"name": "lastResultSet",
-						"type": "bit"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataLoadTrackerID",
-						"type": "nvarchar"
 					}
 				],
 				"typeProperties": {

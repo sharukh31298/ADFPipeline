@@ -399,6 +399,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Test_WorkspacesSQL'"
 		},
+		"Testing Model_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Testing Model'"
+		},
 		"Testing_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Testing'"
@@ -1797,6 +1801,18 @@
 			"defaultValue": "pbimonitor"
 		},
 		"Test_WorkspacesSQL_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Testing Model_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Testing Model_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Testing Model_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -35341,7 +35357,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('SELECT TenantId,AppTenantId,AppClientId,AppClientSecret FROM [dbo].[DailyLoadTracker_batch] \n')",
+									"value": "SELECT TenantId, AppTenantId, AppClientId, AppClientSecret\nFROM [dbo].[DailyLoadTracker]\nWHERE SubscriptionStatus = 1;",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -55600,6 +55616,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "Testing"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -55754,6 +55773,9 @@
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Testing"
 				},
 				"annotations": []
 			},
@@ -55922,6 +55944,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "Testing"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -56087,6 +56112,9 @@
 					"AppClientCode": {
 						"type": "String"
 					}
+				},
+				"folder": {
+					"name": "Testing"
 				},
 				"annotations": []
 			},
@@ -85174,6 +85202,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "Testing"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -100555,6 +100586,9 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"folder": {
+					"name": "Testing"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -101297,6 +101331,9 @@
 						"type": "String"
 					}
 				},
+				"folder": {
+					"name": "Testing"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -101312,6 +101349,322 @@
 				"[concat(variables('factoryId'), '/pipelines/DS_ReportPages_Batch_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_DatasetUsers_Batch_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_DatasetRefreshes_Batch_UAT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
+							},
+							"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
+							"body": {
+								"value": "{\n    \"TenantId\": \"@{pipeline().parameters.TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set variable1",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Subscribe Value",
+							"value": {
+								"value": "@activity('Web1').output.SubscriptionStatus",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Set variable1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@if(equals(activity('Web1').output.SubscriptionStatus, 'UnSubscribed'), false, true)\n",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "DS_Insert Log_copy1",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@concat('EXEC [dbo].[DS_DataLoadTrackInsert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientSecret,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(pipeline().parameters.TenantId),''','' ''')",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "DS_InsertMasterlog_UAT",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "DS_Refreshes UserPermissions Master_copy1",
+									"type": "ExecutePipeline",
+									"dependsOn": [
+										{
+											"activity": "DS_Insert Log_copy1",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "DS_Refreshing User Permissions_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@pipeline().parameters.AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@pipeline().parameters.AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@pipeline().parameters.AppClientSecret",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"TenantId": {
+						"type": "int"
+					},
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientSecret": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"Subscribe Value": {
+						"type": "String"
+					},
+					"Testing": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_InsertMasterlog_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/DS_Refreshing User Permissions_UAT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Capturing TenantId for Subscription Status",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT TenantId \nFROM [dbo].[DailyLoadTracker]\n",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Test_Workspace_SQl",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Capturing TenantId for Subscription Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Capturing TenantId for Subscription Status').output.output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 50,
+							"activities": [
+								{
+									"name": "Web1",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
+										},
+										"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
+										"body": {
+											"value": "{\n    \"TenantId\": \"@{item().TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Web1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_DailyLoadTracker]",
+										"storedProcedureParameters": {
+											"SubscriptionStatus": {
+												"value": {
+													"value": "@if(equals(activity('Web1').output.SubscriptionStatus, 'UnSubscribed'), false, true)\n",
+													"type": "Expression"
+												},
+												"type": "Boolean"
+											},
+											"Tenantid": {
+												"value": {
+													"value": "@item().TenantId",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "CaptureCI",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"Testing": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Test_Workspace_SQl')]",
+				"[concat(variables('factoryId'), '/linkedServices/CaptureCI')]"
 			]
 		},
 		{
@@ -107899,7 +108252,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "Testcredentials_WorkSpaces"
+					"table": "DailyLoadTracker"
 				}
 			},
 			"dependsOn": [
@@ -113191,6 +113544,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Testing Model')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Testing Model",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Testing Model_properties_typeProperties_server')]",
+					"database": "[parameters('Testing Model_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Testing Model_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Testing Model_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Testing')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -114406,6 +114782,102 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline3_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web1",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "POST",
+							"headers": {
+								"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
+							},
+							"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
+							"body": {
+								"value": "{\n    \"TenantId\": \"@{pipeline().parameters.TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Stored procedure1",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Web1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[Sp_DailyLoadTracker]",
+							"storedProcedureParameters": {
+								"SubscriptionStatus": {
+									"value": {
+										"value": "@if(equals(activity('Web1').output.SubscriptionStatus, 'UnSubscribed'), false, true)\n",
+										"type": "Expression"
+									},
+									"type": "Boolean"
+								},
+								"Tenantid": {
+									"value": {
+										"value": "@pipeline().parameters.TenantId",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "CaptureCI",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"TenantId": {
+						"type": "int"
+					}
+				},
+				"variables": {
+					"Subscribe Value": {
+						"type": "String"
+					},
+					"Testing": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/CaptureCI')]"
 			]
 		}
 	]

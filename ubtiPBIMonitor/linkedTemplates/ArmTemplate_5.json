@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Test_WorkspacesSQL'"
 		},
+		"Testing Model_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Testing Model'"
+		},
 		"Testing_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Testing'"
@@ -79,10 +83,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'WorksapcesUsers_sql'"
 		},
-		"WorkspaceUsers live_insertupdate UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'WorkspaceUsers live_insertupdate UAT'"
-		},
 		"Test_Workspace_SQl_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -112,6 +112,18 @@
 			"defaultValue": "pbimonitor"
 		},
 		"Test_WorkspacesSQL_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Testing Model_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Testing Model_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Testing Model_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -282,18 +294,6 @@
 		"WorksapcesUsers_sql_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -362,6 +362,29 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('Test_WorkspacesSQL_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Testing Model')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Testing Model",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Testing Model_properties_typeProperties_server')]",
+					"database": "[parameters('Testing Model_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Testing Model_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Testing Model_password')]"
 					}
 				}
 			},
@@ -712,29 +735,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('WorksapcesUsers_sql_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WorkspaceUsers live_insertupdate UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "WorkspaceUsers live_insertupdate UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_server')]",
-					"database": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('WorkspaceUsers live_insertupdate UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('WorkspaceUsers live_insertupdate UAT_password')]"
 					}
 				}
 			},
