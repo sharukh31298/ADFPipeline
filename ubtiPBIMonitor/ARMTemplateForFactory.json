@@ -101896,14 +101896,21 @@
 						"userProperties": [],
 						"typeProperties": {
 							"expression": {
-								"value": "@equals(variables('Testing'),['done'])",
+								"value": "@if(equals(variables('Testing').Status,'Succeeded'), true, false)",
 								"type": "Expression"
 							},
 							"activities": [
 								{
 									"name": "Set variable1",
 									"type": "SetVariable",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Execute Pipeline1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"secureOutput": false,
 										"secureInput": false
@@ -101911,7 +101918,27 @@
 									"userProperties": [],
 									"typeProperties": {
 										"variableName": "Testing",
-										"value": "[['done']"
+										"value": {
+											"value": "@activity('Execute Pipeline1').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Execute Pipeline1",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Testing to wait",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
 									}
 								}
 							],
@@ -101929,7 +101956,9 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/Testing to wait')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_adf_orchestration')]",
