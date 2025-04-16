@@ -101,14 +101,9 @@
 			{
 				"name": "WorkSpaceUsers History",
 				"type": "Copy",
-				"dependsOn": [
-					{
-						"activity": "For Each Batch",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -371,7 +366,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "WorkSpaceUsers History",
+						"activity": "Script1",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -385,7 +380,7 @@
 				"typeProperties": {
 					"variableName": "WorkSpacesUsers History Status",
 					"value": {
-						"value": "@activity('WorkSpaceUsers History').Status",
+						"value": "@activity('Script1').Status",
 						"type": "Expression"
 					}
 				}
@@ -423,12 +418,6 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "WorkSpaceUsers History",
-						"dependencyConditions": [
-							"Completed"
-						]
-					},
-					{
 						"activity": "Capturing Status in WorkSpaces Users History",
 						"dependencyConditions": [
 							"Completed"
@@ -436,6 +425,12 @@
 					},
 					{
 						"activity": "Capturing Workspaces Batches",
+						"dependencyConditions": [
+							"Completed"
+						]
+					},
+					{
+						"activity": "Script1",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -504,6 +499,42 @@
 							"type": "Query",
 							"text": {
 								"value": "@concat('DELETE  [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
+								"type": "Expression"
+							}
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Script1",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "For Each Batch",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "DS_WorkspaceUsersHistory",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "@concat('select * from [dbo].[WorkSpaceUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
 								"type": "Expression"
 							}
 						}
