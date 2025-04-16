@@ -340,12 +340,32 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Wait1",
-						"type": "Wait",
+						"name": "Until1",
+						"type": "Until",
 						"dependsOn": [],
 						"userProperties": [],
 						"typeProperties": {
-							"waitTimeInSeconds": 1
+							"expression": {
+								"value": "@equals(variables('Testing'),['done'])",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Set variable1",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Testing",
+										"value": "[['done']"
+									}
+								}
+							],
+							"timeout": "0.12:00:00"
 						}
 					}
 				],
