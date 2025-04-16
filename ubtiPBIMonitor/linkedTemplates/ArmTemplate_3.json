@@ -7,6 +7,14 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"LS_API_Workspaces_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'LS_API_Workspaces'"
+		},
+		"LS_Capturing DatasetUsers ED_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_Capturing DatasetUsers ED'"
+		},
 		"LS_Capturing ReportPages ED_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'LS_Capturing ReportPages ED'"
@@ -79,13 +87,25 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'Ls_API_WorkSpaceUsers'"
 		},
-		"Ls_CapturingWorkspaceusersED_UAT_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'Ls_CapturingWorkspaceusersED_UAT'"
+		"LS_API_Workspaces_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.powerbi.com/v1.0/myorg/admin/reports"
 		},
-		"Ls_Ds_SQL_ViewReports_Staging_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'Ls_Ds_SQL_ViewReports_Staging'"
+		"LS_API_Workspaces_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().AppClientId}"
+		},
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Dev"
+		},
+		"LS_Capturing DatasetUsers ED_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"LS_Capturing ReportPages ED_properties_typeProperties_server": {
 			"type": "string",
@@ -298,24 +318,68 @@
 		"Ls_API_WorkSpaceUsers_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
-		},
-		"Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Dev"
-		},
-		"Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_API_Workspaces')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('LS_API_Workspaces_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('LS_API_Workspaces_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('LS_API_Workspaces_clientSecret')]"
+					},
+					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
+					"scope": "https://analysis.windows.net/powerbi/api/.default"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_Capturing DatasetUsers ED')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "LS_Capturing DatasetUsers ED",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_server')]",
+					"database": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_Capturing DatasetUsers ED_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_Capturing DatasetUsers ED_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/LS_Capturing ReportPages ED')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -726,42 +790,6 @@
 					},
 					"tokenEndpoint": "@{concat('https://login.microsoftonline.com',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_CapturingWorkspaceusersED_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Ls_CapturingWorkspaceusersED_UAT",
-				"annotations": [],
-				"type": "AmazonRdsForSqlServer",
-				"typeProperties": {
-					"connectionString": "[parameters('Ls_CapturingWorkspaceusersED_UAT_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ls_Ds_SQL_ViewReports_Staging')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_server')]",
-					"database": "[parameters('Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('Ls_Ds_SQL_ViewReports_Staging_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('Ls_Ds_SQL_ViewReports_Staging_password')]"
-					}
 				}
 			},
 			"dependsOn": []

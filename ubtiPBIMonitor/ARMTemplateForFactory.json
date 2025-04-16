@@ -59,6 +59,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_InsertSP'"
 		},
+		"DS_WorkspaceUsersHistory_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'DS_WorkspaceUsersHistory'"
+		},
 		"DS_lokkupClientInformation_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_lokkupClientInformation_UAT'"
@@ -568,10 +572,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
-		"DS_WorkspaceUsersHistory_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DS_WorkspaceUsersHistory'"
-		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -749,6 +749,18 @@
 			"defaultValue": "PowerPulseDB-Dev"
 		},
 		"DS_InsertSP_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"DS_WorkspaceUsersHistory_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"DS_WorkspaceUsersHistory_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"DS_WorkspaceUsersHistory_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -2183,18 +2195,6 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
-		},
-		"DS_WorkspaceUsersHistory_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DS_WorkspaceUsersHistory_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DS_WorkspaceUsersHistory_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -2748,6 +2748,148 @@
 				"[concat(variables('factoryId'), '/datasets/Capacities_SQL_Live')]",
 				"[concat(variables('factoryId'), '/datasets/Capacities_SQL')]",
 				"[concat(variables('factoryId'), '/datasets/Capacities_History')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Capturing Subscriprion Status')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Capturing TenantId for Subscription Status",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "SELECT TenantId \nFROM [dbo].[DailyLoadTracker]\n",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Test_Workspace_SQl",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Capturing TenantId for Subscription Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Capturing TenantId for Subscription Status').output.output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 50,
+							"activities": [
+								{
+									"name": "Web1",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
+										},
+										"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
+										"body": {
+											"value": "{\n    \"TenantId\": \"@{item().TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Stored procedure1",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Web1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_DailyLoadTracker]",
+										"storedProcedureParameters": {
+											"SubscriptionStatus": {
+												"value": {
+													"value": "@if(equals(activity('Web1').output.SubscriptionStatus, 'UnSubscribed'), false, true)\n",
+													"type": "Expression"
+												},
+												"type": "Boolean"
+											},
+											"Tenantid": {
+												"value": {
+													"value": "@item().TenantId",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "CaptureCI",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"Testing": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Test_Workspace_SQl')]",
+				"[concat(variables('factoryId'), '/linkedServices/CaptureCI')]"
 			]
 		},
 		{
@@ -5577,6 +5719,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[DataflowRefreshes_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -8158,6 +8304,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Dataflows_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -10472,6 +10622,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[DatasetRefreshes_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -13703,6 +13857,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[DatasetUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -17008,6 +17166,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Datasets_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -19830,6 +19992,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": " @concat('select * from [dbo].[ReportPages_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -22966,6 +23132,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Reports_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))\n",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -26426,6 +26596,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": " @concat('select * from [dbo].[ViewReports_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -33640,6 +33814,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[WorkSpaces_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -38786,6 +38964,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[DataflowRefreshes_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -42316,7 +42498,7 @@
 							{
 								"activity": "DataFlow Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -42331,18 +42513,16 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Dataflows_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"DataflowSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -42501,7 +42681,7 @@
 							{
 								"activity": "DataFlow Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -42516,13 +42696,18 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Dataflows_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
 								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
 							"dataIntegrationUnits": 4,
@@ -45365,6 +45550,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[DatasetRefreshes_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -49712,6 +49901,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": " @concat('select * from [dbo].[DatasetUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -54202,7 +54395,7 @@
 							{
 								"activity": "Dataset Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -54217,18 +54410,16 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Datasets_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"DatasetSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -54519,7 +54710,7 @@
 							{
 								"activity": "Dataset Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -54534,6 +54725,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Datasets_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -78228,6 +78423,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": " @concat('select * from [dbo].[ReportPages_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -83080,7 +83279,7 @@
 							{
 								"activity": "Reports Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -83095,18 +83294,16 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Reports_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"ReportSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -83289,7 +83486,7 @@
 							{
 								"activity": "Reports Staging",
 								"dependencyConditions": [
-									"Succeeded"
+									"Completed"
 								]
 							}
 						],
@@ -83304,6 +83501,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[Reports_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -89074,18 +89275,16 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": " @concat('select * from [dbo].[ViewReports_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"ViewReportSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -89655,6 +89854,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": " @concat('select * from [dbo].[ViewReports_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -95455,6 +95658,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[WorkSpaceUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
@@ -99261,19 +99468,17 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "\n@concat('select * from [dbo].[WorkSpaces_Staging] \nwhere TenantId = ', string(pipeline().parameters.TenantId), \n' and Status = ''Active''')\n",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": "select * from [dbo].[WorkSpaces]\nWhere Status = 'Active'",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -99495,18 +99700,16 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[WorkSpaces_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -101678,129 +101881,18 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Capturing Subscriprion Status')]",
+			"name": "[concat(parameters('factoryName'), '/pipeline4_copy1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"activities": [
 					{
-						"name": "Capturing TenantId for Subscription Status",
-						"type": "Lookup",
+						"name": "Wait1",
+						"type": "Wait",
 						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
 						"userProperties": [],
 						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "SELECT TenantId \nFROM [dbo].[DailyLoadTracker]\n",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "Test_Workspace_SQl",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Capturing TenantId for Subscription Status",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Capturing TenantId for Subscription Status').output.output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "Web1",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "POST",
-										"headers": {
-											"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
-										},
-										"url": "https://ubti-stage-df-api.azurewebsites.net/api/v1/MeteredBilling/SubscriptionStatus",
-										"body": {
-											"value": "{\n    \"TenantId\": \"@{item().TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Stored procedure1",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "Web1",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[Sp_DailyLoadTracker]",
-										"storedProcedureParameters": {
-											"SubscriptionStatus": {
-												"value": {
-													"value": "@if(equals(activity('Web1').output.SubscriptionStatus, 'UnSubscribed'), false, true)\n",
-													"type": "Expression"
-												},
-												"type": "Boolean"
-											},
-											"Tenantid": {
-												"value": {
-													"value": "@item().TenantId",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "CaptureCI",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
+							"waitTimeInSeconds": 1
 						}
 					}
 				],
@@ -101814,10 +101906,7 @@
 				},
 				"annotations": []
 			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Test_Workspace_SQl')]",
-				"[concat(variables('factoryId'), '/linkedServices/CaptureCI')]"
-			]
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/pl_adf_orchestration')]",
@@ -111415,6 +111504,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DS_WorkspaceUsersHistory')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "DS_WorkspaceUsersHistory",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('DS_WorkspaceUsersHistory_properties_typeProperties_server')]",
+					"database": "[parameters('DS_WorkspaceUsersHistory_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('DS_WorkspaceUsersHistory_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('DS_WorkspaceUsersHistory_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DS_lokkupClientInformation_UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -114935,57 +115047,6 @@
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline4_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Wait1",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 1
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"Testing": {
-						"type": "String"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_WorkspaceUsersHistory')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DS_WorkspaceUsersHistory",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DS_WorkspaceUsersHistory_properties_typeProperties_server')]",
-					"database": "[parameters('DS_WorkspaceUsersHistory_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DS_WorkspaceUsersHistory_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DS_WorkspaceUsersHistory_password')]"
-					}
-				}
-			},
-			"dependsOn": []
 		}
 	]
 }
