@@ -101,9 +101,14 @@
 			{
 				"name": "WorkSpaceUsers History",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "For Each Batch",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -366,7 +371,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Script1",
+						"activity": "WorkSpaceUsers History",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -380,7 +385,7 @@
 				"typeProperties": {
 					"variableName": "WorkSpacesUsers History Status",
 					"value": {
-						"value": "@activity('Script1').Status",
+						"value": "@activity('WorkSpaceUsers History').Status",
 						"type": "Expression"
 					}
 				}
@@ -430,7 +435,7 @@
 						]
 					},
 					{
-						"activity": "Script1",
+						"activity": "WorkSpaceUsers History",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -509,14 +514,9 @@
 			{
 				"name": "Script1",
 				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "For Each Batch",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
