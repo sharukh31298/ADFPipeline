@@ -84750,6 +84750,29 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Testing to wait')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 10
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Upset Master Pipelines Execution')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -101917,7 +101940,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "Testing",
+										"variableName": "Sample",
 										"value": {
 											"value": "@activity('Execute Pipeline1').Status",
 											"type": "Expression"
@@ -101952,6 +101975,9 @@
 				"variables": {
 					"Testing": {
 						"type": "String"
+					},
+					"Sample": {
+						"type": "Boolean"
 					}
 				},
 				"annotations": []
@@ -115099,29 +115125,6 @@
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Testing to wait')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Wait1",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": 10
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
 		}
 	]
 }

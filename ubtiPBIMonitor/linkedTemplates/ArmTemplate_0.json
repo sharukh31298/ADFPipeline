@@ -63,10 +63,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'DS_WorkspaceUsersHistory'"
 		},
-		"DS_lokkupClientInformation_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'DS_lokkupClientInformation_UAT'"
-		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -234,18 +230,6 @@
 		"DS_WorkspaceUsersHistory_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
-		},
-		"DS_lokkupClientInformation_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"DS_lokkupClientInformation_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"DS_lokkupClientInformation_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -344,6 +328,29 @@
 				},
 				"folder": {
 					"name": "UAT_DailyScheduleChildPipelines"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Testing to wait')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 10
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
 				},
 				"annotations": []
 			},
@@ -703,29 +710,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('DS_WorkspaceUsersHistory_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DS_lokkupClientInformation_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "DS_lokkupClientInformation_UAT",
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('DS_lokkupClientInformation_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('DS_lokkupClientInformation_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('DS_lokkupClientInformation_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('DS_lokkupClientInformation_UAT_password')]"
 					}
 				}
 			},
