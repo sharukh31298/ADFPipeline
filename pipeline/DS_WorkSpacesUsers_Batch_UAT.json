@@ -126,7 +126,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": " @pipeline().parameters.TenantId",
+							"value": "@concat('select * from [dbo].[WorkSpaceUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
 							"type": "Expression"
 						},
 						"writeBehavior": "insert",
