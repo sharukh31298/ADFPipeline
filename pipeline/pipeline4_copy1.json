@@ -16,24 +16,22 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(activity('Execute Pipeline1'),['done'])",
+						"value": "@equals(variables('Testing'),['done'])",
 						"type": "Expression"
 					},
 					"activities": [
 						{
-							"name": "Execute Pipeline1",
-							"type": "ExecutePipeline",
+							"name": "Set variable1",
+							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
+								"secureOutput": false,
 								"secureInput": false
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "Testing to wait",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": false
+								"variableName": "Testing",
+								"value": "['done']"
 							}
 						}
 					],
