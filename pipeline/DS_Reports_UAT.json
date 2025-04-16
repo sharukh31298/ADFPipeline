@@ -383,6 +383,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('select * from [dbo].[Reports_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))\n",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
