@@ -3,12 +3,34 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Wait1",
-				"type": "Wait",
+				"name": "Until1",
+				"type": "Until",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"expression": {
+						"value": "@equals(activity('Execute Pipeline1'),['done'])",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Execute Pipeline1",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Testing to wait",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": false
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
 				}
 			}
 		],
