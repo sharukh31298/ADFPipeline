@@ -115125,6 +115125,169 @@
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DailyMasterPipeline_Refreshes Status')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "select AppTenantId,AppClientId,AppClientCode from PowerBI_DatasetRefreshes",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Capturing_ClientInfromation",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Getting Access_token",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Content-Type": {
+												"value": "application/x-www-form-urlencoded",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "@{concat('https://login.microsoftonline.com/',item().AppTenantId,'/oauth2/v2.0/token')}",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "grant_type=client_credentials&client_id=6077f1b3-2daf-4b4f-9dc7-f6126cf209be&client_secret=@{item().AppClientCode}&scope=https://analysis.windows.net/powerbi/api/.default",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Dataset Refreshes",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "Getting Access_token",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Authorization": {
+												"value": "@concat('Bearer ', activity('Getting Access_token').output.access_token)",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/65731ac8-b5e9-411f-99d8-d2f0066907dc/refreshes",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "{}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Dataset Refreshes_copy1",
+									"type": "WebActivity",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"headers": {
+											"Authorization": {
+												"value": "@concat('Bearer ', activity('Getting Access_token').output.access_token)",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/65731ac8-b5e9-411f-99d8-d2f0066907dc/refreshes",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "{}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Capturing_ClientInfromation')]"
+			]
 		}
 	]
 }

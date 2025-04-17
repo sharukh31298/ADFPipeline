@@ -13,6 +13,541 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/WorkSpacesUsers_Batch_Tenant2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get WorkSpace Batches",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "select distinct BatchNo from [dbo].[Workspaces_batch] ORDER BY 1",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "WorkSpaceUsers_SQL",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "For Each Batch",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Truncate WorkspacesUsers",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get WorkSpace Batches').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"activities": [
+								{
+									"name": "Execute pipeline users",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "WorkSpacesUsers_Tenant2",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"BatchNo": {
+												"value": "@item().BatchNo",
+												"type": "Expression"
+											},
+											"AppTenantId": {
+												"value": "@pipeline().parameters.AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@pipeline().parameters.AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@pipeline().parameters.AppClientCode",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@pipeline().parameters.TenantId",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "WorkSpaceUsers History",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "For Each Batch",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "WorkSpaceUserSourceKey",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "WorkSpaceUserSourceKey",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "WorkSpaceID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "WorkSpaceID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EmailAddress",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "EmailAddress",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "UserName",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "UserName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Identifier",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Identifier",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "UserType",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "UserType",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "GroupUserAccessRight",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "GroupUserAccessRight",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PrincipalType",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "PrincipalType",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "CreatedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TenantId",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "TenantId",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "WorkSpaceUsers_SQL",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "WorkSpaceUsers_SQL_History",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Truncate WorkspacesUsers",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Get WorkSpace Batches",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "getreports_sql_ds",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "TRUNCATE TABLE [dbo].[WorkSpaceUsers];"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					}
+				},
+				"variables": {
+					"CountWorkspace": {
+						"type": "Integer"
+					},
+					"WorkSpaceUsers_Status": {
+						"type": "String"
+					},
+					"WorkSpaceUsers_StartTime": {
+						"type": "String"
+					},
+					"WorkSpaceUsers_EndTime": {
+						"type": "String"
+					},
+					"WorkSpacesUsers_IST": {
+						"type": "String"
+					},
+					"WorkSpacesUsers_IST2": {
+						"type": "String"
+					},
+					"Reports_Staging_Status": {
+						"type": "String"
+					},
+					"Reports Staging_StartTime": {
+						"type": "String"
+					},
+					"Reports Staging_Execution EndTime": {
+						"type": "String"
+					},
+					"Reports_Staging_IST": {
+						"type": "String"
+					},
+					"Reports Staging_IST": {
+						"type": "String"
+					},
+					"ReportPages_Status": {
+						"type": "String"
+					},
+					"ReportPages_StartTime": {
+						"type": "String"
+					},
+					"ReportPages_IST": {
+						"type": "String"
+					},
+					"ReportPages_IST2": {
+						"type": "String"
+					},
+					"ReportPages_EndTime": {
+						"type": "String"
+					},
+					"RefreshSchedules_Status": {
+						"type": "String"
+					},
+					"RefreshSchedules": {
+						"type": "String"
+					},
+					"RefreshSchedules_EndTime": {
+						"type": "String"
+					},
+					"RefreshSchedules_IST": {
+						"type": "String"
+					},
+					"RefreshSchedules_IST2": {
+						"type": "String"
+					},
+					"ReportUsers_Status": {
+						"type": "String"
+					},
+					"ReportUsers_StartTime": {
+						"type": "String"
+					},
+					"ReportUsers_EndTime": {
+						"type": "String"
+					},
+					"ReportUsers_IST": {
+						"type": "String"
+					},
+					"ReportUsers_IST2": {
+						"type": "String"
+					},
+					"Datasources_Status": {
+						"type": "String"
+					},
+					"Datasources_StartTime": {
+						"type": "String"
+					},
+					"Datasources_EndTime": {
+						"type": "String"
+					},
+					"Datasources_IST": {
+						"type": "String"
+					},
+					"Datasources_IST2": {
+						"type": "String"
+					},
+					"DatasetUsers_Status": {
+						"type": "String"
+					},
+					"DatasetUsers_StartTime": {
+						"type": "String"
+					},
+					"DatasetUsers_EndTime": {
+						"type": "String"
+					},
+					"DatasetUsers_IST": {
+						"type": "String"
+					},
+					"DatasetUsers_IST2": {
+						"type": "String"
+					},
+					"Datasets_status": {
+						"type": "String"
+					},
+					"Datasets_startTime": {
+						"type": "String"
+					},
+					"Datasets_EndTime": {
+						"type": "String"
+					},
+					"Datasets_IST": {
+						"type": "String"
+					},
+					"Datasets_IST2": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_status": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_StartTime": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_EndTime": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_IST": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_IST2": {
+						"type": "String"
+					},
+					"DataFlows_Status": {
+						"type": "String"
+					},
+					"DataFlows_StartTime": {
+						"type": "String"
+					},
+					"DataFlows_EndTime": {
+						"type": "String"
+					},
+					"DataFlows_IST": {
+						"type": "String"
+					},
+					"DataFlows_IST2": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_Status": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_StartTime": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_EndTime": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_IST": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_IST2": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "PowerPulseApp_Dev"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-11-29T06:27:10Z"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/WorkSpacesUsers_Batch_UAT')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -10355,966 +10890,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/WorkSpaces_Tenant2')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DailyScheduleMasterPipeline_V1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Lookup the ClientInformation for DailySchedule Pipeline",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "select AppTentantId,AppClientId,AppClientSecret,TentantId from [dbo].[DataLoadTracker]",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "DS_lookupClientInformation",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Capturing ClientInformation",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup the ClientInformation for DailySchedule Pipeline",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup the ClientInformation for DailySchedule Pipeline').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "DS_Workspaces_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "DS_Insert Log",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_WorkSpaces",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing Workspaces_Master status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_Workspaces_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master Workspaces Status",
-										"value": {
-											"value": "@activity('DS_Workspaces_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_WorkspaceUsers__Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "DS_Workspaces_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_WorkSpacesUsers_Batch",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing WorkSpaceUsers Master Status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_WorkspaceUsers__Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master WorkSpaceUsers Status",
-										"value": {
-											"value": "@activity('DS_WorkspaceUsers__Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_Reports_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_Reports",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing ReportsMaster status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_Reports_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master Report status",
-										"value": {
-											"value": "@activity('DS_Reports_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_ReportPages_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "DS_Reports_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_ReportPages_Batch",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing ReportPagesMaster Status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_ReportPages_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master ReportPages Status",
-										"value": {
-											"value": "@activity('DS_ReportPages_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_Datasets_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_Datasets",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing Datasets Master Status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_Datasets_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master Datasets Status",
-										"value": {
-											"value": "@activity('DS_Datasets_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_Datasetusers_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "DS_Datasets_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_DatasetUsers_Batch",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing DatasetUsersMaster Status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_Datasetusers_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master Datasetusers Status",
-										"value": {
-											"value": "@activity('DS_Datasetusers_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_Datasetrefresh_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "DS_Datasets_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_DatasetRefreshes_Batch",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing Datasetsrefresh Master Status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_Datasetrefresh_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master Datasetfreshes status",
-										"value": {
-											"value": "@activity('DS_Datasetrefresh_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_ViewReports_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_ViewReports",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": false,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing Viewreports Master Status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_ViewReports_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master Viewreports Status",
-										"value": {
-											"value": "@activity('DS_ViewReports_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_Dataflows_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_DataFlows",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing Dataflows Master Status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_Dataflows_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master Dataflows Status",
-										"value": {
-											"value": "@activity('DS_Dataflows_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_DataflowRefreshes_Master",
-									"type": "ExecutePipeline",
-									"dependsOn": [
-										{
-											"activity": "DS_Dataflows_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DS_DataFlowRefreshes_Batch",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@item().AppTentantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@item().AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@item().AppClientSecret",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@item().TentantId",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
-									"name": "DS_Capturing DataflowsRefreshes Master Status",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "DS_DataflowRefreshes_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "Master DataflowRefreshes Status",
-										"value": {
-											"value": "@activity('DS_DataflowRefreshes_Master').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "DS_sp_Dataloadtracker",
-									"type": "SqlServerStoredProcedure",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[DataLoadTrack_Insert]",
-										"storedProcedureParameters": {
-											"AppClientId": {
-												"value": {
-													"value": "@item().AppClientId",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"AppClientSecret": {
-												"value": {
-													"value": "@item().AppClientSecret",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"AppTentantId": {
-												"value": {
-													"value": "@item().AppTentantId",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"CreatedDate": {
-												"value": "",
-												"type": "DateTime"
-											},
-											"CurrentStatus": {
-												"value": "Started",
-												"type": "String"
-											},
-											"DataLoadTrackerId": {
-												"value": "",
-												"type": "String"
-											},
-											"IsFirstTimeLoad": {
-												"value": "",
-												"type": "Boolean"
-											},
-											"ModifiedDate": {
-												"value": "",
-												"type": "DateTime"
-											},
-											"PipelineRunId": {
-												"value": "",
-												"type": "String"
-											},
-											"ProcessEndTime": {
-												"value": "",
-												"type": "DateTime"
-											},
-											"ProcessStartTime": {
-												"value": "",
-												"type": "DateTime"
-											},
-											"Status": {
-												"value": "",
-												"type": "String"
-											},
-											"TentantId": {
-												"value": "",
-												"type": "Int32"
-											},
-											"TriggerType": {
-												"value": "",
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "LS_Dataloadtracker_SQL",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "DS_Insert Log",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "@concat('EXEC [dbo].[DS_DataLoadTrackInsert] ','''',item().AppTentantId,''',''',item().AppClientId,''',''',item().AppClientSecret,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(item().TentantId),''','' ''')",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "DS_InsertSP",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									}
-								},
-								{
-									"name": "DS_SP_Call_UpdateStatus",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "DS_Capturing DatasetUsersMaster Status",
-											"dependencyConditions": [
-												"Completed"
-											]
-										},
-										{
-											"activity": "DS_Capturing Datasetsrefresh Master Status",
-											"dependencyConditions": [
-												"Completed"
-											]
-										},
-										{
-											"activity": "DS_Capturing DataflowsRefreshes Master Status",
-											"dependencyConditions": [
-												"Completed"
-											]
-										},
-										{
-											"activity": "DS_Capturing Viewreports Master Status",
-											"dependencyConditions": [
-												"Completed"
-											]
-										},
-										{
-											"activity": "DS_Capturing Dataflows Master Status",
-											"dependencyConditions": [
-												"Completed"
-											]
-										},
-										{
-											"activity": "DS_Capturing Datasets Master Status",
-											"dependencyConditions": [
-												"Completed"
-											]
-										},
-										{
-											"activity": "DS_Capturing ReportPagesMaster Status",
-											"dependencyConditions": [
-												"Completed"
-											]
-										},
-										{
-											"activity": "DS_Capturing ReportsMaster status",
-											"dependencyConditions": [
-												"Completed"
-											]
-										},
-										{
-											"activity": "DS_Workspaces_Master",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[DS_DataLoadTrack_Update]",
-										"storedProcedureParameters": {
-											"DataLoadTrackerID": {
-												"value": {
-													"value": "@activity('DS_Insert Log').output.firstRow.DataLoadTrackerId",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"ProcessEndTime": {
-												"value": {
-													"value": "@utcNow()",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"Status": {
-												"value": {
-													"value": "@if(and(and(and(and(and(and(and(and(and(\nequals(variables('Master Workspaces Status'),'Succeeded'),\nequals(variables('Master WorkSpaceUsers Status'),'Succeeded')),\nequals(variables('Master Report status'),'Succeeded')),\nequals(variables('Master ReportPages Status'),'Succeeded')),\nequals(variables('Master Datasets Status'),'Succeeded')),\nequals(variables('Master Datasetusers Status'),'Succeeded')),\nequals(variables('Master Datasetfreshes status'),'Succeeded')),\nequals(variables('Master Dataflows Status'),'Succeeded')),\nequals(variables('Master DataflowRefreshes Status'),'Succeeded')),\nequals(variables('Master Viewreports Status'),'Succeeded')),\n'Succeeded','Failed')",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "DS_updateLog_SP",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"InProgress Status": {
-						"type": "String",
-						"defaultValue": "InProgress"
-					},
-					"LogID": {
-						"type": "Integer"
-					},
-					"Result": {
-						"type": "String",
-						"defaultValue": "Success"
-					},
-					"a": {
-						"type": "String"
-					},
-					"Master Workspaces Status": {
-						"type": "String"
-					},
-					"Master WorkSpaceUsers Status": {
-						"type": "String"
-					},
-					"Master Report status": {
-						"type": "String"
-					},
-					"Master ReportPages Status": {
-						"type": "String"
-					},
-					"Master Datasets Status": {
-						"type": "String"
-					},
-					"Master Datasetfreshes status": {
-						"type": "String"
-					},
-					"Master Datasetusers Status": {
-						"type": "String"
-					},
-					"Master Viewreports Status": {
-						"type": "String"
-					},
-					"Master Dataflows Status": {
-						"type": "String"
-					},
-					"Master DataflowRefreshes Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Status": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "Dev_DailyScheduleMasterPipeline"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/DS_ReportPages_Batch')]",
-				"[concat(variables('factoryId'), '/pipelines/DS_DatasetUsers_Batch')]"
 			]
 		}
 	]
