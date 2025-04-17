@@ -79,9 +79,14 @@
 						{
 							"name": "Dataset Refreshes",
 							"type": "WebActivity",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Getting Access_token",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
@@ -111,14 +116,9 @@
 						{
 							"name": "Dataset Refreshes_copy1",
 							"type": "WebActivity",
-							"dependsOn": [
-								{
-									"activity": "Getting Access_token",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
+							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
 								"retry": 0,
