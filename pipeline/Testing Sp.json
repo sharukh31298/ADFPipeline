@@ -1,0 +1,53 @@
+{
+	"name": "Testing Sp",
+	"properties": {
+		"activities": [
+			{
+				"name": "SP_Call_UpdateStatus",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[DataLoadTrack_Update]",
+					"storedProcedureParameters": {
+						"DataLoadTrackerID": {
+							"value": "EBD7D56B-53CB-4240-9FB8-4544FD786873",
+							"type": "String"
+						},
+						"ProcessEndTime": {
+							"value": {
+								"value": "@utcNow()",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						},
+						"Status": {
+							"value": "Success",
+							"type": "String"
+						},
+						"CurrentStatus": {
+							"value": "Completed",
+							"type": "String"
+						},
+						"DatasetrefreshesStatus": {
+							"value": "Success",
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_Dataloadtracker_Sql_UAT",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
