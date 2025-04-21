@@ -13,6 +13,96 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Capture_WorkSpacelive_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Capture_WorkSpacelive_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "WorkSpaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "WorkSpaceSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceName",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceType",
+						"type": "varchar"
+					},
+					{
+						"name": "IsonDedicatedCapacity",
+						"type": "bit"
+					},
+					{
+						"name": "CapacityMigrationStatus",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "IsReadOnly",
+						"type": "bit"
+					},
+					{
+						"name": "HasWorkspaceLevelSetting",
+						"type": "bit"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WorkSpaces"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Capturing_ClientInfromation')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -969,127 +1059,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "Dataflows_Staging"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetHistory_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DatasetHistory_sql_UAT",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Datasets_UAT"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "DatasetId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DatasetSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkspaceId",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetName",
-						"type": "varchar"
-					},
-					{
-						"name": "DatasetWebUrl",
-						"type": "varchar"
-					},
-					{
-						"name": "AddRowsAPIEnabled",
-						"type": "bit"
-					},
-					{
-						"name": "ConfiguredBy",
-						"type": "varchar"
-					},
-					{
-						"name": "IsRefreshable",
-						"type": "bit"
-					},
-					{
-						"name": "IsEffectiveIdentityRequired",
-						"type": "bit"
-					},
-					{
-						"name": "IsEffectiveIdentityRolesRequired",
-						"type": "bit"
-					},
-					{
-						"name": "TargetStorageMode",
-						"type": "varchar"
-					},
-					{
-						"name": "ContentProviderType",
-						"type": "varchar"
-					},
-					{
-						"name": "CreateReportEmbedURL",
-						"type": "varchar"
-					},
-					{
-						"name": "QNAEmbedURL",
-						"type": "varchar"
-					},
-					{
-						"name": "IsInPlaceSharingEnabled",
-						"type": "bit"
-					},
-					{
-						"name": "AutoSyncReadOnlyReplicas",
-						"type": "varchar"
-					},
-					{
-						"name": "MaxReadOnlyReplicas",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataLoadTrackerID",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DatasetsHistory"
 				}
 			},
 			"dependsOn": []
