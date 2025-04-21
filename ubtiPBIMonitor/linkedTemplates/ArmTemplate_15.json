@@ -10008,6 +10008,200 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DailyMasterPipeline_Refreshes Status')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Lookup1",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "select AppTenantId,AppClientId,AppClientCode from PowerBI_DatasetRefreshes",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Capturing_ClientInfromation",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Lookup1",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Lookup1').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Getting Access_token",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Content-Type": {
+												"value": "application/x-www-form-urlencoded",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "@{concat('https://login.microsoftonline.com/',item().AppTenantId,'/oauth2/v2.0/token')}",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "grant_type=client_credentials&client_id=6077f1b3-2daf-4b4f-9dc7-f6126cf209be&client_secret=@{item().AppClientCode}&scope=https://analysis.windows.net/powerbi/api/.default",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Dataset Refreshes",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "Getting Access_token",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Authorization": {
+												"value": "@concat('Bearer ', activity('Getting Access_token').output.access_token)",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/65731ac8-b5e9-411f-99d8-d2f0066907dc/refreshes",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "{}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set variable1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Dataset Refreshes",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "Test",
+										"value": {
+											"value": "@activity('Dataset Refreshes').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "Set variable1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@if(or(equals(variables('Datarefreshes').output, 'Succeeded'), equals(variables('Datarefreshes').output, 'Failed')), true, false)\n",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Wait1",
+												"type": "Wait",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"waitTimeInSeconds": 1
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"Datarefreshes": {
+						"type": "String"
+					},
+					"Test": {
+						"type": "String"
+					},
+					"Boolean": {
+						"type": "Boolean"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DataFlowRefreshes')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -20305,172 +20499,6 @@
 					},
 					"ClientCode": {
 						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "Testing"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Demo_Workspaces')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Demo_Workspaces",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "RestSource",
-								"httpRequestTimeout": "00:01:40",
-								"requestInterval": "00.00:00:00.010",
-								"requestMethod": "GET",
-								"paginationRules": {
-									"supportRFC5988": "true"
-								}
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"path": "[['id']"
-										},
-										"sink": {
-											"name": "WorkSpaceSourceKey",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['name']"
-										},
-										"sink": {
-											"name": "WorkSpaceName",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['kind']"
-										},
-										"sink": {
-											"name": "WorkSpaceType",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['refreshSchedule']['enabled']"
-										},
-										"sink": {}
-									},
-									{
-										"source": {
-											"path": "[['refreshSchedule']['localTimeZoneId']"
-										},
-										"sink": {}
-									},
-									{
-										"source": {
-											"path": "[['refreshSchedule']['notifyOption']"
-										},
-										"sink": {}
-									},
-									{
-										"source": {
-											"path": "$['@odata.context']"
-										},
-										"sink": {}
-									},
-									{
-										"source": {
-											"path": "$['@odata.count']"
-										},
-										"sink": {}
-									},
-									{
-										"source": {
-											"path": "[['refreshSchedule']['days'][0]"
-										},
-										"sink": {}
-									},
-									{
-										"source": {
-											"path": "[['refreshSchedule']['times'][0]"
-										},
-										"sink": {}
-									},
-									{
-										"source": {
-											"path": "[['configuredBy'][0]"
-										},
-										"sink": {}
-									}
-								],
-								"collectionReference": "$['value']"
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "Ls_API_Workspaces",
-								"type": "DatasetReference",
-								"parameters": {
-									"AppTenantId": {
-										"value": "@pipeline().parameters.AppTentantId",
-										"type": "Expression"
-									},
-									"AppClientId": {
-										"value": "@pipeline().parameters.AppClientId",
-										"type": "Expression"
-									},
-									"AppClientCode": {
-										"value": "@pipeline().parameters.AppClientCode",
-										"type": "Expression"
-									}
-								}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "LS_SQL_Workspaces",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTentantId": {
-						"type": "String"
-					},
-					"AppClientId": {
-						"type": "String"
-					},
-					"AppClientCode": {
-						"type": "String"
 					}
 				},
 				"folder": {

@@ -13,163 +13,111 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/DailyMasterPipeline_Refreshes Status')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
+			"name": "[concat(parameters('factoryName'), '/get_refresh_schedules_dataflow')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"activities": [
-					{
-						"name": "Lookup1",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "select AppTenantId,AppClientId,AppClientCode from PowerBI_DatasetRefreshes",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
 							"dataset": {
-								"referenceName": "Capturing_ClientInfromation",
-								"type": "DatasetReference",
-								"parameters": {}
+								"referenceName": "RefreshSchedules_API",
+								"type": "DatasetReference"
 							},
-							"firstRowOnly": false
+							"name": "source1"
 						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Lookup1",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Lookup1').output.value",
-								"type": "Expression"
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "RefreshSchedules_SQL",
+								"type": "DatasetReference"
 							},
-							"activities": [
-								{
-									"name": "Getting Access_token",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "POST",
-										"headers": {
-											"Content-Type": {
-												"value": "application/x-www-form-urlencoded",
-												"type": "Expression"
-											}
-										},
-										"url": {
-											"value": "@{concat('https://login.microsoftonline.com/',item().AppTenantId,'/oauth2/v2.0/token')}",
-											"type": "Expression"
-										},
-										"body": {
-											"value": "grant_type=client_credentials&client_id=6077f1b3-2daf-4b4f-9dc7-f6126cf209be&client_secret=@{item().AppClientCode}&scope=https://analysis.windows.net/powerbi/api/.default",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Dataset Refreshes",
-									"type": "WebActivity",
-									"dependsOn": [
-										{
-											"activity": "Getting Access_token",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "POST",
-										"headers": {
-											"Authorization": {
-												"value": "@concat('Bearer ', activity('Getting Access_token').output.access_token)",
-												"type": "Expression"
-											}
-										},
-										"url": {
-											"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/65731ac8-b5e9-411f-99d8-d2f0066907dc/refreshes",
-											"type": "Expression"
-										},
-										"body": {
-											"value": "{}",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Dataset Refreshes_copy1",
-									"type": "WebActivity",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"headers": {
-											"Authorization": {
-												"value": "@concat('Bearer ', activity('Getting Access_token').output.access_token)",
-												"type": "Expression"
-											}
-										},
-										"url": {
-											"value": "https://api.powerbi.com/v1.0/myorg/groups/3b058f6e-431e-4a2b-b734-43455a71f0a2/datasets/65731ac8-b5e9-411f-99d8-d2f0066907dc/refreshes",
-											"type": "Expression"
-										},
-										"body": {
-											"value": "{}",
-											"type": "Expression"
-										}
-									}
-								}
-							]
+							"name": "sink1"
 						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
+					],
+					"transformations": [
+						{
+							"name": "flatten1"
+						},
+						{
+							"name": "flatten2"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     groupid as string,",
+						"     datasetid as string",
+						"}",
+						"source(output(",
+						"          body as ({@odata.context} as string, days as string[], enabled as boolean, localTimeZoneId as string, notifyOption as string, times as string[]),",
+						"          headers as [string,string]",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     httpMethod: 'GET',",
+						"     timeout: 30,",
+						"     requestInterval: 0,",
+						"     paginationRules: ['supportRFC5988' -> 'true'],",
+						"     responseFormat: ['type' -> 'json', 'documentForm' -> 'arrayOfDocuments']) ~> source1",
+						"source1 foldDown(unroll(body.days),",
+						"     mapColumn(",
+						"          days = body.days,",
+						"          enabled = body.enabled,",
+						"          localTimeZoneId = body.localTimeZoneId,",
+						"          notifyOption = body.notifyOption,",
+						"          times = body.times",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten1",
+						"flatten1 foldDown(unroll(times),",
+						"     mapColumn(",
+						"          days,",
+						"          enabled,",
+						"          localTimeZoneId,",
+						"          notifyOption,",
+						"          times",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flatten2",
+						"flatten2 derive(groupid = $groupid,",
+						"          datasetid = $datasetid) ~> derivedColumn1",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          index_no as integer,",
+						"          dataset_id as string,",
+						"          workspace_id as string,",
+						"          days as string,",
+						"          times as string,",
+						"          enabled as string,",
+						"          localTimeZoneId as string,",
+						"          notifyOption as string,",
+						"          updated_time as timestamp",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError',",
+						"     mapColumn(",
+						"          dataset_id = datasetid,",
+						"          workspace_id = groupid,",
+						"          days,",
+						"          times,",
+						"          enabled,",
+						"          localTimeZoneId,",
+						"          notifyOption",
+						"     )) ~> sink1"
+					]
+				}
 			},
 			"dependsOn": []
 		},
