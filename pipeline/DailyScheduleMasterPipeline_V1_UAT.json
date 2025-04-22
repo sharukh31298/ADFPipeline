@@ -5,7 +5,14 @@
 			{
 				"name": "Lookup the ClientInformation for DailySchedule Pipeline",
 				"type": "Lookup",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Check Subscription Status",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -952,6 +959,22 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Check Subscription Status",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "Capturing Subscriprion Status",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
 				}
 			}
 		],
