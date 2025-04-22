@@ -13,6 +13,28 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/Reports_SQL_History')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "getreports_sql_ds",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "UBTI Datasets_Dev"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ReportsHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Reports_SQL_Staging')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -226,95 +248,6 @@
 						"     )) ~> sink1"
 					]
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/API_GenerateEmailNotification')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get_TenantId",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT TenantId \nFROM [dbo].[DailyLoadTracker]\n",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "Get_TenantId",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Passing TenantId",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get_TenantId",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get_TenantId').output.value",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Running_MailNotificationAPI",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "POST",
-										"headers": {
-											"X-API-Value": "01JQP5HKX7JVBKD5876E8DTPMS"
-										},
-										"url": "https://ubti-stage-powerpulse-api.azurewebsites.net/api/v1/Client/GenerateEmailNotification",
-										"body": {
-											"value": "{\n    \"TenantId\": \"@{item().TenantId}\",\n    \"ProductCode\": \"PowerPulse\"\n}\n",
-											"type": "Expression"
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "UAT_DailyScheduleChildPipelines"
-				},
-				"annotations": []
 			},
 			"dependsOn": []
 		},
@@ -7728,7 +7661,8 @@
 				"lastPublishTime": "2023-11-29T05:26:21Z"
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Reports_SQL_Staging')]"
+				"[concat(variables('factoryId'), '/datasets/Reports_SQL_Staging')]",
+				"[concat(variables('factoryId'), '/datasets/Reports_SQL_History')]"
 			]
 		},
 		{
