@@ -5,14 +5,7 @@
 			{
 				"name": "Lookup the ClientInformation for DailySchedule Pipeline",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "Check Subscription Status",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -964,6 +957,8 @@
 			{
 				"name": "Check Subscription Status",
 				"type": "ExecutePipeline",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureInput": false
