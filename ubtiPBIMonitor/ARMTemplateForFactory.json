@@ -35870,7 +35870,14 @@
 					{
 						"name": "Lookup the ClientInformation for DailySchedule Pipeline",
 						"type": "Lookup",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Check Subscription Status",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -36821,6 +36828,23 @@
 								}
 							]
 						}
+					},
+					{
+						"name": "Check Subscription Status",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "Capturing Subscriprion Status",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
 					}
 				],
 				"policy": {
@@ -36891,6 +36915,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/DS_lokkupClientInformation_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/Capturing Subscriprion Status')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpaces_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_WorkSpacesUsers_Batch_UAT')]",
 				"[concat(variables('factoryId'), '/pipelines/DS_Reports_UAT')]",
@@ -76021,7 +76046,7 @@
 					"elapsedTimeMetric": {}
 				},
 				"folder": {
-					"name": "UAT_FirstTimeLoadchildPipelines"
+					"name": "Testing"
 				},
 				"annotations": []
 			},
