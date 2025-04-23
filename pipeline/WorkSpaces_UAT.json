@@ -204,7 +204,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "select * from [dbo].[WorkSpaces]\nWhere Status = 'Active'",
+						"preCopyScript": {
+							"value": "@concat('UPDATE WS\nSET WS.DataloadTrackerID = DL.DataloadTrackerId\nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId =', string(pipeline().parameters.TenantId))",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
@@ -380,6 +383,14 @@
 									"name": "TenantId",
 									"type": "Int32",
 									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "DataLoadTrackerID"
+								},
+								"sink": {
+									"name": "DataLoadTrackerID"
 								}
 							}
 						],
@@ -609,6 +620,14 @@
 									"name": "TenantId",
 									"type": "Int32",
 									"physicalType": "int"
+								}
+							},
+							{
+								"source": {
+									"name": "DataLoadTrackerID"
+								},
+								"sink": {
+									"name": "DataLoadTrackerID"
 								}
 							}
 						],
