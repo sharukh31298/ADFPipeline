@@ -205,7 +205,7 @@
 					"sink": {
 						"type": "AzureSqlSink",
 						"preCopyScript": {
-							"value": "@concat('UPDATE WS\nSET WS.DataloadTrackerID = DL.DataloadTrackerId\nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId =', string(pipeline().parameters.TenantId))",
+							"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
 							"type": "Expression"
 						},
 						"writeBehavior": "insert",
@@ -445,6 +445,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
