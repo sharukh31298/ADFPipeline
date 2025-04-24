@@ -42,6 +42,10 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "@concat('UPDATE R\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN Reports R ON R.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+							"type": "Expression"
+						},
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
