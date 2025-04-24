@@ -5848,6 +5848,18 @@
 								"mappings": [
 									{
 										"source": {
+											"name": "DataflowRefreshesID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "DataflowRefreshesID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
 											"name": "DataflowRefreshesSourcekey",
 											"type": "String",
 											"physicalType": "varchar"
@@ -5988,6 +6000,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -8839,7 +8863,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "DataFlow Staging",
+								"activity": "DataFlow History",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -17595,6 +17619,12 @@
 								"dependencyConditions": [
 									"Completed"
 								]
+							},
+							{
+								"activity": "Datasets_InsertUpsert",
+								"dependencyConditions": [
+									"Completed"
+								]
 							}
 						],
 						"policy": {
@@ -17827,7 +17857,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "Dataset Staging",
+								"activity": "Dataset History",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -20121,6 +20151,18 @@
 								"mappings": [
 									{
 										"source": {
+											"name": "ReportPageID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "ReportPageID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
 											"name": "ReportID",
 											"type": "String",
 											"physicalType": "varchar"
@@ -20237,6 +20279,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -23692,7 +23746,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "Reports Staging",
+								"activity": "Report History Data",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -27927,7 +27981,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "View Activity Staging",
+								"activity": "View Activity History",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -31549,6 +31603,18 @@
 								"mappings": [
 									{
 										"source": {
+											"name": "WorkSpaceUserId",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "WorkSpaceUserId",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
 											"name": "WorkSpaceUserSourceKey",
 											"type": "String",
 											"physicalType": "varchar"
@@ -31701,6 +31767,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -33539,7 +33617,7 @@
 							"sink": {
 								"type": "AzureSqlSink",
 								"preCopyScript": {
-									"value": "@{concat('DELETE [dbo].[WorkSpaces_Staging] where TenantId = ', string(pipeline().parameters.TenantId))}",
+									"value": "@{concat('DELETE [dbo].[WorkSpaces_Staging] where TenantId = ', string(pipeline().parameters.TenantId))}\n\n\n",
 									"type": "Expression"
 								},
 								"writeBehavior": "insert",
@@ -33933,6 +34011,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -34151,6 +34233,12 @@
 							},
 							{
 								"activity": "Capturing Status of WorkSpaceLive",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Status of WorkSpaceHistory",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -34415,7 +34503,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "WorkSpace Staging",
+								"activity": "WorkSpace History",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -39386,6 +39474,18 @@
 								"mappings": [
 									{
 										"source": {
+											"name": "DataflowRefreshesID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "DataflowRefreshesID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
 											"name": "DataflowRefreshesSourcekey",
 											"type": "String",
 											"physicalType": "varchar"
@@ -39526,6 +39626,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -42925,6 +43037,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN Dataflows_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -43108,6 +43224,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN Dataflows_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -54822,6 +54942,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN Datasets_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -55137,6 +55261,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN Datasets_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false
 							},
@@ -78845,6 +78973,18 @@
 								"mappings": [
 									{
 										"source": {
+											"name": "ReportPageID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "ReportPageID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
 											"name": "ReportID",
 											"type": "String",
 											"physicalType": "varchar"
@@ -78961,6 +79101,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -83626,6 +83778,42 @@
 									},
 									{
 										"source": {
+											"path": "[['createdDateTime']"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "[['modifiedDateTime']"
+										},
+										"sink": {
+											"name": "ModifiedDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "[['modifiedBy']"
+										},
+										"sink": {
+											"name": "ModifiedBy",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['createdBy']"
+										},
+										"sink": {
+											"name": "CreatedBy",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
 											"path": "[['workspaceId']"
 										},
 										"sink": {
@@ -83706,6 +83894,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE R\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN Reports_Staging R ON R.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -83717,6 +83909,18 @@
 								"mappings": [
 									{
 										"source": {
+											"name": "ReportID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "ReportID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
 											"name": "ReportSourceKey",
 											"type": "String",
 											"physicalType": "varchar"
@@ -83857,6 +84061,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -83913,6 +84129,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE R\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN Reports_Staging R ON R.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false
 							},
@@ -83923,6 +84143,18 @@
 								"mappings": [
 									{
 										"source": {
+											"name": "ReportID",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "ReportID",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
 											"name": "ReportSourceKey",
 											"type": "String",
 											"physicalType": "varchar"
@@ -84063,6 +84295,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -89755,6 +89999,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN ViewReports_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -90334,6 +90582,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN ViewReports_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false
 							},
@@ -96148,6 +96400,18 @@
 								"mappings": [
 									{
 										"source": {
+											"name": "WorkSpaceUserId",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "WorkSpaceUserId",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
 											"name": "WorkSpaceUserSourceKey",
 											"type": "String",
 											"physicalType": "varchar"
@@ -96300,6 +96564,18 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
 										}
 									}
 								],
@@ -99948,7 +100224,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": "select * from [dbo].[WorkSpaces]\nWhere Status = 'Active'",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -100124,6 +100403,14 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID"
 										}
 									}
 								],
@@ -100180,6 +100467,10 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
+								"preCopyScript": {
+									"value": "@concat('UPDATE WS\nSET R.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
 								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -100355,6 +100646,14 @@
 											"name": "TenantId",
 											"type": "Int32",
 											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID"
 										}
 									}
 								],
