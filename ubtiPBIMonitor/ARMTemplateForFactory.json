@@ -2961,7 +2961,7 @@
 										"storedProcedureParameters": {
 											"SubscriptionStatus": {
 												"value": {
-													"value": "@if(equals(activity('Web1').output.Response?.SubscriptionStatus, 'Subscribed'), true, false)\n",
+													"value": "@if(equals(activity('Web1').output.SubscriptionStatus, 'Subscribed'), true, false) \n \n\n",
 													"type": "Expression"
 												},
 												"type": "Boolean"
@@ -36049,7 +36049,14 @@
 					{
 						"name": "Lookup the ClientInformation for DailySchedule Pipeline",
 						"type": "Lookup",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "Check Subscription Status",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -37004,8 +37011,6 @@
 					{
 						"name": "Check Subscription Status",
 						"type": "ExecutePipeline",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"secureInput": false
