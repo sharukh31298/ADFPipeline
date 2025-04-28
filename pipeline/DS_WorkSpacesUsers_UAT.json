@@ -36,7 +36,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Delete StagingTable",
+						"activity": "Capturing Status for Get WorkSpaces",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -745,42 +745,6 @@
 						{
 							"type": "Query",
 							"text": "EXEC WorkSpaceUsers_InsertUpsert"
-						}
-					],
-					"scriptBlockExecutionTimeout": "02:00:00"
-				}
-			},
-			{
-				"name": "Delete StagingTable",
-				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "Get WorkSpaces",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"linkedServiceName": {
-					"referenceName": "Delete_WorkspaceUsersStaging",
-					"type": "LinkedServiceReference"
-				},
-				"typeProperties": {
-					"scripts": [
-						{
-							"type": "Query",
-							"text": {
-								"value": "@concat('DELETE from [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId = ',string(pipeline().parameters.TenantId))",
-								"type": "Expression"
-							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
