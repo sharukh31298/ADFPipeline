@@ -13,6 +13,84 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ReportPagesHistory_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ReportPagesHistory_sql_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Datasets_UAT"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ReportPageID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "ReportID",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceID",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportPageName",
+						"type": "varchar"
+					},
+					{
+						"name": "ReportPageDisplayName",
+						"type": "varchar"
+					},
+					{
+						"name": "report_order",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "ReportPagesHistory"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ReportPagesLive_SQL')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1227,77 +1305,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "DatasetUsers_Staging"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SQL_ReportPagesLive')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "ReportPages_SQL",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "ReportPageID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "ReportID",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportPageName",
-						"type": "varchar"
-					},
-					{
-						"name": "ReportPageDisplayName",
-						"type": "varchar"
-					},
-					{
-						"name": "report_order",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "ReportPages"
 				}
 			},
 			"dependsOn": []

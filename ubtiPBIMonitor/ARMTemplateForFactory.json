@@ -576,6 +576,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
 		},
+		"Testing_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Testing_UAT'"
+		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -2211,6 +2215,18 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
+		},
+		"Testing_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Testing_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Testing_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -110894,7 +110910,7 @@
 				],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "WorkSpaceUsersHistory"
+					"table": "TestWorkSpaceUsers_History"
 				}
 			},
 			"dependsOn": [
@@ -110942,7 +110958,7 @@
 				"schema": [],
 				"typeProperties": {
 					"schema": "dbo",
-					"table": "WorkSpaceUsers_Staging"
+					"table": "TestWorkSpaceUsers_Staging"
 				}
 			},
 			"dependsOn": [
@@ -115912,7 +115928,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[Workspaces_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
+									"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[TestWorkspaces_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -116009,7 +116025,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('select * from [dbo].[WorkSpaceUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"value": "@concat('select * from [dbo].[TestWorkSpaceUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -117529,7 +117545,7 @@
 							"scripts": [
 								{
 									"type": "Query",
-									"text": "EXEC WorkSpaceUsers_InsertUpsert"
+									"text": "EXEC TestWorkSpaceUsers_InsertUpsert"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -117911,6 +117927,120 @@
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers_log_UAT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Testing_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Testing_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('Testing_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Testing_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Testing_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Testing_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "WorkSpaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "WorkSpaceSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceName",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceType",
+						"type": "varchar"
+					},
+					{
+						"name": "IsonDedicatedCapacity",
+						"type": "bit"
+					},
+					{
+						"name": "CapacityMigrationStatus",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "IsReadOnly",
+						"type": "bit"
+					},
+					{
+						"name": "HasWorkspaceLevelSetting",
+						"type": "bit"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WorkSpaces"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Testing_UAT')]"
 			]
 		}
 	]

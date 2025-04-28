@@ -13,6 +13,22 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/CaptureCI')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "CaptureCI",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Capture_ClientInformation')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -909,95 +925,6 @@
 				"typeProperties": {
 					"schema": "dbo",
 					"table": "DataflowRefreshes"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DataflowRefreshesStaging_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "DataflowRefreshesStaging_sql_UAT",
-					"type": "LinkedServiceReference"
-				},
-				"folder": {
-					"name": "Datasets_UAT"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "DataflowRefreshesID",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataflowRefreshesSourcekey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceID",
-						"type": "varchar"
-					},
-					{
-						"name": "DataflowID",
-						"type": "varchar"
-					},
-					{
-						"name": "RefreshType",
-						"type": "varchar"
-					},
-					{
-						"name": "StartTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "EndTime",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "Status",
-						"type": "varchar"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataLoadTrackerID",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "DataflowRefreshes_Staging"
 				}
 			},
 			"dependsOn": []
