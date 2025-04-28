@@ -32447,7 +32447,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Delete StagingTable",
+								"activity": "Capturing Status for Get WorkSpaces",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -33163,42 +33163,6 @@
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
 						}
-					},
-					{
-						"name": "Delete StagingTable",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "Get WorkSpaces",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "Delete_WorkspaceUsersStaging",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "@concat('DELETE from [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId = ',string(pipeline().parameters.TenantId))",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
 					}
 				],
 				"policy": {
@@ -33569,7 +33533,6 @@
 				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
 				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers live_insertupdate UAT')]",
-				"[concat(variables('factoryId'), '/linkedServices/Delete_WorkspaceUsersStaging')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers_log_UAT')]"
