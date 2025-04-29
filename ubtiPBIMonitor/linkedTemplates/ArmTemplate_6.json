@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "ubtiPBIMonitor"
 		},
+		"WorkSpaceUsersHistory_sql_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'WorkSpaceUsersHistory_sql_UAT'"
+		},
 		"WorkSpaceUsersLive_sql_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'WorkSpaceUsersLive_sql_UAT'"
@@ -83,9 +87,17 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'getgroups_api_ds'"
 		},
-		"getgroups_sql_ls_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'getgroups_sql_ls'"
+		"WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
 		},
 		"WorkSpaceUsersLive_sql_UAT_properties_typeProperties_server": {
 			"type": "string",
@@ -256,6 +268,28 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/WorkSpaceUsersHistory_sql_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('WorkSpaceUsersHistory_sql_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/WorkSpaceUsersLive_sql_UAT')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -759,19 +793,6 @@
 					},
 					"tokenEndpoint": "@{concat('https://login.microsoftonline.com/',linkedService().AppTenantId,'/oauth2/v2.0/token')}",
 					"scope": "https://analysis.windows.net/powerbi/api/.default"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/getgroups_sql_ls')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('getgroups_sql_ls_connectionString')]"
 				}
 			},
 			"dependsOn": []

@@ -39,6 +39,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Testing'"
 		},
+		"Testing_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Testing_UAT'"
+		},
 		"Update_UATChildpipelineLogs_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Update_UATChildpipelineLogs'"
@@ -78,10 +82,6 @@
 		"WorkSpaceLive_SQL_UAT_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'WorkSpaceLive_SQL_UAT'"
-		},
-		"WorkSpaceUsersHistory_sql_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'WorkSpaceUsersHistory_sql_UAT'"
 		},
 		"TestActivityevents_properties_typeProperties_url": {
 			"type": "string",
@@ -168,6 +168,18 @@
 			"defaultValue": "pbimonitor"
 		},
 		"Testing_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Testing_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Testing_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Testing_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -276,18 +288,6 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"WorkSpaceLive_SQL_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
-		},
-		"WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		}
@@ -469,6 +469,28 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('Testing_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Testing_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Testing_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('Testing_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Testing_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Testing_UAT_password')]"
 					}
 				}
 			},
@@ -708,28 +730,6 @@
 					"password": {
 						"type": "SecureString",
 						"value": "[parameters('WorkSpaceLive_SQL_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WorkSpaceUsersHistory_sql_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('WorkSpaceUsersHistory_sql_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('WorkSpaceUsersHistory_sql_UAT_password')]"
 					}
 				}
 			},

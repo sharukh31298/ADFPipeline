@@ -415,6 +415,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Testing'"
 		},
+		"Testing_UAT_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Testing_UAT'"
+		},
 		"Update_UATChildpipelineLogs_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Update_UATChildpipelineLogs'"
@@ -575,10 +579,6 @@
 		"view_report_api_ls_clientSecret": {
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'view_report_api_ls'"
-		},
-		"Testing_UAT_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'Testing_UAT'"
 		},
 		"ADF_Pipeline_Status_Log_properties_typeProperties_server": {
 			"type": "string",
@@ -1864,6 +1864,18 @@
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
+		"Testing_UAT_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Testing_UAT_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Testing_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
 		"Upsert Query Dataset Refreshes_properties_typeProperties_server": {
 			"type": "string",
 			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
@@ -2215,18 +2227,6 @@
 		"view_report_api_ls_properties_typeProperties_clientId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().AppClientId}"
-		},
-		"Testing_UAT_properties_typeProperties_server": {
-			"type": "string",
-			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
-		},
-		"Testing_UAT_properties_typeProperties_database": {
-			"type": "string",
-			"defaultValue": "PowerPulseDB-Stage"
-		},
-		"Testing_UAT_properties_typeProperties_userName": {
-			"type": "string",
-			"defaultValue": "adminsql"
 		}
 	},
 	"variables": {
@@ -73754,7 +73754,7 @@
 							"source": {
 								"type": "AzureSqlSource",
 								"sqlReaderQuery": {
-									"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientCode,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(pipeline().parameters.TenantId),''','' ''')",
+									"value": "@concat(\n 'EXEC [dbo].[DataLoadTrack_Insert] ',\n '''', pipeline().parameters.AppTenantId, '''', ',',\n '''', pipeline().parameters.AppClientId, '''', ',',\n  '''', pipeline().parameters.AppClientCode, '''', ',',\n '''', pipeline().RunId, '''', ',',\n '''', utcNow(), '''', ',',\n '''', 'Started', '''', ',',\n '''', 'Started', '''', ',',\n '''', 'True', '''', ',',\n '''', 'Application', '''', ',',\n '''', utcNow(), '''', ',',\n '''', ' ', '''', ',',\n '''', string(pipeline().parameters.TenantId), '''', ',',\n '''', 'False', '''', ',')\n",
 									"type": "Expression"
 								},
 								"queryTimeout": "02:00:00",
@@ -97153,6 +97153,913 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/WorkSpacesUsers_Batch_UAT_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get WorkSpace Batches",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Execute_ChildPipelinelogs",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[TestWorkspaces_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "WorkSpaceLive_Sql_UAT",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "For Each Batch",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get WorkSpace Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get WorkSpace Batches').output.value",
+								"type": "Expression"
+							},
+							"isSequential": true,
+							"activities": [
+								{
+									"name": "Execute pipeline users",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "WorkSpacesUsers_UAT",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"AppTenantId": {
+												"value": "@pipeline().parameters.AppTenantId",
+												"type": "Expression"
+											},
+											"AppClientId": {
+												"value": "@pipeline().parameters.AppClientId",
+												"type": "Expression"
+											},
+											"AppClientCode": {
+												"value": "@pipeline().parameters.AppClientCode",
+												"type": "Expression"
+											},
+											"TenantId": {
+												"value": "@pipeline().parameters.TenantId",
+												"type": "Expression"
+											},
+											"BatchNo": {
+												"value": "@item().BatchNo",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "WorkSpaceUsers History",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "For Each Batch",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[TestWorkSpaceUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "insert",
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": 4,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "WorkSpaceUserId",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "WorkSpaceUserId",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "WorkSpaceUserSourceKey",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "WorkSpaceUserSourceKey",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "WorkSpaceID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "WorkSpaceID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EmailAddress",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "EmailAddress",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "UserName",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "UserName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Identifier",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Identifier",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "UserType",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "UserType",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "GroupUserAccessRight",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "GroupUserAccessRight",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PrincipalType",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "PrincipalType",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "CreatedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TenantId",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "TenantId",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DataLoadTrackerID",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "WorkSpaceUsersStaging_sql_UAT",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "WorkSpaceUsersHistory_sql_UAT",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Truncate WorkspacesUsers",
+						"type": "Script",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "getreports_sql_ds",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "TRUNCATE TABLE [dbo].[WorkSpaceUsers_Staging];"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Capturing Workspaces Batches",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get WorkSpace Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "Get WorkSpaces Batch Status",
+							"value": {
+								"value": "@activity('Get WorkSpace Batches').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Capturing Status in WorkSpaces Users History",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "WorkSpaceUsers History",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "WorkSpacesUsers History Status",
+							"value": {
+								"value": "@activity('WorkSpaceUsers History').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Execute_ChildPipelinelogs",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Execute_UATChildpipelineLogs",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Sp_TrackProcessSuccess",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "WorkSpaceUsers History",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Status in WorkSpaces Users History",
+								"dependencyConditions": [
+									"Completed"
+								]
+							},
+							{
+								"activity": "Capturing Workspaces Batches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogTrackerID": {
+									"value": {
+										"value": "@activity('Execute_ChildPipelinelogs').output.firstRow.LogTrackerID",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"Status": {
+									"value": {
+										"value": "@if(and(\n\nequals(variables('Get WorkSpaces Batch Status'),'Succeeded'),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n\n'Succeeded','Failed')\n",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "Update_UATChildpipelineLogs",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Delete WorkSpaceUsers_Staging",
+						"type": "Script",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Sql_DeleteQuery_UAT",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('DELETE  [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					}
+				},
+				"variables": {
+					"CountWorkspace": {
+						"type": "Integer"
+					},
+					"WorkSpaceUsers_Status": {
+						"type": "String"
+					},
+					"WorkSpaceUsers_StartTime": {
+						"type": "String"
+					},
+					"WorkSpaceUsers_EndTime": {
+						"type": "String"
+					},
+					"WorkSpacesUsers_IST": {
+						"type": "String"
+					},
+					"WorkSpacesUsers_IST2": {
+						"type": "String"
+					},
+					"Reports_Staging_Status": {
+						"type": "String"
+					},
+					"Reports Staging_StartTime": {
+						"type": "String"
+					},
+					"Reports Staging_Execution EndTime": {
+						"type": "String"
+					},
+					"Reports_Staging_IST": {
+						"type": "String"
+					},
+					"Reports Staging_IST": {
+						"type": "String"
+					},
+					"ReportPages_Status": {
+						"type": "String"
+					},
+					"ReportPages_StartTime": {
+						"type": "String"
+					},
+					"ReportPages_IST": {
+						"type": "String"
+					},
+					"ReportPages_IST2": {
+						"type": "String"
+					},
+					"ReportPages_EndTime": {
+						"type": "String"
+					},
+					"RefreshSchedules_Status": {
+						"type": "String"
+					},
+					"RefreshSchedules": {
+						"type": "String"
+					},
+					"RefreshSchedules_EndTime": {
+						"type": "String"
+					},
+					"RefreshSchedules_IST": {
+						"type": "String"
+					},
+					"RefreshSchedules_IST2": {
+						"type": "String"
+					},
+					"ReportUsers_Status": {
+						"type": "String"
+					},
+					"ReportUsers_StartTime": {
+						"type": "String"
+					},
+					"ReportUsers_EndTime": {
+						"type": "String"
+					},
+					"ReportUsers_IST": {
+						"type": "String"
+					},
+					"ReportUsers_IST2": {
+						"type": "String"
+					},
+					"Datasources_Status": {
+						"type": "String"
+					},
+					"Datasources_StartTime": {
+						"type": "String"
+					},
+					"Datasources_EndTime": {
+						"type": "String"
+					},
+					"Datasources_IST": {
+						"type": "String"
+					},
+					"Datasources_IST2": {
+						"type": "String"
+					},
+					"DatasetUsers_Status": {
+						"type": "String"
+					},
+					"DatasetUsers_StartTime": {
+						"type": "String"
+					},
+					"DatasetUsers_EndTime": {
+						"type": "String"
+					},
+					"DatasetUsers_IST": {
+						"type": "String"
+					},
+					"DatasetUsers_IST2": {
+						"type": "String"
+					},
+					"Datasets_status": {
+						"type": "String"
+					},
+					"Datasets_startTime": {
+						"type": "String"
+					},
+					"Datasets_EndTime": {
+						"type": "String"
+					},
+					"Datasets_IST": {
+						"type": "String"
+					},
+					"Datasets_IST2": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_status": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_StartTime": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_EndTime": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_IST": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_IST2": {
+						"type": "String"
+					},
+					"DataFlows_Status": {
+						"type": "String"
+					},
+					"DataFlows_StartTime": {
+						"type": "String"
+					},
+					"DataFlows_EndTime": {
+						"type": "String"
+					},
+					"DataFlows_IST": {
+						"type": "String"
+					},
+					"DataFlows_IST2": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_Status": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_StartTime": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_EndTime": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_IST": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_IST2": {
+						"type": "String"
+					},
+					"WorkspaceUsers Staging Status": {
+						"type": "String"
+					},
+					"WorkSpaceUserLive Status": {
+						"type": "String"
+					},
+					"Get Workspaces Status": {
+						"type": "String"
+					},
+					"WorkSpaces Batch": {
+						"type": "String"
+					},
+					"WorkSpacesUsers History Status": {
+						"type": "String"
+					},
+					"Get WorkSpaces Batch Status": {
+						"type": "String"
+					},
+					"ViewReportStaging Status": {
+						"type": "String"
+					},
+					"ViewReport Live Status": {
+						"type": "String"
+					},
+					"ViewReport History Status": {
+						"type": "String"
+					},
+					"Reports Staging Status": {
+						"type": "String"
+					},
+					"Report History Status": {
+						"type": "String"
+					},
+					"Report Live Status": {
+						"type": "String"
+					},
+					"ReportPages Staging Status": {
+						"type": "String"
+					},
+					"Get ReportPages Status": {
+						"type": "String"
+					},
+					"ReportPages Batch Status": {
+						"type": "String"
+					},
+					"ReportPages History Status": {
+						"type": "String"
+					},
+					"DatasetUsers Staging Status": {
+						"type": "String"
+					},
+					"DatasetUsers Live Status": {
+						"type": "String"
+					},
+					"Datasets Batches Status": {
+						"type": "String"
+					},
+					"DatasetUsers History Status": {
+						"type": "String"
+					},
+					"Get Datasets Status": {
+						"type": "String"
+					},
+					"Dataset staging Status": {
+						"type": "String"
+					},
+					"Dataset Live Status": {
+						"type": "String"
+					},
+					"Dataset History Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Batch Status": {
+						"type": "String"
+					},
+					"DatasetRefreshes History Status": {
+						"type": "String"
+					},
+					"Dataflows Staging Status": {
+						"type": "String"
+					},
+					"Dataflows Live Status": {
+						"type": "String"
+					},
+					"Dataflows History Status": {
+						"type": "String"
+					},
+					"DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Batch": {
+						"type": "String"
+					},
+					"DataflowRefreshes History Status": {
+						"type": "String"
+					},
+					"Master Workspaces Status": {
+						"type": "String"
+					},
+					"Master WorkSpaceUsers Status": {
+						"type": "String"
+					},
+					"Master Report status": {
+						"type": "String"
+					},
+					"Master ReportPages Status": {
+						"type": "String"
+					},
+					"Master Datasets Status": {
+						"type": "String"
+					},
+					"Master Datasetfreshes status": {
+						"type": "String"
+					},
+					"Master Datasetusers Status": {
+						"type": "String"
+					},
+					"Master Viewreports Status": {
+						"type": "String"
+					},
+					"Master Dataflows Status": {
+						"type": "String"
+					},
+					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get ReportPage Status": {
+						"type": "String"
+					},
+					"ReportPage Staging Status": {
+						"type": "String"
+					},
+					"DatasetUser Staging Status": {
+						"type": "String"
+					},
+					"DatasetUser Live Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes_ Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshe Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
+						"type": "String"
+					},
+					"Workspace Staging Status": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Arun_BatchTesting"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-11-29T06:27:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceLive_Sql_UAT')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersHistory_sql_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/getreports_sql_ds')]",
+				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
+				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
+				"[concat(variables('factoryId'), '/linkedServices/Sql_DeleteQuery_UAT')]",
+				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_UAT')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/WorkSpacesUsers_Tenant2')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -98901,6 +99808,1129 @@
 				},
 				"folder": {
 					"name": "UAT_FirstTimeLoadchildPipelines"
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-11-29T06:27:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Capture_WorkSpacelive_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
+				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
+				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
+				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers live_insertupdate UAT')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers_log_UAT')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/WorkSpacesUsers_UAT_copy1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get WorkSpaces",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('SELECT WorkSpaceSourceKey FROM [dbo].[Workspaces_batch] \nWHERE BatchNo = ', string(pipeline().parameters.BatchNo), \n' AND TenantId = ', string(pipeline().parameters.TenantId))",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Capture_WorkSpacelive_UAT",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "WorkSpace ID in Loop",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get WorkSpaces",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get WorkSpaces').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 50,
+							"activities": [
+								{
+									"name": "Get WorkSpace Users_Staging",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"additionalColumns": [
+												{
+													"name": "WorkSpaceID",
+													"value": {
+														"value": "@item().WorkSpaceSourceKey",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "TenantId",
+													"value": {
+														"value": "@pipeline().parameters.TenantId",
+														"type": "Expression"
+													}
+												}
+											],
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "insert",
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": 4,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"path": "[['emailAddress']"
+													},
+													"sink": {
+														"name": "EmailAddress",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['groupUserAccessRight']"
+													},
+													"sink": {
+														"name": "GroupUserAccessRight",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['displayName']"
+													},
+													"sink": {
+														"name": "UserName",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['identifier']"
+													},
+													"sink": {
+														"name": "Identifier",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['principalType']"
+													},
+													"sink": {
+														"name": "PrincipalType",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['WorkSpaceID']"
+													},
+													"sink": {
+														"name": "WorkSpaceID",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['TenantId']"
+													},
+													"sink": {
+														"name": "TenantId",
+														"type": "Int32"
+													}
+												}
+											],
+											"collectionReference": "$['value']",
+											"mapComplexValuesToString": true
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "WorkSpaceUsers_Staging_API",
+											"type": "DatasetReference",
+											"parameters": {
+												"WorkspaceID": {
+													"value": "@item().WorkSpaceSourceKey",
+													"type": "Expression"
+												},
+												"AppTenantId": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"AppClientId": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"AppClientCode": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "WorkSpaceUsersStaging_sql_UAT",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								},
+								{
+									"name": "Capturing Status in WorkSpace Users Staging",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get WorkSpace Users_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "WorkspaceUsers Staging Status",
+										"value": {
+											"value": "@activity('Get WorkSpace Users_Staging').Status",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Capturing WorkspaceUsers ED",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Get WorkSpace Users_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_WorkSpaceUsersED]",
+										"storedProcedureParameters": {
+											"AppClientId": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppClientSecret": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppTentantId": {
+												"value": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "String"
+											},
+											"ErrorMessage": {
+												"value": {
+													"value": "@activity('Get WorkSpace Users_Staging').error?.message",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineName": {
+												"value": {
+													"value": "@pipeline().Pipeline",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineRunId": {
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ProcessEndTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"ProcessStartTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"Status": {
+												"value": {
+													"value": "@activity('Get WorkSpace Users_Staging').Status",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"TenantId": {
+												"value": {
+													"value": "@pipeline().parameters.TenantId",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"WorkSpaceID": {
+												"value": {
+													"value": "@item().WorkSpaceSourceKey",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "WorkspaceUsers_log_UAT",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Sp_TrackProcessSuccess",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"LogTrackerID": {
+									"type": "String"
+								},
+								"Status": {
+									"value": {
+										"value": "@if(and(and(and(and(\nequals(variables('Get Workspaces Status'),'Succeeded'),\nequals(variables('WorkspaceUsers Staging Staus'),'Succeeded')),\nequals(variables('WorkSpaceUserLive Status'),'Succeeded')),\nequals(variables('WorkSpaces Batch'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "Update_UATChildpipelineLogs",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Sp_TrackProcessFailure",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"ErrorMessage": {
+									"value": null,
+									"type": "String"
+								},
+								"PipelineName": {
+									"value": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"StartTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"Status": {
+									"value": null,
+									"type": "String"
+								},
+								"TriggerName": {
+									"value": {
+										"value": "@pipeline().TriggerName",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"TriggerTime": {
+									"value": {
+										"value": "@pipeline().TriggerTime",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"TriggerType": {
+									"value": {
+										"value": "@pipeline().TriggerType",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Capturing Status for Get WorkSpaces",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get WorkSpaces",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "WorkSpaceUsers_Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get WorkSpaces').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
+						}
+					},
+					{
+						"name": "Get WorkSpaceUsers_Live",
+						"type": "Copy",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"WorkSpaceID",
+										"UserName",
+										"Identifier"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": 4,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "WorkSpaceID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "WorkSpaceID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EmailAddress",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "EmailAddress",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "UserName",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "UserName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Identifier",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "Identifier",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "GroupUserAccessRight",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "GroupUserAccessRight",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "PrincipalType",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "PrincipalType",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "CreatedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TenantId",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "TenantId",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "LS_SQL_WorkspacesUsers_Live",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "WorkSpacesUsers_Live_SQL",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Capturing Status in WorkSpaceUsers Live",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "InsertUpdate the WorkspaceLive table",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "WorkSpaceUserLive Status",
+							"value": {
+								"value": "@activity('InsertUpdate the WorkspaceLive table').Status",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "InsertUpdate the WorkspaceLive table",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "WorkSpace ID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "WorkspaceUsers live_insertupdate UAT",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "EXEC TestWorkSpaceUsers_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					},
+					"BatchNo": {
+						"type": "string",
+						"defaultValue": "@item().BatchNo"
+					}
+				},
+				"variables": {
+					"WorkSpaceUsers_Status": {
+						"type": "String"
+					},
+					"WorkSpaceUsers_StartTime": {
+						"type": "String"
+					},
+					"WorkSpaceUsers_EndTime": {
+						"type": "String"
+					},
+					"WorkSpacesUsers_IST": {
+						"type": "String"
+					},
+					"WorkSpacesUsers_IST2": {
+						"type": "String"
+					},
+					"Reports_Staging_Status": {
+						"type": "String"
+					},
+					"Reports Staging_StartTime": {
+						"type": "String"
+					},
+					"Reports Staging_Execution EndTime": {
+						"type": "String"
+					},
+					"Reports Staging_IST2": {
+						"type": "String"
+					},
+					"Reports Staging_IST": {
+						"type": "String"
+					},
+					"ReportPages_Status": {
+						"type": "String"
+					},
+					"ReportPages_StartTime": {
+						"type": "String"
+					},
+					"ReportPages_IST": {
+						"type": "String"
+					},
+					"ReportPages_IST2": {
+						"type": "String"
+					},
+					"ReportPages_EndTime": {
+						"type": "String"
+					},
+					"RefreshSchedules_Status": {
+						"type": "String"
+					},
+					"RefreshSchedules": {
+						"type": "String"
+					},
+					"RefreshSchedules_EndTime": {
+						"type": "String"
+					},
+					"RefreshSchedules_IST": {
+						"type": "String"
+					},
+					"RefreshSchedules_IST2": {
+						"type": "String"
+					},
+					"ReportUsers_Status": {
+						"type": "String"
+					},
+					"ReportUsers_StartTime": {
+						"type": "String"
+					},
+					"ReportUsers_EndTime": {
+						"type": "String"
+					},
+					"ReportUsers_IST": {
+						"type": "String"
+					},
+					"ReportUsers_IST2": {
+						"type": "String"
+					},
+					"Datasources_Status": {
+						"type": "String"
+					},
+					"Datasources_StartTime": {
+						"type": "String"
+					},
+					"Datasources_EndTime": {
+						"type": "String"
+					},
+					"Datasources_IST": {
+						"type": "String"
+					},
+					"Datasources_IST2": {
+						"type": "String"
+					},
+					"DatasetUsers_Status": {
+						"type": "String"
+					},
+					"DatasetUsers_StartTime": {
+						"type": "String"
+					},
+					"DatasetUsers_EndTime": {
+						"type": "String"
+					},
+					"DatasetUsers_IST": {
+						"type": "String"
+					},
+					"DatasetUsers_IST2": {
+						"type": "String"
+					},
+					"Datasets_status": {
+						"type": "String"
+					},
+					"Datasets_startTime": {
+						"type": "String"
+					},
+					"Datasets_EndTime": {
+						"type": "String"
+					},
+					"Datasets_IST": {
+						"type": "String"
+					},
+					"Datasets_IST2": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_status": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_StartTime": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_EndTime": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_IST": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_IST2": {
+						"type": "String"
+					},
+					"DataFlows_Status": {
+						"type": "String"
+					},
+					"DataFlows_StartTime": {
+						"type": "String"
+					},
+					"DataFlows_EndTime": {
+						"type": "String"
+					},
+					"DataFlows_IST": {
+						"type": "String"
+					},
+					"DataFlows_IST2": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_Status": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_StartTime": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_EndTime": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_IST": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_IST2": {
+						"type": "String"
+					},
+					"ViewReports_Status": {
+						"type": "String"
+					},
+					"ViewReports_StartTime": {
+						"type": "String"
+					},
+					"ViewReports_EndTime": {
+						"type": "String"
+					},
+					"ViewReports_IST": {
+						"type": "String"
+					},
+					"ViewReports_IST2": {
+						"type": "String"
+					},
+					"WorkspaceUsers Staging Staus": {
+						"type": "String"
+					},
+					"WorkSpaceUserLive Status": {
+						"type": "String"
+					},
+					"Get Workspaces Status": {
+						"type": "String"
+					},
+					"WorkSpaces Batch": {
+						"type": "String"
+					},
+					"WorkSpacesUsers History Status": {
+						"type": "String"
+					},
+					"Get WorkSpaces Batch Status": {
+						"type": "String"
+					},
+					"ViewReportStaging Status": {
+						"type": "String"
+					},
+					"ViewReport Live Status": {
+						"type": "String"
+					},
+					"ViewReport History Status": {
+						"type": "String"
+					},
+					"Reports Staging Status": {
+						"type": "String"
+					},
+					"Report History Status": {
+						"type": "String"
+					},
+					"Report Live Status": {
+						"type": "String"
+					},
+					"ReportPages Staging Status": {
+						"type": "String"
+					},
+					"Get ReportPages Status": {
+						"type": "String"
+					},
+					"ReportPages Batch Status": {
+						"type": "String"
+					},
+					"ReportPages History Status": {
+						"type": "String"
+					},
+					"DatasetUsers Staging Status": {
+						"type": "String"
+					},
+					"DatasetUsers Live Status": {
+						"type": "String"
+					},
+					"Datasets Batches Status": {
+						"type": "String"
+					},
+					"DatasetUsers History Status": {
+						"type": "String"
+					},
+					"Get Datasets Status": {
+						"type": "String"
+					},
+					"Dataset staging Status": {
+						"type": "String"
+					},
+					"Dataset Live Status": {
+						"type": "String"
+					},
+					"Dataset History Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Batch Status": {
+						"type": "String"
+					},
+					"DatasetRefreshes History Status": {
+						"type": "String"
+					},
+					"Dataflows Staging Status": {
+						"type": "String"
+					},
+					"Dataflows Live Status": {
+						"type": "String"
+					},
+					"Dataflows History Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Batch": {
+						"type": "String"
+					},
+					"DataflowRefreshes History Status": {
+						"type": "String"
+					},
+					"Master Workspaces Status": {
+						"type": "String"
+					},
+					"Master WorkSpaceUsers Status": {
+						"type": "String"
+					},
+					"Master Report status": {
+						"type": "String"
+					},
+					"Master ReportPages Status": {
+						"type": "String"
+					},
+					"Master Datasets Status": {
+						"type": "String"
+					},
+					"Master Datasetfreshes status": {
+						"type": "String"
+					},
+					"Master Datasetusers Status": {
+						"type": "String"
+					},
+					"Master Viewreports Status": {
+						"type": "String"
+					},
+					"Master Dataflows Status": {
+						"type": "String"
+					},
+					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get ReportPage Status": {
+						"type": "String"
+					},
+					"ReportPage Staging Status": {
+						"type": "String"
+					},
+					"DatasetUser Staging Status": {
+						"type": "String"
+					},
+					"DatasetUser Live Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes_ Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshe Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
+						"type": "String"
+					},
+					"WorkspaceUsers Staging Status": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Arun_BatchTesting"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
@@ -109288,6 +111318,98 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Test')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Testing_UAT",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "WorkSpaceId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "WorkSpaceSourceKey",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceName",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceDescription",
+						"type": "varchar"
+					},
+					{
+						"name": "WorkSpaceType",
+						"type": "varchar"
+					},
+					{
+						"name": "IsonDedicatedCapacity",
+						"type": "bit"
+					},
+					{
+						"name": "CapacityMigrationStatus",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "IsReadOnly",
+						"type": "bit"
+					},
+					{
+						"name": "HasWorkspaceLevelSetting",
+						"type": "bit"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "ModifiedDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "CreatedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "ModifiedBy",
+						"type": "varchar"
+					},
+					{
+						"name": "TenantId",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "DataLoadTrackerID",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "WorkSpaces"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Testing_UAT')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/TestActivity_DS')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -114704,6 +116826,28 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Testing_UAT')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Testing_UAT_properties_typeProperties_server')]",
+					"database": "[parameters('Testing_UAT_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Testing_UAT_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Testing_UAT_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Update_UATChildpipelineLogs')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -115897,2150 +118041,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WorkSpacesUsers_Batch_UAT_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get WorkSpace Batches",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Execute_ChildPipelinelogs",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('SELECT DISTINCT BatchNo, TenantId \nFROM [dbo].[TestWorkspaces_batch] \nWHERE TenantId = ', string(pipeline().parameters.TenantId), \n' ORDER BY 1')",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "WorkSpaceLive_Sql_UAT",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "For Each Batch",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get WorkSpace Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get WorkSpace Batches').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "Execute pipeline users",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "WorkSpacesUsers_UAT",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"AppTenantId": {
-												"value": "@pipeline().parameters.AppTenantId",
-												"type": "Expression"
-											},
-											"AppClientId": {
-												"value": "@pipeline().parameters.AppClientId",
-												"type": "Expression"
-											},
-											"AppClientCode": {
-												"value": "@pipeline().parameters.AppClientCode",
-												"type": "Expression"
-											},
-											"TenantId": {
-												"value": "@pipeline().parameters.TenantId",
-												"type": "Expression"
-											},
-											"BatchNo": {
-												"value": "@item().BatchNo",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "WorkSpaceUsers History",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "For Each Batch",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('select * from [dbo].[TestWorkSpaceUsers_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"dataIntegrationUnits": 4,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "WorkSpaceUserId",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "WorkSpaceUserId",
-											"type": "Int32",
-											"physicalType": "int"
-										}
-									},
-									{
-										"source": {
-											"name": "WorkSpaceUserSourceKey",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "WorkSpaceUserSourceKey",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "WorkSpaceID",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "WorkSpaceID",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "UserName",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "UserName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Identifier",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "Identifier",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "UserType",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "UserType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "GroupUserAccessRight",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "GroupUserAccessRight",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PrincipalType",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "PrincipalType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "ModifiedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "CreatedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "ModifiedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TenantId",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "TenantId",
-											"type": "Int32",
-											"physicalType": "int"
-										}
-									},
-									{
-										"source": {
-											"name": "DataLoadTrackerID",
-											"type": "String",
-											"physicalType": "nvarchar"
-										},
-										"sink": {
-											"name": "DataLoadTrackerID",
-											"type": "String",
-											"physicalType": "nvarchar"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "WorkSpaceUsersStaging_sql_UAT",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "WorkSpaceUsersHistory_sql_UAT",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "Truncate WorkspacesUsers",
-						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "getreports_sql_ds",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE [dbo].[WorkSpaceUsers_Staging];"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "Capturing Workspaces Batches",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Get WorkSpace Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "Get WorkSpaces Batch Status",
-							"value": {
-								"value": "@activity('Get WorkSpace Batches').Status",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Capturing Status in WorkSpaces Users History",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "WorkSpaceUsers History",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "WorkSpacesUsers History Status",
-							"value": {
-								"value": "@activity('WorkSpaceUsers History').Status",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Execute_ChildPipelinelogs",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat (\n    'EXEC [dbo].[sp_ChildPipelineLog_Insert] ',\n    '''', 'Started', '''', ',',\n    '''', pipeline().Pipeline, '''', ',',\n    '''', pipeline().RunId, '''', ',',\n    '''', convertTimeZone(utcnow(),'UTC','India Standard Time'), '''', ',',\n    '''', '', '''', ',',\n    '''', pipeline().TriggerName, '''', ',',\n    '''', pipeline().TriggerType, '''', ',',\n    '''', pipeline().TriggerTime, '''', ',',\n    '''', ' ', '''', ',',\n    '''', pipeline().parameters.TenantId, '''', ',',\n    '''', ' ', '''', ',',\n    '''', ' ', ''''\n)",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "Execute_UATChildpipelineLogs",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						}
-					},
-					{
-						"name": "Sp_TrackProcessSuccess",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "WorkSpaceUsers History",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Capturing Status in WorkSpaces Users History",
-								"dependencyConditions": [
-									"Completed"
-								]
-							},
-							{
-								"activity": "Capturing Workspaces Batches",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
-							"storedProcedureParameters": {
-								"EndTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"LogTrackerID": {
-									"value": {
-										"value": "@activity('Execute_ChildPipelinelogs').output.firstRow.LogTrackerID",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"Status": {
-									"value": {
-										"value": "@if(and(\n\nequals(variables('Get WorkSpaces Batch Status'),'Succeeded'),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n\n'Succeeded','Failed')\n",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "Update_UATChildpipelineLogs",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Delete WorkSpaceUsers_Staging",
-						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "Sql_DeleteQuery_UAT",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "@concat('DELETE  [dbo].[WorkSpaceUsers_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					},
-					"TenantId": {
-						"type": "int"
-					}
-				},
-				"variables": {
-					"CountWorkspace": {
-						"type": "Integer"
-					},
-					"WorkSpaceUsers_Status": {
-						"type": "String"
-					},
-					"WorkSpaceUsers_StartTime": {
-						"type": "String"
-					},
-					"WorkSpaceUsers_EndTime": {
-						"type": "String"
-					},
-					"WorkSpacesUsers_IST": {
-						"type": "String"
-					},
-					"WorkSpacesUsers_IST2": {
-						"type": "String"
-					},
-					"Reports_Staging_Status": {
-						"type": "String"
-					},
-					"Reports Staging_StartTime": {
-						"type": "String"
-					},
-					"Reports Staging_Execution EndTime": {
-						"type": "String"
-					},
-					"Reports_Staging_IST": {
-						"type": "String"
-					},
-					"Reports Staging_IST": {
-						"type": "String"
-					},
-					"ReportPages_Status": {
-						"type": "String"
-					},
-					"ReportPages_StartTime": {
-						"type": "String"
-					},
-					"ReportPages_IST": {
-						"type": "String"
-					},
-					"ReportPages_IST2": {
-						"type": "String"
-					},
-					"ReportPages_EndTime": {
-						"type": "String"
-					},
-					"RefreshSchedules_Status": {
-						"type": "String"
-					},
-					"RefreshSchedules": {
-						"type": "String"
-					},
-					"RefreshSchedules_EndTime": {
-						"type": "String"
-					},
-					"RefreshSchedules_IST": {
-						"type": "String"
-					},
-					"RefreshSchedules_IST2": {
-						"type": "String"
-					},
-					"ReportUsers_Status": {
-						"type": "String"
-					},
-					"ReportUsers_StartTime": {
-						"type": "String"
-					},
-					"ReportUsers_EndTime": {
-						"type": "String"
-					},
-					"ReportUsers_IST": {
-						"type": "String"
-					},
-					"ReportUsers_IST2": {
-						"type": "String"
-					},
-					"Datasources_Status": {
-						"type": "String"
-					},
-					"Datasources_StartTime": {
-						"type": "String"
-					},
-					"Datasources_EndTime": {
-						"type": "String"
-					},
-					"Datasources_IST": {
-						"type": "String"
-					},
-					"Datasources_IST2": {
-						"type": "String"
-					},
-					"DatasetUsers_Status": {
-						"type": "String"
-					},
-					"DatasetUsers_StartTime": {
-						"type": "String"
-					},
-					"DatasetUsers_EndTime": {
-						"type": "String"
-					},
-					"DatasetUsers_IST": {
-						"type": "String"
-					},
-					"DatasetUsers_IST2": {
-						"type": "String"
-					},
-					"Datasets_status": {
-						"type": "String"
-					},
-					"Datasets_startTime": {
-						"type": "String"
-					},
-					"Datasets_EndTime": {
-						"type": "String"
-					},
-					"Datasets_IST": {
-						"type": "String"
-					},
-					"Datasets_IST2": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_status": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_StartTime": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_EndTime": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_IST": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_IST2": {
-						"type": "String"
-					},
-					"DataFlows_Status": {
-						"type": "String"
-					},
-					"DataFlows_StartTime": {
-						"type": "String"
-					},
-					"DataFlows_EndTime": {
-						"type": "String"
-					},
-					"DataFlows_IST": {
-						"type": "String"
-					},
-					"DataFlows_IST2": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_Status": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_StartTime": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_EndTime": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_IST": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_IST2": {
-						"type": "String"
-					},
-					"WorkspaceUsers Staging Status": {
-						"type": "String"
-					},
-					"WorkSpaceUserLive Status": {
-						"type": "String"
-					},
-					"Get Workspaces Status": {
-						"type": "String"
-					},
-					"WorkSpaces Batch": {
-						"type": "String"
-					},
-					"WorkSpacesUsers History Status": {
-						"type": "String"
-					},
-					"Get WorkSpaces Batch Status": {
-						"type": "String"
-					},
-					"ViewReportStaging Status": {
-						"type": "String"
-					},
-					"ViewReport Live Status": {
-						"type": "String"
-					},
-					"ViewReport History Status": {
-						"type": "String"
-					},
-					"Reports Staging Status": {
-						"type": "String"
-					},
-					"Report History Status": {
-						"type": "String"
-					},
-					"Report Live Status": {
-						"type": "String"
-					},
-					"ReportPages Staging Status": {
-						"type": "String"
-					},
-					"Get ReportPages Status": {
-						"type": "String"
-					},
-					"ReportPages Batch Status": {
-						"type": "String"
-					},
-					"ReportPages History Status": {
-						"type": "String"
-					},
-					"DatasetUsers Staging Status": {
-						"type": "String"
-					},
-					"DatasetUsers Live Status": {
-						"type": "String"
-					},
-					"Datasets Batches Status": {
-						"type": "String"
-					},
-					"DatasetUsers History Status": {
-						"type": "String"
-					},
-					"Get Datasets Status": {
-						"type": "String"
-					},
-					"Dataset staging Status": {
-						"type": "String"
-					},
-					"Dataset Live Status": {
-						"type": "String"
-					},
-					"Dataset History Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshes Status": {
-						"type": "String"
-					},
-					"Get DatasetsRefreshes Batch Status": {
-						"type": "String"
-					},
-					"DatasetRefreshes History Status": {
-						"type": "String"
-					},
-					"Dataflows Staging Status": {
-						"type": "String"
-					},
-					"Dataflows Live Status": {
-						"type": "String"
-					},
-					"Dataflows History Status": {
-						"type": "String"
-					},
-					"DataflowRefreshes Status": {
-						"type": "String"
-					},
-					"Get Dataflowsrefreshes Status": {
-						"type": "String"
-					},
-					"Get Dataflowsrefreshes Batch": {
-						"type": "String"
-					},
-					"DataflowRefreshes History Status": {
-						"type": "String"
-					},
-					"Master Workspaces Status": {
-						"type": "String"
-					},
-					"Master WorkSpaceUsers Status": {
-						"type": "String"
-					},
-					"Master Report status": {
-						"type": "String"
-					},
-					"Master ReportPages Status": {
-						"type": "String"
-					},
-					"Master Datasets Status": {
-						"type": "String"
-					},
-					"Master Datasetfreshes status": {
-						"type": "String"
-					},
-					"Master Datasetusers Status": {
-						"type": "String"
-					},
-					"Master Viewreports Status": {
-						"type": "String"
-					},
-					"Master Dataflows Status": {
-						"type": "String"
-					},
-					"Master DataflowRefreshes Status": {
-						"type": "String"
-					},
-					"Get ReportPage Status": {
-						"type": "String"
-					},
-					"ReportPage Staging Status": {
-						"type": "String"
-					},
-					"DatasetUser Staging Status": {
-						"type": "String"
-					},
-					"DatasetUser Live Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshes_ Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshe Status": {
-						"type": "String"
-					},
-					"Get DatasetsRefreshes Status": {
-						"type": "String"
-					},
-					"DataflowRefreshesLive Status": {
-						"type": "String"
-					},
-					"Workspace Staging Status": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "Arun_BatchTesting"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-11-29T06:27:10Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/WorkSpaceLive_Sql_UAT')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersHistory_sql_UAT')]",
-				"[concat(variables('factoryId'), '/linkedServices/getreports_sql_ds')]",
-				"[concat(variables('factoryId'), '/datasets/Execute_UATChildpipelineLogs')]",
-				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
-				"[concat(variables('factoryId'), '/linkedServices/Sql_DeleteQuery_UAT')]",
-				"[concat(variables('factoryId'), '/pipelines/WorkSpacesUsers_UAT')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/WorkSpacesUsers_UAT_copy1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get WorkSpaces",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('SELECT WorkSpaceSourceKey FROM [dbo].[Workspaces_batch] \nWHERE BatchNo = ', string(pipeline().parameters.BatchNo), \n' AND TenantId = ', string(pipeline().parameters.TenantId))",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "Capture_WorkSpacelive_UAT",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "WorkSpace ID in Loop",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Get WorkSpaces",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get WorkSpaces').output.value",
-								"type": "Expression"
-							},
-							"isSequential": false,
-							"batchCount": 50,
-							"activities": [
-								{
-									"name": "Get WorkSpace Users_Staging",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "RestSource",
-											"additionalColumns": [
-												{
-													"name": "WorkSpaceID",
-													"value": {
-														"value": "@item().WorkSpaceSourceKey",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "TenantId",
-													"value": {
-														"value": "@pipeline().parameters.TenantId",
-														"type": "Expression"
-													}
-												}
-											],
-											"httpRequestTimeout": "00:01:40",
-											"requestInterval": "00.00:00:00.010",
-											"requestMethod": "GET",
-											"paginationRules": {
-												"supportRFC5988": "true"
-											}
-										},
-										"sink": {
-											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
-											"sqlWriterUseTableLock": false,
-											"disableMetricsCollection": false
-										},
-										"enableStaging": false,
-										"dataIntegrationUnits": 4,
-										"translator": {
-											"type": "TabularTranslator",
-											"mappings": [
-												{
-													"source": {
-														"path": "[['emailAddress']"
-													},
-													"sink": {
-														"name": "EmailAddress",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['groupUserAccessRight']"
-													},
-													"sink": {
-														"name": "GroupUserAccessRight",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['displayName']"
-													},
-													"sink": {
-														"name": "UserName",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['identifier']"
-													},
-													"sink": {
-														"name": "Identifier",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "[['principalType']"
-													},
-													"sink": {
-														"name": "PrincipalType",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['WorkSpaceID']"
-													},
-													"sink": {
-														"name": "WorkSpaceID",
-														"type": "String"
-													}
-												},
-												{
-													"source": {
-														"path": "$['TenantId']"
-													},
-													"sink": {
-														"name": "TenantId",
-														"type": "Int32"
-													}
-												}
-											],
-											"collectionReference": "$['value']",
-											"mapComplexValuesToString": true
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "WorkSpaceUsers_Staging_API",
-											"type": "DatasetReference",
-											"parameters": {
-												"WorkspaceID": {
-													"value": "@item().WorkSpaceSourceKey",
-													"type": "Expression"
-												},
-												"AppTenantId": {
-													"value": "@pipeline().parameters.AppTenantId",
-													"type": "Expression"
-												},
-												"AppClientId": {
-													"value": "@pipeline().parameters.AppClientId",
-													"type": "Expression"
-												},
-												"AppClientCode": {
-													"value": "@pipeline().parameters.AppClientCode",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "WorkSpaceUsersStaging_sql_UAT",
-											"type": "DatasetReference",
-											"parameters": {}
-										}
-									]
-								},
-								{
-									"name": "Capturing Status in WorkSpace Users Staging",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "Get WorkSpace Users_Staging",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "WorkspaceUsers Staging Status",
-										"value": {
-											"value": "@activity('Get WorkSpace Users_Staging').Status",
-											"type": "Expression"
-										}
-									}
-								},
-								{
-									"name": "Capturing WorkspaceUsers ED",
-									"type": "SqlServerStoredProcedure",
-									"dependsOn": [
-										{
-											"activity": "Get WorkSpace Users_Staging",
-											"dependencyConditions": [
-												"Completed"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"storedProcedureName": "[[dbo].[Sp_WorkSpaceUsersED]",
-										"storedProcedureParameters": {
-											"AppClientId": {
-												"value": {
-													"value": "@pipeline().parameters.AppClientId",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"AppClientSecret": {
-												"value": {
-													"value": "@pipeline().parameters.AppClientCode",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"AppTentantId": {
-												"value": {
-													"value": "@pipeline().parameters.AppTenantId",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"DataLoadTrackerId": {
-												"value": "",
-												"type": "String"
-											},
-											"ErrorMessage": {
-												"value": {
-													"value": "@activity('Get WorkSpace Users_Staging').error?.message",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"PipelineName": {
-												"value": {
-													"value": "@pipeline().Pipeline",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"PipelineRunId": {
-												"value": {
-													"value": "@pipeline().RunId",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"ProcessEndTime": {
-												"value": {
-													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"ProcessStartTime": {
-												"value": {
-													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-													"type": "Expression"
-												},
-												"type": "DateTime"
-											},
-											"Status": {
-												"value": {
-													"value": "@activity('Get WorkSpace Users_Staging').Status",
-													"type": "Expression"
-												},
-												"type": "String"
-											},
-											"TenantId": {
-												"value": {
-													"value": "@pipeline().parameters.TenantId",
-													"type": "Expression"
-												},
-												"type": "Int32"
-											},
-											"WorkSpaceID": {
-												"value": {
-													"value": "@item().WorkSpaceSourceKey",
-													"type": "Expression"
-												},
-												"type": "String"
-											}
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "WorkspaceUsers_log_UAT",
-										"type": "LinkedServiceReference"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Sp_TrackProcessSuccess",
-						"type": "SqlServerStoredProcedure",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[sp_ChildPipelineLog_Update]",
-							"storedProcedureParameters": {
-								"EndTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"LogTrackerID": {
-									"type": "String"
-								},
-								"Status": {
-									"value": {
-										"value": "@if(and(and(and(and(\nequals(variables('Get Workspaces Status'),'Succeeded'),\nequals(variables('WorkspaceUsers Staging Staus'),'Succeeded')),\nequals(variables('WorkSpaceUserLive Status'),'Succeeded')),\nequals(variables('WorkSpaces Batch'),'Succeeded')),\nequals(variables('WorkSpacesUsers History Status'),'Succeeded')),\n'Succeeded','Failed')",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "Update_UATChildpipelineLogs",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Sp_TrackProcessFailure",
-						"type": "SqlServerStoredProcedure",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
-							"storedProcedureParameters": {
-								"EndTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"ErrorMessage": {
-									"value": null,
-									"type": "String"
-								},
-								"PipelineName": {
-									"value": {
-										"value": "@pipeline().Pipeline",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"RunID": {
-									"value": {
-										"value": "@pipeline().RunId",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"StartTime": {
-									"value": {
-										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"Status": {
-									"value": null,
-									"type": "String"
-								},
-								"TriggerName": {
-									"value": {
-										"value": "@pipeline().TriggerName",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"TriggerTime": {
-									"value": {
-										"value": "@pipeline().TriggerTime",
-										"type": "Expression"
-									},
-									"type": "DateTime"
-								},
-								"TriggerType": {
-									"value": {
-										"value": "@pipeline().TriggerType",
-										"type": "Expression"
-									},
-									"type": "String"
-								}
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "ADF_Pipeline_Status_Log",
-							"type": "LinkedServiceReference"
-						}
-					},
-					{
-						"name": "Capturing Status for Get WorkSpaces",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "Get WorkSpaces",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "pipelineReturnValue",
-							"value": [
-								{
-									"key": "WorkSpaceUsers_Status",
-									"value": {
-										"type": "Expression",
-										"content": "@activity('Get WorkSpaces').Status"
-									}
-								}
-							],
-							"setSystemVariable": true
-						}
-					},
-					{
-						"name": "Get WorkSpaceUsers_Live",
-						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceID",
-										"UserName",
-										"Identifier"
-									]
-								},
-								"sqlWriterUseTableLock": false,
-								"disableMetricsCollection": false
-							},
-							"enableStaging": false,
-							"dataIntegrationUnits": 4,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "WorkSpaceID",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "WorkSpaceID",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "UserName",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "UserName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Identifier",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "Identifier",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "GroupUserAccessRight",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "GroupUserAccessRight",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PrincipalType",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "PrincipalType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "ModifiedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "CreatedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "ModifiedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TenantId",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "TenantId",
-											"type": "Int32",
-											"physicalType": "int"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "LS_SQL_WorkspacesUsers_Live",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "WorkSpacesUsers_Live_SQL",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					},
-					{
-						"name": "Capturing Status in WorkSpaceUsers Live",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "InsertUpdate the WorkspaceLive table",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "WorkSpaceUserLive Status",
-							"value": {
-								"value": "@activity('InsertUpdate the WorkspaceLive table').Status",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "InsertUpdate the WorkspaceLive table",
-						"type": "Script",
-						"dependsOn": [
-							{
-								"activity": "WorkSpace ID in Loop",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "WorkspaceUsers live_insertupdate UAT",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "EXEC TestWorkSpaceUsers_InsertUpsert"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"AppTenantId": {
-						"type": "string"
-					},
-					"AppClientId": {
-						"type": "string"
-					},
-					"AppClientCode": {
-						"type": "string"
-					},
-					"TenantId": {
-						"type": "int"
-					},
-					"BatchNo": {
-						"type": "string",
-						"defaultValue": "@item().BatchNo"
-					}
-				},
-				"variables": {
-					"WorkSpaceUsers_Status": {
-						"type": "String"
-					},
-					"WorkSpaceUsers_StartTime": {
-						"type": "String"
-					},
-					"WorkSpaceUsers_EndTime": {
-						"type": "String"
-					},
-					"WorkSpacesUsers_IST": {
-						"type": "String"
-					},
-					"WorkSpacesUsers_IST2": {
-						"type": "String"
-					},
-					"Reports_Staging_Status": {
-						"type": "String"
-					},
-					"Reports Staging_StartTime": {
-						"type": "String"
-					},
-					"Reports Staging_Execution EndTime": {
-						"type": "String"
-					},
-					"Reports Staging_IST2": {
-						"type": "String"
-					},
-					"Reports Staging_IST": {
-						"type": "String"
-					},
-					"ReportPages_Status": {
-						"type": "String"
-					},
-					"ReportPages_StartTime": {
-						"type": "String"
-					},
-					"ReportPages_IST": {
-						"type": "String"
-					},
-					"ReportPages_IST2": {
-						"type": "String"
-					},
-					"ReportPages_EndTime": {
-						"type": "String"
-					},
-					"RefreshSchedules_Status": {
-						"type": "String"
-					},
-					"RefreshSchedules": {
-						"type": "String"
-					},
-					"RefreshSchedules_EndTime": {
-						"type": "String"
-					},
-					"RefreshSchedules_IST": {
-						"type": "String"
-					},
-					"RefreshSchedules_IST2": {
-						"type": "String"
-					},
-					"ReportUsers_Status": {
-						"type": "String"
-					},
-					"ReportUsers_StartTime": {
-						"type": "String"
-					},
-					"ReportUsers_EndTime": {
-						"type": "String"
-					},
-					"ReportUsers_IST": {
-						"type": "String"
-					},
-					"ReportUsers_IST2": {
-						"type": "String"
-					},
-					"Datasources_Status": {
-						"type": "String"
-					},
-					"Datasources_StartTime": {
-						"type": "String"
-					},
-					"Datasources_EndTime": {
-						"type": "String"
-					},
-					"Datasources_IST": {
-						"type": "String"
-					},
-					"Datasources_IST2": {
-						"type": "String"
-					},
-					"DatasetUsers_Status": {
-						"type": "String"
-					},
-					"DatasetUsers_StartTime": {
-						"type": "String"
-					},
-					"DatasetUsers_EndTime": {
-						"type": "String"
-					},
-					"DatasetUsers_IST": {
-						"type": "String"
-					},
-					"DatasetUsers_IST2": {
-						"type": "String"
-					},
-					"Datasets_status": {
-						"type": "String"
-					},
-					"Datasets_startTime": {
-						"type": "String"
-					},
-					"Datasets_EndTime": {
-						"type": "String"
-					},
-					"Datasets_IST": {
-						"type": "String"
-					},
-					"Datasets_IST2": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_status": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_StartTime": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_EndTime": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_IST": {
-						"type": "String"
-					},
-					"DatasetsRefreshes_IST2": {
-						"type": "String"
-					},
-					"DataFlows_Status": {
-						"type": "String"
-					},
-					"DataFlows_StartTime": {
-						"type": "String"
-					},
-					"DataFlows_EndTime": {
-						"type": "String"
-					},
-					"DataFlows_IST": {
-						"type": "String"
-					},
-					"DataFlows_IST2": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_Status": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_StartTime": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_EndTime": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_IST": {
-						"type": "String"
-					},
-					"DataFlowRefreshes_IST2": {
-						"type": "String"
-					},
-					"ViewReports_Status": {
-						"type": "String"
-					},
-					"ViewReports_StartTime": {
-						"type": "String"
-					},
-					"ViewReports_EndTime": {
-						"type": "String"
-					},
-					"ViewReports_IST": {
-						"type": "String"
-					},
-					"ViewReports_IST2": {
-						"type": "String"
-					},
-					"WorkspaceUsers Staging Staus": {
-						"type": "String"
-					},
-					"WorkSpaceUserLive Status": {
-						"type": "String"
-					},
-					"Get Workspaces Status": {
-						"type": "String"
-					},
-					"WorkSpaces Batch": {
-						"type": "String"
-					},
-					"WorkSpacesUsers History Status": {
-						"type": "String"
-					},
-					"Get WorkSpaces Batch Status": {
-						"type": "String"
-					},
-					"ViewReportStaging Status": {
-						"type": "String"
-					},
-					"ViewReport Live Status": {
-						"type": "String"
-					},
-					"ViewReport History Status": {
-						"type": "String"
-					},
-					"Reports Staging Status": {
-						"type": "String"
-					},
-					"Report History Status": {
-						"type": "String"
-					},
-					"Report Live Status": {
-						"type": "String"
-					},
-					"ReportPages Staging Status": {
-						"type": "String"
-					},
-					"Get ReportPages Status": {
-						"type": "String"
-					},
-					"ReportPages Batch Status": {
-						"type": "String"
-					},
-					"ReportPages History Status": {
-						"type": "String"
-					},
-					"DatasetUsers Staging Status": {
-						"type": "String"
-					},
-					"DatasetUsers Live Status": {
-						"type": "String"
-					},
-					"Datasets Batches Status": {
-						"type": "String"
-					},
-					"DatasetUsers History Status": {
-						"type": "String"
-					},
-					"Get Datasets Status": {
-						"type": "String"
-					},
-					"Dataset staging Status": {
-						"type": "String"
-					},
-					"Dataset Live Status": {
-						"type": "String"
-					},
-					"Dataset History Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshes Status": {
-						"type": "String"
-					},
-					"Get DatasetsRefreshes Batch Status": {
-						"type": "String"
-					},
-					"DatasetRefreshes History Status": {
-						"type": "String"
-					},
-					"Dataflows Staging Status": {
-						"type": "String"
-					},
-					"Dataflows Live Status": {
-						"type": "String"
-					},
-					"Dataflows History Status": {
-						"type": "String"
-					},
-					"Get Dataflowsrefreshes Status": {
-						"type": "String"
-					},
-					"Get Dataflowsrefreshes Batch": {
-						"type": "String"
-					},
-					"DataflowRefreshes History Status": {
-						"type": "String"
-					},
-					"Master Workspaces Status": {
-						"type": "String"
-					},
-					"Master WorkSpaceUsers Status": {
-						"type": "String"
-					},
-					"Master Report status": {
-						"type": "String"
-					},
-					"Master ReportPages Status": {
-						"type": "String"
-					},
-					"Master Datasets Status": {
-						"type": "String"
-					},
-					"Master Datasetfreshes status": {
-						"type": "String"
-					},
-					"Master Datasetusers Status": {
-						"type": "String"
-					},
-					"Master Viewreports Status": {
-						"type": "String"
-					},
-					"Master Dataflows Status": {
-						"type": "String"
-					},
-					"Master DataflowRefreshes Status": {
-						"type": "String"
-					},
-					"Get ReportPage Status": {
-						"type": "String"
-					},
-					"ReportPage Staging Status": {
-						"type": "String"
-					},
-					"DatasetUser Staging Status": {
-						"type": "String"
-					},
-					"DatasetUser Live Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshes_ Status": {
-						"type": "String"
-					},
-					"Get DatasetRefreshe Status": {
-						"type": "String"
-					},
-					"Get DatasetsRefreshes Status": {
-						"type": "String"
-					},
-					"DataflowRefreshesLive Status": {
-						"type": "String"
-					},
-					"WorkspaceUsers Staging Status": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "Arun_BatchTesting"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-11-29T06:27:10Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Capture_WorkSpacelive_UAT')]",
-				"[concat(variables('factoryId'), '/linkedServices/Update_UATChildpipelineLogs')]",
-				"[concat(variables('factoryId'), '/linkedServices/ADF_Pipeline_Status_Log')]",
-				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
-				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers live_insertupdate UAT')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
-				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers_log_UAT')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Testing_UAT')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"server": "[parameters('Testing_UAT_properties_typeProperties_server')]",
-					"database": "[parameters('Testing_UAT_properties_typeProperties_database')]",
-					"encrypt": "mandatory",
-					"trustServerCertificate": false,
-					"authenticationType": "SQL",
-					"userName": "[parameters('Testing_UAT_properties_typeProperties_userName')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('Testing_UAT_password')]"
-					}
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Test')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Testing_UAT",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [
-					{
-						"name": "WorkSpaceId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "WorkSpaceSourceKey",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceName",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceDescription",
-						"type": "varchar"
-					},
-					{
-						"name": "WorkSpaceType",
-						"type": "varchar"
-					},
-					{
-						"name": "IsonDedicatedCapacity",
-						"type": "bit"
-					},
-					{
-						"name": "CapacityMigrationStatus",
-						"type": "varchar"
-					},
-					{
-						"name": "Status",
-						"type": "varchar"
-					},
-					{
-						"name": "IsReadOnly",
-						"type": "bit"
-					},
-					{
-						"name": "HasWorkspaceLevelSetting",
-						"type": "bit"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "ModifiedDate",
-						"type": "datetime",
-						"precision": 23,
-						"scale": 3
-					},
-					{
-						"name": "CreatedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "ModifiedBy",
-						"type": "varchar"
-					},
-					{
-						"name": "TenantId",
-						"type": "int",
-						"precision": 10
-					},
-					{
-						"name": "DataLoadTrackerID",
-						"type": "nvarchar"
-					}
-				],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": "WorkSpaces"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Testing_UAT')]"
 			]
 		}
 	]
