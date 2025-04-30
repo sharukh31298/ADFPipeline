@@ -118109,6 +118109,73 @@
 								"parameters": {}
 							}
 						}
+					},
+					{
+						"name": "SP_Call_UpdateStatus",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Execute_SP",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
+							"storedProcedureParameters": {
+								"DataLoadTrackerID": {
+									"value": {
+										"value": "@activity('Execute_SP').output.firstRow.DataLoadTrackerId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"ProcessEndTime": {
+									"value": {
+										"value": "@utcNow()",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"Status": {
+									"value": {
+										"value": "Succeeded",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"CurrentStatus": {
+									"value": "Completed",
+									"type": "String"
+								},
+								"DatasetrefreshesStatus": {
+									"value": {
+										"value": "Succeeded",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"ActivedStatus": {
+									"value": {
+										"value": "Actived",
+										"type": "Expression"
+									}
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_Dataloadtracker_Sql_UAT",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"policy": {
@@ -118131,7 +118198,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/LS_ExecuteSP_UAT')]"
+				"[concat(variables('factoryId'), '/datasets/LS_ExecuteSP_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/LS_Dataloadtracker_Sql_UAT')]"
 			]
 		}
 	]
