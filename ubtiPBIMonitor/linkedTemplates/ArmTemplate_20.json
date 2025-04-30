@@ -13,6 +13,1291 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/ReportPages')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Reports",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": {
+									"value": "@concat('select ReportSourceKey,WorkspaceId \nfrom [dbo].[Reports_batch] where BatchNo = ',pipeline().parameters.BatchNo)\n",
+									"type": "Expression"
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "Reports_SQL",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "ReportID in Loop",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "Get Reports",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Reports').output.value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 50,
+							"activities": [
+								{
+									"name": "Get ReportPage_Staging",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"additionalColumns": [
+												{
+													"name": "Reportid",
+													"value": {
+														"value": "@item().ReportSourceKey",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "WorkSpaceid",
+													"value": {
+														"value": "@item().WorkSpaceID",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "TenantId",
+													"value": {
+														"value": "@pipeline().parameters.TenantId",
+														"type": "Expression"
+													}
+												}
+											],
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "insert",
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": 4,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"path": "[['name']"
+													},
+													"sink": {
+														"name": "ReportPageName",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['displayName']"
+													},
+													"sink": {
+														"name": "ReportPageDisplayName",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "[['order']"
+													},
+													"sink": {
+														"name": "report_order",
+														"type": "Int32"
+													}
+												},
+												{
+													"source": {
+														"path": "$['Reportid']"
+													},
+													"sink": {
+														"name": "ReportID",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['WorkSpaceid']"
+													},
+													"sink": {
+														"name": "WorkSpaceID",
+														"type": "String"
+													}
+												},
+												{
+													"source": {
+														"path": "$['TenantId']"
+													},
+													"sink": {
+														"name": "TenantId",
+														"type": "Int32"
+													}
+												}
+											],
+											"collectionReference": "$['value']"
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ReportPages_API",
+											"type": "DatasetReference",
+											"parameters": {
+												"ReportID": {
+													"value": "@item().ReportSourceKey",
+													"type": "Expression"
+												},
+												"AppTenantId": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"AppClientId": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"AppClientCode": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"WorkspaceID": {
+													"value": "@item().WorkSpaceID",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ReportPages_SQL",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								},
+								{
+									"name": "Get ReportPages_Live_copy",
+									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"ReportID"
+												]
+											},
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"dataIntegrationUnits": 4,
+										"translator": {
+											"type": "TabularTranslator",
+											"mappings": [
+												{
+													"source": {
+														"name": "ReportID",
+														"type": "String",
+														"physicalType": "varchar"
+													},
+													"sink": {
+														"name": "ReportID",
+														"type": "String",
+														"physicalType": "varchar"
+													}
+												},
+												{
+													"source": {
+														"name": "WorkSpaceID",
+														"type": "String",
+														"physicalType": "varchar"
+													},
+													"sink": {
+														"name": "WorkSpaceID",
+														"type": "String",
+														"physicalType": "varchar"
+													}
+												},
+												{
+													"source": {
+														"name": "ReportPageName",
+														"type": "String",
+														"physicalType": "varchar"
+													},
+													"sink": {
+														"name": "ReportPageName",
+														"type": "String",
+														"physicalType": "varchar"
+													}
+												},
+												{
+													"source": {
+														"name": "ReportPageDisplayName",
+														"type": "String",
+														"physicalType": "varchar"
+													},
+													"sink": {
+														"name": "ReportPageDisplayName",
+														"type": "String",
+														"physicalType": "varchar"
+													}
+												},
+												{
+													"source": {
+														"name": "report_order",
+														"type": "Int32",
+														"physicalType": "int"
+													},
+													"sink": {
+														"name": "report_order",
+														"type": "Int32",
+														"physicalType": "int"
+													}
+												},
+												{
+													"source": {
+														"name": "CreatedDate",
+														"type": "DateTime",
+														"physicalType": "datetime"
+													},
+													"sink": {
+														"name": "CreatedDate",
+														"type": "DateTime",
+														"physicalType": "datetime"
+													}
+												},
+												{
+													"source": {
+														"name": "ModifiedDate",
+														"type": "DateTime",
+														"physicalType": "datetime"
+													},
+													"sink": {
+														"name": "ModifiedDate",
+														"type": "DateTime",
+														"physicalType": "datetime"
+													}
+												},
+												{
+													"source": {
+														"name": "CreatedBy",
+														"type": "String",
+														"physicalType": "varchar"
+													},
+													"sink": {
+														"name": "CreatedBy",
+														"type": "String",
+														"physicalType": "varchar"
+													}
+												},
+												{
+													"source": {
+														"name": "ModifiedBy",
+														"type": "String",
+														"physicalType": "varchar"
+													},
+													"sink": {
+														"name": "ModifiedBy",
+														"type": "String",
+														"physicalType": "varchar"
+													}
+												},
+												{
+													"source": {
+														"name": "TenantId",
+														"type": "Int32",
+														"physicalType": "int"
+													},
+													"sink": {
+														"name": "TenantId",
+														"type": "Int32",
+														"physicalType": "int"
+													}
+												}
+											],
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ReportPagesLive_SQL",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "SQL_ReportPagesLive",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									]
+								},
+								{
+									"name": "Capturing GetreportPage Staging status",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Get ReportPage_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipelineReturnValue",
+										"value": [
+											{
+												"key": "ReportPage Staging Status",
+												"value": {
+													"type": "Expression",
+													"content": "@activity('Get ReportPage_Staging').Status"
+												}
+											}
+										],
+										"setSystemVariable": true
+									}
+								},
+								{
+									"name": "Capturing Get Reportpages Live Status_copy",
+									"type": "SetVariable",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [
+										{
+											"activity": "Get ReportPages_Live_copy",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipelineReturnValue",
+										"value": [
+											{
+												"key": "ReportPages Live Status",
+												"value": {
+													"type": "Expression",
+													"content": "@activity('Get ReportPages_Live').Status"
+												}
+											}
+										],
+										"setSystemVariable": true
+									}
+								},
+								{
+									"name": "Capturing ReportPages ED",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Get ReportPage_Staging",
+											"dependencyConditions": [
+												"Completed"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[Sp_ReportPagesED]",
+										"storedProcedureParameters": {
+											"AppClientId": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppClientSecret": {
+												"value": {
+													"value": "@pipeline().parameters.AppClientCode",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"AppTentantId": {
+												"value": {
+													"value": "@pipeline().parameters.AppTenantId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"DataLoadTrackerId": {
+												"value": "",
+												"type": "String"
+											},
+											"ErrorMessage": {
+												"value": {
+													"value": "@activity('Get ReportPage_Staging').error?.message",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineName": {
+												"value": {
+													"value": "@pipeline().Pipeline",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"PipelineRunId": {
+												"value": {
+													"value": "@pipeline().RunId",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"ProcessEndTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"ProcessStartTime": {
+												"value": {
+													"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"ReportID": {
+												"value": {
+													"value": "@item().ReportSourceKey",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"Status": {
+												"value": {
+													"value": "@activity('Get ReportPage_Staging').Status",
+													"type": "Expression"
+												},
+												"type": "String"
+											},
+											"TenantId": {
+												"value": {
+													"value": "@pipeline().parameters.TenantId",
+													"type": "Expression"
+												},
+												"type": "Int32"
+											},
+											"WorkSpaceID": {
+												"value": {
+													"value": "@item().WorkSpaceID",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_Capturing ReportPages ED",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "sp_TrackProcessSuccess",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"ErrorMessage": {
+									"value": "NA",
+									"type": "String"
+								},
+								"PipelineName": {
+									"value": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"StartTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"Status": {
+									"value": {
+										"value": "@if(and(and(and(and(\nequals(variables('Get ReportPages Status'),'Succeeded'),\nequals(variables('ReportPages Staging Status'),'Succeeded')),\nequals(variables('ReportPages Live Status'),'Succeeded')),\nequals(variables('ReportPages Batch Status'),'Succeeded')),\nequals(variables('ReportPages History Status'),'Succeeded')),\n'Succeeded','Failed')",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"TriggerName": {
+									"value": {
+										"value": "@pipeline().TriggerName",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"TriggerTime": {
+									"value": {
+										"value": "@pipeline().TriggerTime",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"TriggerType": {
+									"value": {
+										"value": "@pipeline().TriggerType",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"TenantID": {
+									"value": {
+										"value": "@pipeline().parameters.TenantID",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "sp_TrackProcessFailure",
+						"type": "SqlServerStoredProcedure",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[dbo].[usp_LogADF_PipelineExecution]",
+							"storedProcedureParameters": {
+								"EndTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"ErrorMessage": {
+									"value": null,
+									"type": "String"
+								},
+								"PipelineName": {
+									"value": {
+										"value": "@pipeline().Pipeline",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"RunID": {
+									"value": {
+										"value": "@pipeline().RunId",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"StartTime": {
+									"value": {
+										"value": "@convertTimeZone(utcnow(),'UTC','India Standard Time')\n",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"Status": {
+									"value": null,
+									"type": "String"
+								},
+								"TriggerName": {
+									"value": {
+										"value": "@pipeline().TriggerName",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"TriggerTime": {
+									"value": {
+										"value": "@pipeline().TriggerTime",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								},
+								"TriggerType": {
+									"value": {
+										"value": "@pipeline().TriggerType",
+										"type": "Expression"
+									},
+									"type": "String"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Pipeline_Status_Log",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Capturing Get Reportspages Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get Reports",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "Get ReportPage Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get Reports').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
+						}
+					},
+					{
+						"name": "Get ReportPages_Live",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "ReportID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"ReportID"
+									]
+								},
+								"sqlWriterUseTableLock": false,
+								"disableMetricsCollection": false
+							},
+							"enableStaging": false,
+							"dataIntegrationUnits": 4,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "ReportID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ReportID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "WorkSpaceID",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "WorkSpaceID",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ReportPageName",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ReportPageName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ReportPageDisplayName",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ReportPageDisplayName",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "report_order",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "report_order",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "ModifiedDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "CreatedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "CreatedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										},
+										"sink": {
+											"name": "ModifiedBy",
+											"type": "String",
+											"physicalType": "varchar"
+										}
+									},
+									{
+										"source": {
+											"name": "TenantId",
+											"type": "Int32",
+											"physicalType": "int"
+										},
+										"sink": {
+											"name": "TenantId",
+											"type": "Int32",
+											"physicalType": "int"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ReportPagesLive_SQL",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SQL_ReportPagesLive",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Capturing Get Reportpages Live Status",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get ReportPages_Live",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "ReportPages Live Status",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Get ReportPages_Live').Status"
+									}
+								}
+							],
+							"setSystemVariable": true
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"AppTenantId": {
+						"type": "string"
+					},
+					"AppClientId": {
+						"type": "string"
+					},
+					"AppClientCode": {
+						"type": "string"
+					},
+					"TenantId": {
+						"type": "int"
+					},
+					"BatchNo": {
+						"type": "string",
+						"defaultValue": "@item().BatchNo"
+					}
+				},
+				"variables": {
+					"CountWorkspace": {
+						"type": "Integer"
+					},
+					"ReportPages_Status": {
+						"type": "String"
+					},
+					"ReportPages_StartTime": {
+						"type": "String"
+					},
+					"ReportPages_IST": {
+						"type": "String"
+					},
+					"ReportPages_IST2": {
+						"type": "String"
+					},
+					"ReportPages_EndTime": {
+						"type": "String"
+					},
+					"RefreshSchedules_Status": {
+						"type": "String"
+					},
+					"RefreshSchedules": {
+						"type": "String"
+					},
+					"RefreshSchedules_EndTime": {
+						"type": "String"
+					},
+					"RefreshSchedules_IST": {
+						"type": "String"
+					},
+					"RefreshSchedules_IST2": {
+						"type": "String"
+					},
+					"ReportUsers_Status": {
+						"type": "String"
+					},
+					"ReportUsers_StartTime": {
+						"type": "String"
+					},
+					"ReportUsers_EndTime": {
+						"type": "String"
+					},
+					"ReportUsers_IST": {
+						"type": "String"
+					},
+					"ReportUsers_IST2": {
+						"type": "String"
+					},
+					"Datasources_Status": {
+						"type": "String"
+					},
+					"Datasources_StartTime": {
+						"type": "String"
+					},
+					"Datasources_EndTime": {
+						"type": "String"
+					},
+					"Datasources_IST": {
+						"type": "String"
+					},
+					"Datasources_IST2": {
+						"type": "String"
+					},
+					"DatasetUsers_Status": {
+						"type": "String"
+					},
+					"DatasetUsers_StartTime": {
+						"type": "String"
+					},
+					"DatasetUsers_EndTime": {
+						"type": "String"
+					},
+					"DatasetUsers_IST": {
+						"type": "String"
+					},
+					"DatasetUsers_IST2": {
+						"type": "String"
+					},
+					"Datasets_status": {
+						"type": "String"
+					},
+					"Datasets_startTime": {
+						"type": "String"
+					},
+					"Datasets_EndTime": {
+						"type": "String"
+					},
+					"Datasets_IST": {
+						"type": "String"
+					},
+					"Datasets_IST2": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_status": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_StartTime": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_EndTime": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_IST": {
+						"type": "String"
+					},
+					"DatasetsRefreshes_IST2": {
+						"type": "String"
+					},
+					"DataFlows_Status": {
+						"type": "String"
+					},
+					"DataFlows_StartTime": {
+						"type": "String"
+					},
+					"DataFlows_EndTime": {
+						"type": "String"
+					},
+					"DataFlows_IST": {
+						"type": "String"
+					},
+					"DataFlows_IST2": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_Status": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_StartTime": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_EndTime": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_IST": {
+						"type": "String"
+					},
+					"DataFlowRefreshes_IST2": {
+						"type": "String"
+					},
+					"ViewReports_Status": {
+						"type": "String"
+					},
+					"ViewReports_StartTime": {
+						"type": "String"
+					},
+					"ViewReports_EndTime": {
+						"type": "String"
+					},
+					"ViewReports_IST": {
+						"type": "String"
+					},
+					"ViewReports_IST2": {
+						"type": "String"
+					},
+					"ReportPages Staging Status": {
+						"type": "String"
+					},
+					"Get ReportPages Status": {
+						"type": "String"
+					},
+					"ReportPages Batch Status": {
+						"type": "String"
+					},
+					"ReportPages History Status": {
+						"type": "String"
+					},
+					"DatasetUsers Staging Status": {
+						"type": "String"
+					},
+					"DatasetUsers Live Status": {
+						"type": "String"
+					},
+					"Datasets Batches Status": {
+						"type": "String"
+					},
+					"DatasetUsers History Status": {
+						"type": "String"
+					},
+					"Get Datasets Status": {
+						"type": "String"
+					},
+					"Dataset staging Status": {
+						"type": "String"
+					},
+					"Dataset Live Status": {
+						"type": "String"
+					},
+					"Dataset History Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Batch Status": {
+						"type": "String"
+					},
+					"DatasetRefreshes History Status": {
+						"type": "String"
+					},
+					"Dataflows Staging Status": {
+						"type": "String"
+					},
+					"Dataflows Live Status": {
+						"type": "String"
+					},
+					"Dataflows History Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Status": {
+						"type": "String"
+					},
+					"Get Dataflowsrefreshes Batch": {
+						"type": "String"
+					},
+					"DataflowRefreshes History Status": {
+						"type": "String"
+					},
+					"Master Workspaces Status": {
+						"type": "String"
+					},
+					"Master WorkSpaceUsers Status": {
+						"type": "String"
+					},
+					"Master Report status": {
+						"type": "String"
+					},
+					"Master ReportPages Status": {
+						"type": "String"
+					},
+					"Master Datasets Status": {
+						"type": "String"
+					},
+					"Master Datasetfreshes status": {
+						"type": "String"
+					},
+					"Master Datasetusers Status": {
+						"type": "String"
+					},
+					"Master Viewreports Status": {
+						"type": "String"
+					},
+					"Master Dataflows Status": {
+						"type": "String"
+					},
+					"Master DataflowRefreshes Status": {
+						"type": "String"
+					},
+					"Get ReportPage Status": {
+						"type": "String"
+					},
+					"ReportPage Staging Status": {
+						"type": "String"
+					},
+					"DatasetUser Staging Status": {
+						"type": "String"
+					},
+					"DatasetUser Live Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshes_ Status": {
+						"type": "String"
+					},
+					"Get DatasetRefreshe Status": {
+						"type": "String"
+					},
+					"Get DatasetsRefreshes Status": {
+						"type": "String"
+					},
+					"DataflowRefreshesLive Status": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "UBTI_Dev"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ReportPages_Batch_UAT')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -13740,360 +15025,6 @@
 				},
 				"folder": {
 					"name": "UBTI_Dev"
-				},
-				"annotations": [],
-				"lastPublishTime": "2023-11-29T06:27:10Z"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/DatasetUsers_Batch_Tenant2')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Get Dataset Batches",
-						"type": "Lookup",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": "SELECT DISTINCT BatchNo \nFROM [dbo].[Dataset_batch] \nORDER BY 1",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "Dataset_SQL",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "For Each Batch",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "Truncate Dataset Users",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('Get Dataset Batches').output.value",
-								"type": "Expression"
-							},
-							"isSequential": true,
-							"activities": [
-								{
-									"name": "Execute Pipeline DatasetUsers",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "DatasetUsers_Tenant2",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"BatchNo": {
-												"value": "@item().BatchNo",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "Truncate Dataset Users",
-						"type": "Script",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
-						"dependsOn": [
-							{
-								"activity": "Get Dataset Batches",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "getgroups_sql_ls",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": "TRUNCATE TABLE [dbo].[DatasetUsers];"
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
-					},
-					{
-						"name": "DatasetUsers History",
-						"type": "Copy",
-						"dependsOn": [
-							{
-								"activity": "For Each Batch",
-								"dependencyConditions": [
-									"Completed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"sink": {
-								"type": "AzureSqlSink",
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "DatasetUserSourceKey",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "DatasetUserSourceKey",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "WorkSpaceID",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "WorkSpaceID",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DatasetID",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "DatasetID",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "EmailAddress",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "UserName",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "UserName",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "Identifier",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "Identifier",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "UserType",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "UserType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "DatasetUserAccessRight",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "DatasetUserAccessRight",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "PrincipalType",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "PrincipalType",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "CreatedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										},
-										"sink": {
-											"name": "ModifiedDate",
-											"type": "DateTime",
-											"physicalType": "datetime"
-										}
-									},
-									{
-										"source": {
-											"name": "CreatedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "CreatedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "ModifiedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										},
-										"sink": {
-											"name": "ModifiedBy",
-											"type": "String",
-											"physicalType": "varchar"
-										}
-									},
-									{
-										"source": {
-											"name": "TenantId",
-											"type": "Int32",
-											"physicalType": "int"
-										},
-										"sink": {
-											"name": "TenantId",
-											"type": "Int32",
-											"physicalType": "int"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DatasetUsers_sql",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "DatasetUserHistory_sql",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"CountWorkspace": {
-						"type": "Integer"
-					}
-				},
-				"folder": {
-					"name": "PowerPulseApp_Dev"
 				},
 				"annotations": [],
 				"lastPublishTime": "2023-11-29T06:27:10Z"
