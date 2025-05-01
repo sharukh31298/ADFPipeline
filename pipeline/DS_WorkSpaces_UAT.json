@@ -46,11 +46,15 @@
 							"value": "@{concat('DELETE [dbo].[WorkSpaces_Staging] where TenantId = ', string(pipeline().parameters.TenantId))}\n\n\n",
 							"type": "Expression"
 						},
-						"writeBehavior": "upsert",
-						"upsertSettings": {
-							"useTempDB": true
+						"sqlWriterStoredProcedureName": "[dbo].[WorkSpacesStaging_InsertUpsert]",
+						"sqlWriterTableType": {
+							"value": "WorkSpaces_Staging",
+							"type": "Expression"
 						},
-						"sqlWriterUseTableLock": false,
+						"storedProcedureTableTypeParameterName": {
+							"value": "{\n        \"category\": {\n            \"value\": \"WorkSpaceSourceKey\"\n        }\n    }\n",
+							"type": "Expression"
+						},
 						"disableMetricsCollection": false
 					},
 					"enableStaging": false,
