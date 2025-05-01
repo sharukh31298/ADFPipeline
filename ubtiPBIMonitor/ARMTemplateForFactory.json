@@ -33604,8 +33604,15 @@
 									"value": "@{concat('DELETE [dbo].[WorkSpaces_Staging] where TenantId = ', string(pipeline().parameters.TenantId))}\n\n\n",
 									"type": "Expression"
 								},
-								"writeBehavior": "insert",
-								"sqlWriterUseTableLock": false,
+								"sqlWriterStoredProcedureName": "[[dbo].[WorkSpacesStaging_InsertUpsert]",
+								"sqlWriterTableType": {
+									"value": "WorkSpaces_Staging",
+									"type": "Expression"
+								},
+								"storedProcedureTableTypeParameterName": {
+									"value": "{\n        \"category\": {\n            \"value\": \"WorkSpaceSourceKey\"\n        }\n    }\n",
+									"type": "Expression"
+								},
 								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
@@ -118085,8 +118092,8 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Execute_SP",
-						"type": "Lookup",
+						"name": "WorkSpace Staging",
+						"type": "Copy",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -118098,87 +118105,163 @@
 						"userProperties": [],
 						"typeProperties": {
 							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "@concat('EXEC [dbo].[DataLoadTrack_Insert] ','''',pipeline().parameters.AppTenantId,''',''',pipeline().parameters.AppClientId,''',''',pipeline().parameters.AppClientCode,''',''',pipeline().RunId,''',''',utcNow(),''','' '',','''Started'',','''Started'',','''True'',','''Application'',', '''',utcNow(),''',',''' '',','''',string(pipeline().parameters.TenantId),''',''False'','' ''')",
+								"type": "RestSource",
+								"additionalColumns": [
+									{
+										"name": "TenantId",
+										"value": {
+											"value": "@pipeline().parameters.TenantId",
+											"type": "Expression"
+										}
+									}
+								],
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "AzureSqlSink",
+								"sqlWriterStoredProcedureName": "[[dbo].[WorkSpacesStaging_InsertUpsert]",
+								"sqlWriterTableType": {
+									"value": "WorkSpaces_Staging",
 									"type": "Expression"
 								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
+								"storedProcedureTableTypeParameterName": {
+									"value": "{\n        \"category\": {\n            \"value\": \"WorkSpaceSourceKey\"\n        }\n    }\n",
+									"type": "Expression"
+								},
+								"disableMetricsCollection": false
 							},
-							"dataset": {
-								"referenceName": "LS_ExecuteSP_UAT",
-								"type": "DatasetReference",
-								"parameters": {}
+							"enableStaging": false,
+							"dataIntegrationUnits": 4,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "[['id']"
+										},
+										"sink": {
+											"name": "WorkSpaceSourceKey",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isReadOnly']"
+										},
+										"sink": {
+											"name": "IsReadOnly",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['isOnDedicatedCapacity']"
+										},
+										"sink": {
+											"name": "IsonDedicatedCapacity",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['capacityMigrationStatus']"
+										},
+										"sink": {
+											"name": "CapacityMigrationStatus",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['description']"
+										},
+										"sink": {
+											"name": "WorkSpaceDescription",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['type']"
+										},
+										"sink": {
+											"name": "WorkSpaceType",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['state']"
+										},
+										"sink": {
+											"name": "Status",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['hasWorkspaceLevelSettings ']"
+										},
+										"sink": {
+											"name": "HasWorkspaceLevelSetting",
+											"type": "Boolean"
+										}
+									},
+									{
+										"source": {
+											"path": "[['name']"
+										},
+										"sink": {
+											"name": "WorkSpaceName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "$['TenantId']"
+										},
+										"sink": {
+											"name": "TenantId",
+											"type": "Int32"
+										}
+									}
+								],
+								"collectionReference": "$['value']",
+								"mapComplexValuesToString": false
 							}
-						}
-					},
-					{
-						"name": "SP_Call_UpdateStatus",
-						"type": "SqlServerStoredProcedure",
-						"dependsOn": [
-							{
-								"activity": "Execute_SP",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
 						},
-						"userProperties": [],
-						"typeProperties": {
-							"storedProcedureName": "[[dbo].[DataLoadTrack_Update]",
-							"storedProcedureParameters": {
-								"DataLoadTrackerID": {
-									"value": {
-										"value": "@activity('Execute_SP').output.firstRow.DataLoadTrackerId",
+						"inputs": [
+							{
+								"referenceName": "WorkSpaces_API",
+								"type": "DatasetReference",
+								"parameters": {
+									"AppTenantId": {
+										"value": "@pipeline().parameters.AppTenantId",
 										"type": "Expression"
 									},
-									"type": "String"
-								},
-								"ProcessEndTime": {
-									"value": {
-										"value": "@utcNow()",
+									"AppClientId": {
+										"value": "@pipeline().parameters.AppClientId",
 										"type": "Expression"
 									},
-									"type": "DateTime"
-								},
-								"Status": {
-									"value": {
-										"value": "Succeeded",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"CurrentStatus": {
-									"value": "Completed",
-									"type": "String"
-								},
-								"DatasetrefreshesStatus": {
-									"value": {
-										"value": "Succeeded",
-										"type": "Expression"
-									},
-									"type": "String"
-								},
-								"ActiveStatus": {
-									"value": {
-										"value": "Actived",
+									"AppClientCode": {
+										"value": "@pipeline().parameters.AppClientCode",
 										"type": "Expression"
 									}
 								}
 							}
-						},
-						"linkedServiceName": {
-							"referenceName": "LS_Dataloadtracker_Sql_UAT",
-							"type": "LinkedServiceReference"
-						}
+						],
+						"outputs": [
+							{
+								"referenceName": "WorkSpacesStaging_Sql_UAT",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
 					}
 				],
 				"policy": {
@@ -118201,8 +118284,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/LS_ExecuteSP_UAT')]",
-				"[concat(variables('factoryId'), '/linkedServices/LS_Dataloadtracker_Sql_UAT')]"
+				"[concat(variables('factoryId'), '/datasets/WorkSpaces_API')]",
+				"[concat(variables('factoryId'), '/datasets/WorkSpacesStaging_Sql_UAT')]"
 			]
 		}
 	]
