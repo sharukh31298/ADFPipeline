@@ -766,7 +766,7 @@
 				"type": "Script",
 				"dependsOn": [
 					{
-						"activity": "ReportID in Loop",
+						"activity": "Update_DataLoadtrackerID",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -789,6 +789,42 @@
 						{
 							"type": "Query",
 							"text": "EXEC ReportPages_InsertUpsert"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Update_DataLoadtrackerID",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "ReportID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "Update_RP_DataLoadTracker",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "@concat('UPDATE RPS\nSET RPS.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN ReportPages_Staging RPS  ON RPS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+								"type": "Expression"
+							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
