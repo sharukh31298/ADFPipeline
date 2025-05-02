@@ -419,9 +419,29 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'Testing_UAT'"
 		},
+		"Update_DFRH_DataLoadTracker_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Update_DFRH_DataLoadTracker'"
+		},
+		"Update_DRS_DataLoadTracker_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Update_DRS_DataLoadTracker'"
+		},
+		"Update_DSU_DataLoadTracker_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Update_DSU_DataLoadTracker'"
+		},
+		"Update_RP_DataLoadTracker_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Update_RP_DataLoadTracker'"
+		},
 		"Update_UATChildpipelineLogs_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Update_UATChildpipelineLogs'"
+		},
+		"Update_WSU_DataLoadTracker_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Update_WSU_DataLoadTracker'"
 		},
 		"Upsert Query Dataset Refreshes_password": {
 			"type": "secureString",
@@ -1873,6 +1893,66 @@
 			"defaultValue": "PowerPulseDB-Stage"
 		},
 		"Testing_UAT_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Update_DFRH_DataLoadTracker_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Update_DFRH_DataLoadTracker_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Update_DFRH_DataLoadTracker_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Update_DRS_DataLoadTracker_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Update_DRS_DataLoadTracker_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Update_DRS_DataLoadTracker_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Update_DSU_DataLoadTracker_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Update_DSU_DataLoadTracker_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Update_DSU_DataLoadTracker_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Update_RP_DataLoadTracker_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Update_RP_DataLoadTracker_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Update_RP_DataLoadTracker_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "adminsql"
+		},
+		"Update_WSU_DataLoadTracker_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "ubti-ssvr-d-pbimonitor.database.windows.net"
+		},
+		"Update_WSU_DataLoadTracker_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "PowerPulseDB-Stage"
+		},
+		"Update_WSU_DataLoadTracker_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "adminsql"
 		},
@@ -41155,7 +41235,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "Dataflow ID in Loop",
+								"activity": "Update_DataLoadTrackerID",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -41178,6 +41258,42 @@
 								{
 									"type": "Query",
 									"text": "EXEC DataflowRefreshes_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Update_DataLoadTrackerID",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Dataflow ID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Update_DFRH_DataLoadTracker",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('UPDATE DFRH\nSET DFRH.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN DataflowRefreshesHistory DFRH ON DFRH.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -41284,6 +41400,7 @@
 				"[concat(variables('factoryId'), '/datasets/SQL_DataFlowRefreshLive_Staging')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DataFlowRefeshLive')]",
 				"[concat(variables('factoryId'), '/linkedServices/InserUpdate_Dataflowrefreshes_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Update_DFRH_DataLoadTracker')]",
 				"[concat(variables('factoryId'), '/datasets/DataFlowRefreshes_API')]",
 				"[concat(variables('factoryId'), '/datasets/DataflowRefreshesStaging_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/DataFlowRefreshes_log_UAT')]"
@@ -47845,7 +47962,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "DatasetID in Loop",
+								"activity": "Update_DataLoadtrackerID",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -47868,6 +47985,42 @@
 								{
 									"type": "Query",
 									"text": "EXEC DatasetRefreshes_InsertUpsert;"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Update_DataLoadtrackerID",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DatasetID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Update_DRS_DataLoadTracker",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('UPDATE DRS\nSET DRS.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN DatasetRefreshes_Staging DRS ON DRS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -48001,6 +48154,7 @@
 				"[concat(variables('factoryId'), '/datasets/SQL_DatasetRefreshesLive_Staging')]",
 				"[concat(variables('factoryId'), '/datasets/SQl_DatasetRefreshesLive')]",
 				"[concat(variables('factoryId'), '/linkedServices/Insertupdate_DatasetRefreshes_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Update_DRS_DataLoadTracker')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetRefreshes_API')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetRefreshesStaging_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/DatasetRefreshes_log_UAT')]"
@@ -52141,7 +52295,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "DatasetID in Loop",
+								"activity": "Update_DataLoadTracker",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -52164,6 +52318,42 @@
 								{
 									"type": "Query",
 									"text": "EXEC DatasetUsers_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Update_DataLoadTracker",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DatasetID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Update_DSU_DataLoadTracker",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('UPDATE DUS\nSET DUS.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN DatasetUsers_Staging DUS ON DUS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -52325,6 +52515,7 @@
 				"[concat(variables('factoryId'), '/datasets/SQL_DatasetUsers_Staging')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_DatasetUsersLive')]",
 				"[concat(variables('factoryId'), '/linkedServices/InsertUpdate_Datausers_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Update_DSU_DataLoadTracker')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetUsers_API')]",
 				"[concat(variables('factoryId'), '/datasets/DatasetUsersLive_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/DatasetUsers_log_UAT')]"
@@ -80784,7 +80975,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "ReportID in Loop",
+								"activity": "Update_DataLoadtrackerID",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -80807,6 +80998,42 @@
 								{
 									"type": "Query",
 									"text": "EXEC ReportPages_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Update_DataLoadtrackerID",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "ReportID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Update_RP_DataLoadTracker",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('UPDATE RPS\nSET RPS.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN ReportPages_Staging RPS  ON RPS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -81117,6 +81344,7 @@
 				"[concat(variables('factoryId'), '/datasets/ReportPagesLive_SQL')]",
 				"[concat(variables('factoryId'), '/datasets/SQL_ReportPagesLive')]",
 				"[concat(variables('factoryId'), '/linkedServices/InserUpdate Reportpages_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Update_RP_DataLoadTracker')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPages_API')]",
 				"[concat(variables('factoryId'), '/datasets/ReportPagesStaging_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/Reportpages_log_UAT')]"
@@ -99443,7 +99671,7 @@
 						"type": "Script",
 						"dependsOn": [
 							{
-								"activity": "WorkSpace ID in Loop",
+								"activity": "Update_DataloadTrackerID",
 								"dependencyConditions": [
 									"Completed"
 								]
@@ -99466,6 +99694,42 @@
 								{
 									"type": "Query",
 									"text": "EXEC WorkSpaceUsers_InsertUpsert"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "Update_DataloadTrackerID",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "WorkSpace ID in Loop",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Update_WSU_DataLoadTracker",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('UPDATE WUS\nSET WUS.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN WorkSpaceUsers_Staging WUS ON WUS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -99844,6 +100108,7 @@
 				"[concat(variables('factoryId'), '/datasets/LS_SQL_WorkspacesUsers_Live')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpacesUsers_Live_SQL')]",
 				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers live_insertupdate UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Update_WSU_DataLoadTracker')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsers_Staging_API')]",
 				"[concat(variables('factoryId'), '/datasets/WorkSpaceUsersStaging_sql_UAT')]",
 				"[concat(variables('factoryId'), '/linkedServices/WorkspaceUsers_log_UAT')]"
@@ -117098,6 +117363,95 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Update_DFRH_DataLoadTracker')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Update_DFRH_DataLoadTracker_properties_typeProperties_server')]",
+					"database": "[parameters('Update_DFRH_DataLoadTracker_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Update_DFRH_DataLoadTracker_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Update_DFRH_DataLoadTracker_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Update_DRS_DataLoadTracker')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Update_DRS_DataLoadTracker_properties_typeProperties_server')]",
+					"database": "[parameters('Update_DRS_DataLoadTracker_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Update_DRS_DataLoadTracker_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Update_DRS_DataLoadTracker_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Update_DSU_DataLoadTracker')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Update_DSU_DataLoadTracker_properties_typeProperties_server')]",
+					"database": "[parameters('Update_DSU_DataLoadTracker_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Update_DSU_DataLoadTracker_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Update_DSU_DataLoadTracker_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Update_RP_DataLoadTracker')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Update_RP_DataLoadTracker",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Update_RP_DataLoadTracker_properties_typeProperties_server')]",
+					"database": "[parameters('Update_RP_DataLoadTracker_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Update_RP_DataLoadTracker_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Update_RP_DataLoadTracker_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Update_UATChildpipelineLogs')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -117107,6 +117461,29 @@
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
 					"connectionString": "[parameters('Update_UATChildpipelineLogs_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Update_WSU_DataLoadTracker')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Update_WS_DataLoadTracker",
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Update_WSU_DataLoadTracker_properties_typeProperties_server')]",
+					"database": "[parameters('Update_WSU_DataLoadTracker_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Update_WSU_DataLoadTracker_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Update_WSU_DataLoadTracker_password')]"
+					}
 				}
 			},
 			"dependsOn": []
@@ -118204,8 +118581,7 @@
 						"frequency": "Day",
 						"interval": 1,
 						"startTime": "2025-05-02T20:30:00",
-						"timeZone": "India Standard Time",
-						"schedule": {}
+						"timeZone": "India Standard Time"
 					}
 				}
 			},
