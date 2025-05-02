@@ -2838,7 +2838,14 @@
 										},
 										"sink": {
 											"type": "AzureSqlSink",
-											"writeBehavior": "insert",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"WorkSpaceID",
+													"DataflowID"
+												]
+											},
 											"sqlWriterUseTableLock": false,
 											"disableMetricsCollection": false
 										},
@@ -4588,11 +4595,13 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"preCopyScript": {
-									"value": "@concat('DELETE  [dbo].[Dataflows_Staging]\nWHERE TenantId  = ', string(pipeline().parameters.TenantId))\n",
-									"type": "Expression"
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"DataflowSourceKey"
+									]
 								},
-								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
