@@ -104703,6 +104703,8 @@
 					{
 						"name": "WorkSpace Staging",
 						"type": "Copy",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -104861,6 +104863,35 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Script1",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "Capacities_History",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": {
+										"value": "@concat('UPDATE WS\nSET WS.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+										"type": "Expression"
+									}
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
@@ -104884,7 +104915,8 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/WorkSpaces_API')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpacesStaging_Sql_UAT')]"
+				"[concat(variables('factoryId'), '/datasets/WorkSpacesStaging_Sql_UAT')]",
+				"[concat(variables('factoryId'), '/linkedServices/Capacities_History')]"
 			]
 		},
 		{
@@ -118171,8 +118203,9 @@
 					"recurrence": {
 						"frequency": "Day",
 						"interval": 1,
-						"startTime": "2025-04-30T00:33:00",
-						"timeZone": "India Standard Time"
+						"startTime": "2025-05-02T20:30:00",
+						"timeZone": "India Standard Time",
+						"schedule": {}
 					}
 				}
 			},
