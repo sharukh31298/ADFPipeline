@@ -11382,9 +11382,14 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"sqlWriterStoredProcedureName": "[[dbo].[spCopyWorkSpacesStaging]",
-								"sqlWriterTableType": "WorkSpaces_Staging",
-								"storedProcedureTableTypeParameterName": "WorkSpaces",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"WorkSpaceSourceKey"
+									]
+								},
+								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
 							"enableStaging": false,
