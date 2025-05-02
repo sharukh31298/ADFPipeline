@@ -805,7 +805,7 @@
 				"type": "Script",
 				"dependsOn": [
 					{
-						"activity": "Dataflow ID in Loop",
+						"activity": "Update_DataLoadTrackerID",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -828,6 +828,42 @@
 						{
 							"type": "Query",
 							"text": "EXEC DataflowRefreshes_InsertUpsert"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "Update_DataLoadTrackerID",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "Dataflow ID in Loop",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "Update_DFRH_DataLoadTracker",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": {
+								"value": "@concat('UPDATE DFRH\nSET DFRH.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN DataflowRefreshesHistory DFRH ON DFRH.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
+								"type": "Expression"
+							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
