@@ -38,9 +38,10 @@
 						"writeBehavior": "upsert",
 						"upsertSettings": {
 							"useTempDB": true,
-							"keys": [
-								"ReportSourceKey"
-							]
+							"keys": {
+								"value": "    DELETE R\n    FROM [dbo].[Reports_Staging] R\n    LEFT JOIN Reports_Staging RT\n    ON R.ReportSourceKey = RT.ReportSourceKey \n    WHERE RT.ReportSourceKey",
+								"type": "Expression"
+							}
 						},
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
