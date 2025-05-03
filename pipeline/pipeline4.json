@@ -35,7 +35,13 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
+						"writeBehavior": "upsert",
+						"upsertSettings": {
+							"useTempDB": true,
+							"keys": [
+								"ReportSourceKey"
+							]
+						},
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
 					},
@@ -95,42 +101,6 @@
 								},
 								"sink": {
 									"name": "DatasetID",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['createdDateTime']"
-								},
-								"sink": {
-									"name": "CreatedDate",
-									"type": "DateTime"
-								}
-							},
-							{
-								"source": {
-									"path": "['modifiedDateTime']"
-								},
-								"sink": {
-									"name": "ModifiedDate",
-									"type": "DateTime"
-								}
-							},
-							{
-								"source": {
-									"path": "['modifiedBy']"
-								},
-								"sink": {
-									"name": "ModifiedBy",
-									"type": "String"
-								}
-							},
-							{
-								"source": {
-									"path": "['createdBy']"
-								},
-								"sink": {
-									"name": "CreatedBy",
 									"type": "String"
 								}
 							},
