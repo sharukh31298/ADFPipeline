@@ -104966,10 +104966,8 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "WorkSpace Staging",
+						"name": "Reports Staging",
 						"type": "Copy",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
 						"policy": {
 							"timeout": "0.12:00:00",
@@ -105000,13 +104998,7 @@
 							},
 							"sink": {
 								"type": "AzureSqlSink",
-								"writeBehavior": "upsert",
-								"upsertSettings": {
-									"useTempDB": true,
-									"keys": [
-										"WorkSpaceSourceKey"
-									]
-								},
+								"writeBehavior": "insert",
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
 							},
@@ -105020,62 +105012,17 @@
 											"path": "[['id']"
 										},
 										"sink": {
-											"name": "WorkSpaceSourceKey",
+											"name": "ReportSourceKey",
 											"type": "String"
 										}
 									},
 									{
 										"source": {
-											"path": "[['isReadOnly']"
+											"path": "[['reportType']"
 										},
 										"sink": {
-											"name": "IsReadOnly",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['isOnDedicatedCapacity']"
-										},
-										"sink": {
-											"name": "IsonDedicatedCapacity",
-											"type": "Boolean"
-										}
-									},
-									{
-										"source": {
-											"path": "[['capacityMigrationStatus']"
-										},
-										"sink": {
-											"name": "CapacityMigrationStatus",
+											"name": "ReportType",
 											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['type']"
-										},
-										"sink": {
-											"name": "WorkSpaceType",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['state']"
-										},
-										"sink": {
-											"name": "Status",
-											"type": "String"
-										}
-									},
-									{
-										"source": {
-											"path": "[['hasWorkspaceLevelSettings ']"
-										},
-										"sink": {
-											"name": "HasWorkspaceLevelSetting",
-											"type": "Boolean"
 										}
 									},
 									{
@@ -105083,7 +105030,79 @@
 											"path": "[['name']"
 										},
 										"sink": {
-											"name": "WorkSpaceName",
+											"name": "ReportName",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['webUrl']"
+										},
+										"sink": {
+											"name": "ReportWebUrl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['embedUrl']"
+										},
+										"sink": {
+											"name": "ReportEmbedUrl",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['datasetId']"
+										},
+										"sink": {
+											"name": "DatasetID",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['createdDateTime']"
+										},
+										"sink": {
+											"name": "CreatedDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "[['modifiedDateTime']"
+										},
+										"sink": {
+											"name": "ModifiedDate",
+											"type": "DateTime"
+										}
+									},
+									{
+										"source": {
+											"path": "[['modifiedBy']"
+										},
+										"sink": {
+											"name": "ModifiedBy",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['createdBy']"
+										},
+										"sink": {
+											"name": "CreatedBy",
+											"type": "String"
+										}
+									},
+									{
+										"source": {
+											"path": "[['workspaceId']"
+										},
+										"sink": {
+											"name": "WorkSpaceID",
 											"type": "String"
 										}
 									},
@@ -105103,7 +105122,7 @@
 						},
 						"inputs": [
 							{
-								"referenceName": "WorkSpaces_API",
+								"referenceName": "Reports_API",
 								"type": "DatasetReference",
 								"parameters": {
 									"AppTenantId": {
@@ -105123,40 +105142,11 @@
 						],
 						"outputs": [
 							{
-								"referenceName": "WorkSpacesStaging_Sql_UAT",
+								"referenceName": "ReportsStaging_sql_UAT",
 								"type": "DatasetReference",
 								"parameters": {}
 							}
 						]
-					},
-					{
-						"name": "Script1",
-						"type": "Script",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"linkedServiceName": {
-							"referenceName": "Capacities_History",
-							"type": "LinkedServiceReference"
-						},
-						"typeProperties": {
-							"scripts": [
-								{
-									"type": "Query",
-									"text": {
-										"value": "@concat('UPDATE WS\nSET WS.DataloadTrackerID = DL.DataloadTrackerId \nFROM DataLoadTracker DL\nJOIN WorkSpaces_Staging WS ON WS.TenantId = DL.TenantId\nwhere DL.TenantId = ',string(pipeline().parameters.TenantId))",
-										"type": "Expression"
-									}
-								}
-							],
-							"scriptBlockExecutionTimeout": "02:00:00"
-						}
 					}
 				],
 				"policy": {
@@ -105179,9 +105169,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/WorkSpaces_API')]",
-				"[concat(variables('factoryId'), '/datasets/WorkSpacesStaging_Sql_UAT')]",
-				"[concat(variables('factoryId'), '/linkedServices/Capacities_History')]"
+				"[concat(variables('factoryId'), '/datasets/Reports_API')]",
+				"[concat(variables('factoryId'), '/datasets/ReportsStaging_sql_UAT')]"
 			]
 		},
 		{
