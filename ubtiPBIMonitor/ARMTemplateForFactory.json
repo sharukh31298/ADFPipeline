@@ -47244,7 +47244,7 @@
 											"mappings": [
 												{
 													"source": {
-														"path": "$['value'][0]['requestId']"
+														"path": "[['requestId']"
 													},
 													"sink": {
 														"name": "RequestId",
@@ -47253,7 +47253,7 @@
 												},
 												{
 													"source": {
-														"path": "$['value'][0]['id']"
+														"path": "[['id']"
 													},
 													"sink": {
 														"name": "DatasetRefreshesSourceKey",
@@ -47262,7 +47262,7 @@
 												},
 												{
 													"source": {
-														"path": "$['value'][0]['refreshType']"
+														"path": "[['refreshType']"
 													},
 													"sink": {
 														"name": "RefreshType",
@@ -47271,7 +47271,7 @@
 												},
 												{
 													"source": {
-														"path": "$['value'][0]['startTime']"
+														"path": "[['startTime']"
 													},
 													"sink": {
 														"name": "StartTime",
@@ -47280,7 +47280,7 @@
 												},
 												{
 													"source": {
-														"path": "$['value'][0]['endTime']"
+														"path": "[['endTime']"
 													},
 													"sink": {
 														"name": "EndTime",
@@ -47289,7 +47289,7 @@
 												},
 												{
 													"source": {
-														"path": "$['value'][0]['status']"
+														"path": "[['status']"
 													},
 													"sink": {
 														"name": "Status",
@@ -47324,7 +47324,7 @@
 													}
 												}
 											],
-											"collectionReference": "",
+											"collectionReference": "$['value']",
 											"mapComplexValuesToString": true
 										}
 									},
@@ -118549,6 +118549,36 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Test_Daily')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "DailyScheduleMasterPipeline_V1_UAT",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2025-05-05T14:00:00",
+						"timeZone": "India Standard Time"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/DailyScheduleMasterPipeline_V1_UAT')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/get_refresh_schedules_dataflow')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -118658,37 +118688,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Test_Daily')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "DailyScheduleMasterPipeline_V1_UAT",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
-				"type": "ScheduleTrigger",
-				"typeProperties": {
-					"recurrence": {
-						"frequency": "Day",
-						"interval": 1,
-						"startTime": "2025-05-05T14:00:00",
-						"timeZone": "India Standard Time",
-						"schedule": {}
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/DailyScheduleMasterPipeline_V1_UAT')]"
 			]
 		}
 	]
