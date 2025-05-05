@@ -105001,10 +105001,9 @@
 								"writeBehavior": "upsert",
 								"upsertSettings": {
 									"useTempDB": true,
-									"keys": {
-										"value": "    DELETE R\n    FROM [dbo].[Reports_Staging] R\n    LEFT JOIN Reports_Staging RT\n    ON R.ReportSourceKey = RT.ReportSourceKey \n    WHERE RT.ReportSourceKey",
-										"type": "Expression"
-									}
+									"keys": [
+										"ReportSourceKey"
+									]
 								},
 								"sqlWriterUseTableLock": false,
 								"disableMetricsCollection": false
@@ -118541,8 +118540,7 @@
 						"frequency": "Day",
 						"interval": 1,
 						"startTime": "2025-05-03T00:00:00",
-						"timeZone": "India Standard Time",
-						"schedule": {}
+						"timeZone": "India Standard Time"
 					}
 				}
 			},
@@ -118660,6 +118658,37 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_API')]",
 				"[concat(variables('factoryId'), '/datasets/RefreshSchedules_SQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Test_Daily')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "DailyScheduleMasterPipeline_V1_UAT",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
+					}
+				],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Day",
+						"interval": 1,
+						"startTime": "2025-05-05T14:00:00",
+						"timeZone": "India Standard Time",
+						"schedule": {}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/DailyScheduleMasterPipeline_V1_UAT')]"
 			]
 		}
 	]
