@@ -428,7 +428,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "@concat('select * from [dbo].[WorkSpaces_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+							"value": "@concat('select * from [dbo].[WorkSpaces_Staging] \nwhere TenantId = ', string(pipeline().parameters.TenantId), \n' and Status = ''Active''')",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
