@@ -583,9 +583,14 @@
 			{
 				"name": "Get DatasetRefreshes_Live",
 				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Update_DataLoadtrackerID",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -602,7 +607,6 @@
 					},
 					"sink": {
 						"type": "AzureSqlSink",
-						"preCopyScript": "EXEC UpsertFromSourceToTarget;",
 						"writeBehavior": "insert",
 						"sqlWriterUseTableLock": false,
 						"disableMetricsCollection": false
@@ -794,7 +798,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "InsertUpdate Datasetrefreshes",
+						"activity": "Get DatasetRefreshes_Live",
 						"dependencyConditions": [
 							"Completed"
 						]
@@ -812,7 +816,7 @@
 							"key": "DatasetRefreshes Live Status",
 							"value": {
 								"type": "Expression",
-								"content": "@activity('InsertUpdate Datasetrefreshes').Status"
+								"content": "@activity('Get DatasetRefreshes_Live').Status"
 							}
 						}
 					],
@@ -822,14 +826,9 @@
 			{
 				"name": "InsertUpdate Datasetrefreshes",
 				"type": "Script",
-				"dependsOn": [
-					{
-						"activity": "Update_DataLoadtrackerID",
-						"dependencyConditions": [
-							"Completed"
-						]
-					}
-				],
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
