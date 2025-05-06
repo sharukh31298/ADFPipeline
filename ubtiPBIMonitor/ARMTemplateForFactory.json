@@ -11925,7 +11925,10 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderQuery": "@concat('select * from [dbo].[DatasetRefreshes_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId))",
+								"sqlReaderQuery": {
+									"value": "@concat('select * from [dbo].[DatasetRefreshes_Staging]\nwhere TenantId = ',string(pipeline().parameters.TenantId),\n'AND BatchNo = ',string(pipeline().parameters.BatchNo))",
+									"type": "Expression"
+								},
 								"queryTimeout": "02:00:00",
 								"partitionOption": "None"
 							},
